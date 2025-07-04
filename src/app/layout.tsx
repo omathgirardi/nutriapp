@@ -1,14 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { Toaster } from "@/components/ui/sonner";
-import dynamic from 'next/dynamic';
-
-// Importar o AuthProvider de forma dinâmica para evitar problemas no SSR
-const AuthProviderDynamic = dynamic(
-  () => import('@/contexts/auth-context').then(mod => mod.AuthProvider),
-  { ssr: false }
-);
+import { Providers } from "@/components/providers";
 
 // Observe que precisaríamos da fonte Helvetica Now Display, 
 // mas como é proprietária, usaremos Inter como substituta
@@ -30,10 +23,9 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" suppressHydrationWarning>
       <body className={`${inter.variable} antialiased min-h-screen`}>
-        <AuthProviderDynamic>
+        <Providers>
           {children}
-          <Toaster richColors position="top-right" />
-        </AuthProviderDynamic>
+        </Providers>
       </body>
     </html>
   );
