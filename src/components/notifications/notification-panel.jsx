@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { CardPremium, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card-premium";
 import { Button } from "@/components/ui/button-premium";
-import { User, Calendar, Bell, Check, Trash2, Clock } from "lucide-react";
+import { User, Calendar, Bell, Check, Trash2, Clock, ShoppingCart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 
@@ -40,6 +40,8 @@ export function NotificationPanel({ notifications, onClose }) {
       router.push(`/calculator/result?dietId=${notification.dietId}`);
     } else if (notification.action === "calendar") {
       router.push(`/calendar?date=${notification.date}`);
+    } else if (notification.action === "viewPurchase") {
+      router.push(`/admin/purchases?id=${notification.purchaseId}`);
     }
     onClose();
   };
@@ -53,6 +55,8 @@ export function NotificationPanel({ notifications, onClose }) {
         return <User className="h-5 w-5 text-secondary-500" />;
       case "assessment":
         return <Clock className="h-5 w-5 text-amber-500" />;
+      case "purchase":
+        return <ShoppingCart className="h-5 w-5 text-green-500" />;
       default:
         return <Bell className="h-5 w-5 text-gray-500" />;
     }
@@ -90,6 +94,11 @@ export function NotificationPanel({ notifications, onClose }) {
                         <p className={cn("text-sm", !notification.read && "font-medium")}>
                           {notification.message}
                         </p>
+                        {notification.type === "purchase" && (
+                          <p className="text-xs text-green-600 font-medium mt-1">
+                            R$ {notification.amount?.toFixed(2)}
+                          </p>
+                        )}
                         <p className="text-xs text-gray-500 mt-1">
                           {new Date(notification.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </p>
