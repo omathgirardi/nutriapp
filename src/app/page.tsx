@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Button } from "@/components/ui/button-premium";
 import { CardPremium, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card-premium";
@@ -8,19 +9,80 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Eye, EyeOff, Check, Lock, Mail, User, BookOpen, PhoneCall } from "lucide-react";
+import { useAuth } from "@/contexts/auth-context";
+import { toast } from "sonner";
 
 export default function Home() {
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const { signIn, signUp, loading } = useAuth();
+  const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // Estados para os formulários
+  const [loginData, setLoginData] = useState({
+    email: "",
+    password: "",
+  });
+
+  const [registerData, setRegisterData] = useState({
+    fullName: "",
+    email: "",
+    cref: "",
+    whatsapp: "",
+    password: "",
+  });
+
+  const handleLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target;
+    setLoginData(prev => ({
+      ...prev,
+      [id]: value
+    }));
+  };
+
+  const handleRegisterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target;
+    setRegisterData(prev => ({
+      ...prev,
+      [id.replace("register-", "")]: value
+    }));
+  };
+
+  const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    
-    // Simulando carregamento
-    setTimeout(() => {
-      setLoading(false);
-    }, 1500);
+    try {
+      await signIn(loginData.email, loginData.password);
+      router.push("/dashboard");
+    } catch (error) {
+      console.error("Erro no login:", error);
+    }
+  };
+
+  const handleRegisterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await signUp(
+        registerData.email,
+        registerData.password,
+        registerData.fullName,
+        registerData.cref,
+        registerData.whatsapp
+      );
+      
+      // Mostrar mensagem de sucesso e redirecionar para verificação de WhatsApp
+      toast.success("Cadastro realizado! Verifique seu WhatsApp para o código de verificação.");
+      
+      // Em um cenário real, você redirecionaria para uma página de verificação ou login
+      // Por enquanto, apenas limpamos o formulário
+      setRegisterData({
+        fullName: "",
+        email: "",
+        cref: "",
+        whatsapp: "",
+        password: "",
+      });
+    } catch (error) {
+      console.error("Erro no registro:", error);
+    }
   };
 
   return (
@@ -133,7 +195,7 @@ export default function Home() {
                 </TabsList>
                 
                 <TabsContent value="login">
-                  <form onSubmit={handleSubmit} className="space-y-4">
+                  <form onSubmit={handleLoginSubmit} className="space-y-4">
                     <div className="space-y-2">
                       <Label htmlFor="email">Email</Label>
                       <div className="relative">
@@ -144,6 +206,8 @@ export default function Home() {
                           placeholder="seu@email.com"
                           className="pl-10" 
                           required 
+                          value={loginData.email}
+                          onChange={handleLoginChange}
                         />
                       </div>
                     </div>
@@ -158,6 +222,8 @@ export default function Home() {
                           placeholder="********"
                           className="pl-10" 
                           required 
+                          value={loginData.password}
+                          onChange={handleLoginChange}
                         />
                         <button 
                           type="button"
@@ -185,7 +251,7 @@ export default function Home() {
                 </TabsContent>
                 
                 <TabsContent value="register">
-                  <form onSubmit={handleSubmit} className="space-y-4">
+                  <form onSubmit={handleRegisterSubmit} className="space-y-4">
                     <div className="space-y-2">
                       <Label htmlFor="fullname">Nome Completo</Label>
                       <div className="relative">
@@ -196,6 +262,8 @@ export default function Home() {
                           placeholder="Seu nome completo"
                           className="pl-10" 
                           required 
+                          value={registerData.fullName}
+                          onChange={handleRegisterChange}
                         />
                       </div>
                     </div>
@@ -210,34 +278,40 @@ export default function Home() {
                           placeholder="seu@email.com"
                           className="pl-10" 
                           required 
+                          value={registerData.email}
+                          onChange={handleRegisterChange}
                         />
                       </div>
                     </div>
                     
                     <div className="space-y-2">
-                      <Label htmlFor="cref">CREF</Label>
+                      <Label htmlFor="register-cref">CREF</Label>
                       <div className="relative">
                         <BookOpen className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
                         <Input 
-                          id="cref" 
+                          id="register-cref" 
                           type="text" 
                           placeholder="Seu número CREF"
                           className="pl-10" 
                           required 
+                          value={registerData.cref}
+                          onChange={handleRegisterChange}
                         />
                       </div>
                     </div>
                     
                     <div className="space-y-2">
-                      <Label htmlFor="whatsapp">WhatsApp</Label>
+                      <Label htmlFor="register-whatsapp">WhatsApp</Label>
                       <div className="relative">
                         <PhoneCall className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
                         <Input 
-                          id="whatsapp" 
+                          id="register-whatsapp" 
                           type="tel" 
                           placeholder="(00) 00000-0000"
                           className="pl-10" 
                           required 
+                          value={registerData.whatsapp}
+                          onChange={handleRegisterChange}
                         />
                       </div>
                     </div>
@@ -253,6 +327,8 @@ export default function Home() {
                           className="pl-10" 
                           required 
                           minLength={6}
+                          value={registerData.password}
+                          onChange={handleRegisterChange}
                         />
                         <button 
                           type="button"

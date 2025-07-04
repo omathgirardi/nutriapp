@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { 
   Home, 
   Calculator, 
@@ -17,6 +17,8 @@ import {
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button-premium";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useAuth } from "@/contexts/auth-context";
+import { toast } from "sonner";
 
 interface SidebarItemProps {
   icon: React.ReactNode;
@@ -60,6 +62,16 @@ export default function DashboardLayout({
   const pathname = usePathname();
   const isMobile = useIsMobile();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { user, loading, signOut } = useAuth();
+  const router = useRouter();
+
+  // Redirecionamento se não estiver autenticado
+  useEffect(() => {
+    if (!loading && !user) {
+      toast.error("Você precisa estar logado para acessar esta página.");
+      router.push("/");
+    }
+  }, [user, loading, router]);
 
   useEffect(() => {
     // Close sidebar when route changes on mobile
@@ -67,6 +79,24 @@ export default function DashboardLayout({
       setSidebarOpen(false);
     }
   }, [pathname, isMobile]);
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      router.push("/");
+    } catch (error) {
+      console.error("Erro ao fazer logout:", error);
+    }
+  };
+
+  // Se estiver carregando ou não tiver usuário, mostrar tela de carregamento
+  if (loading || !user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="w-16 h-16 border-4 border-primary-200 border-t-primary-500 rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -83,7 +113,7 @@ export default function DashboardLayout({
             </Button>
             <span className="ml-3 font-medium text-lg text-primary-600">NutriPlan</span>
           </div>
-          <Button variant="ghost" size="icon">
+          <Button variant="ghost" size="icon" onClick={() => router.push("/profile")}>
             <User className="h-5 w-5" />
           </Button>
         </div>
@@ -111,6 +141,19 @@ export default function DashboardLayout({
             <div className="px-6 mb-8">
               <h1 className="text-2xl font-bold text-primary-600">NutriPlan</h1>
               <p className="text-sm text-gray-500">Plataforma Premium</p>
+            </div>
+          )}
+          
+          {/* User info for desktop */}
+          {!isMobile && (
+            <div className="px-6 mb-6 flex items-center">
+              <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center mr-3">
+                <User className="h-5 w-5 text-primary-600" />
+              </div>
+              <div>
+                <h3 className="font-medium text-sm">{user.displayName}</h3>
+                <p className="text-xs text-gray-500">{user.id}</p>
+              </div>
             </div>
           )}
           
@@ -160,6 +203,7 @@ export default function DashboardLayout({
               size="sm" 
               fullWidth={true}
               className="justify-start"
+              onClick={handleSignOut}
             >
               <LogOut className="h-4 w-4 mr-2" />
               Sair
