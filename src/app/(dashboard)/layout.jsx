@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button-premium";
 import { useAuth } from "@/contexts/auth-context";
 import { toast } from "sonner";
+import { NotificationBell } from "@/components/notifications/notification-bell";
 
 const SidebarItem = ({ icon, label, href, isActive, onClick }) => {
   return (
@@ -118,9 +119,12 @@ export default function DashboardLayout({ children }) {
             </Button>
             <span className="ml-3 font-medium text-lg text-primary-600">NutriPlan</span>
           </div>
-          <Button variant="ghost" size="icon" onClick={() => router.push("/profile")}>
-            <User className="h-5 w-5" />
-          </Button>
+          <div className="flex items-center">
+            <NotificationBell />
+            <Button variant="ghost" size="icon" onClick={() => router.push("/profile")}>
+              <User className="h-5 w-5" />
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -175,14 +179,14 @@ export default function DashboardLayout({ children }) {
               icon={<Calculator className="h-5 w-5" />} 
               label="Calculadora" 
               href="/calculator" 
-              isActive={pathname === "/calculator"}
+              isActive={pathname === "/calculator" || pathname.startsWith("/calculator/")}
               onClick={() => isMobile && setSidebarOpen(false)}
             />
             <SidebarItem 
               icon={<Users className="h-5 w-5" />} 
               label="Clientes" 
               href="/clients" 
-              isActive={pathname === "/clients"}
+              isActive={pathname === "/clients" || pathname.startsWith("/clients/")}
               onClick={() => isMobile && setSidebarOpen(false)}
             />
             <SidebarItem 
@@ -196,7 +200,7 @@ export default function DashboardLayout({ children }) {
               icon={<User className="h-5 w-5" />} 
               label="Perfil" 
               href="/profile" 
-              isActive={pathname === "/profile"}
+              isActive={pathname === "/profile" || pathname.startsWith("/profile/")}
               onClick={() => isMobile && setSidebarOpen(false)}
             />
           </nav>
@@ -223,6 +227,13 @@ export default function DashboardLayout({ children }) {
         isMobile ? "pt-14 pb-6" : "pt-6 pb-6",
         sidebarOpen || !isMobile ? "lg:ml-64" : "ml-0"
       )}>
+        {/* Desktop header with notifications */}
+        {!isMobile && (
+          <div className="fixed top-6 right-6 z-20">
+            <NotificationBell />
+          </div>
+        )}
+        
         <div className="px-4 sm:px-6 lg:px-8">
           {children}
         </div>

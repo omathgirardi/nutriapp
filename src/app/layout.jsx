@@ -2,6 +2,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/contexts/auth-context";
+import { NotificationProvider } from "@/contexts/notification-context";
 
 // Observe que precisaríamos da fonte Helvetica Now Display, 
 // mas como é proprietária, usaremos Inter como substituta
@@ -20,8 +21,10 @@ export default function RootLayout({ children }) {
     <html lang="pt-BR" suppressHydrationWarning>
       <body className={`${inter.variable} antialiased min-h-screen`}>
         <AuthProvider>
-          {children}
-          <Toaster richColors position="top-right" />
+          <NotificationProvider>
+            {children}
+            <Toaster richColors position="top-right" />
+          </NotificationProvider>
         </AuthProvider>
       </body>
     </html>
