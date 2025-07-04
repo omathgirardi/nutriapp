@@ -15,11 +15,16 @@ import {
   ActivitySquare, 
   Target, 
   Plus, 
-  ChevronRight 
+  ChevronRight,
+  Info,
+  CheckCircle
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/auth-context";
+import { calculateNutritionPlan, distributeMeals } from "@/lib/nutrition-calculator";
+import { saveDietToHistory, updateUserCredits } from "@/lib/firebase-services";
 
 // Componente de passos da calculadora
 const CalculatorSteps = ({ currentStep }) => {
@@ -88,19 +93,124 @@ const GeneratingDiet = ({ progress }) => {
 
 export default function Calculator() {
   const router = useRouter();
+  const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState(0);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationProgress, setGenerationProgress] = useState(0);
   const [selectedClient, setSelectedClient] = useState(null);
   
+  // Estados para formulário
+  const [formData, setFormData] = useState({
+    // Dados do cliente
+    clientName: "",
+    clientId: "",
+    // Dados físicos
+    gender: "male",
+    age: "",
+    weight: "",
+    height: "",
+    activityLevel: "moderate",
+    // Objetivo
+    goal: "maintain",
+    restrictions: "none",
+    meals: "5",
+    // Tipo de dieta
+    dietType: "ai"
+  });
+  
+  // Atualizar dados do formulário
+  const handleChange = (field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+  
+  // Selecionar cliente existente
+  const handleSelectClient = (client) => {
+    setSelectedClient(client.id);
+    setFormData(prev => ({
+      ...prev,
+      clientName: client.name,
+      clientId: client.id
+    }));
+  };
+  
+  // Selecionar tipo de dieta
+  const handleSelectDietType = (type) => {
+    setFormData(prev => ({
+      ...prev,
+      dietType: type
+    }));
+  };
+  
   // Função para avançar o passo
   const nextStep = () => {
+    // Validar o passo atual
+    if (!validateCurrentStep()) {
+      return;
+    }
+    
     if (currentStep < 3) {
       setCurrentStep(currentStep + 1);
     } else {
-      // Iniciar geração da dieta
-      setIsGenerating(true);
+      // Verificar se o usuário tem créditos suficientes para gerar dieta IA
+      if (formData.dietType === "ai" && (user?.credits || 0) < 1) {
+        toast.error("Você não tem créditos suficientes para gerar uma dieta personalizada IA. Compre mais créditos ou escolha um template.");
+        return;
+      }
       
+      // Iniciar geração da dieta
+      generateDiet();
+    }
+  };
+  
+  // Validação do passo atual
+  const validateCurrentStep = () => {
+    if (currentStep === 0) {
+      // Validar seleção de cliente
+      if (!formData.clientName) {
+        toast.error("Selecione ou cadastre um cliente");
+        return false;
+      }
+    } else if (currentStep === 1) {
+      // Validar dados físicos
+      if (!formData.age || !formData.weight || !formData.height) {
+        toast.error("Preencha todos os campos obrigatórios");
+        return false;
+      }
+      
+      // Validar valores numéricos
+      if (formData.age < 10 || formData.age > 100) {
+        toast.error("Idade deve estar entre 10 e 100 anos");
+        return false;
+      }
+      
+      if (formData.weight < 30 || formData.weight > 250) {
+        toast.error("Peso deve estar entre 30 e 250 kg");
+        return false;
+      }
+      
+      if (formData.height < 100 || formData.height > 250) {
+        toast.error("Altura deve estar entre 100 e 250 cm");
+        return false;
+      }
+    } else if (currentStep === 3) {
+      // Validar tipo de dieta
+      if (!formData.dietType) {
+        toast.error("Selecione um tipo de dieta");
+        return false;
+      }
+    }
+    
+    return true;
+  };
+  
+  // Gerar dieta
+  const generateDiet = async () => {
+    setIsGenerating(true);
+    
+    try {
       // Simular progresso
       let progress = 0;
       const interval = setInterval(() => {
@@ -109,16 +219,80 @@ export default function Calculator() {
         
         if (progress >= 100) {
           clearInterval(interval);
-          
-          // Finalizar geração após 100%
-          setTimeout(() => {
-            setIsGenerating(false);
-            toast.success("Dieta gerada com sucesso!");
-            // Redirecionar para a página de resultado
-            router.push("/calculator/result");
-          }, 500);
+          finalizeDietGeneration();
         }
-      }, 200);
+      }, 150);
+    } catch (error) {
+      console.error("Erro ao gerar dieta:", error);
+      toast.error("Ocorreu um erro ao gerar a dieta. Tente novamente.");
+      setIsGenerating(false);
+    }
+  };
+  
+  // Finalizar geração da dieta
+  const finalizeDietGeneration = async () => {
+    try {
+      // Calcular plano nutricional
+      const nutritionPlan = calculateNutritionPlan({
+        gender: formData.gender,
+        age: parseInt(formData.age),
+        weight: parseInt(formData.weight),
+        height: parseInt(formData.height),
+        activityLevel: formData.activityLevel,
+        goal: formData.goal
+      });
+      
+      // Distribuir refeições
+      const mealDistribution = distributeMeals(nutritionPlan, parseInt(formData.meals));
+      
+      // Criar objeto da dieta
+      const diet = {
+        title: `Dieta para ${formData.goal === 'gain' ? 'Ganho Muscular' : formData.goal === 'lose' ? 'Perda de Peso' : 'Manutenção'}`,
+        clientName: formData.clientName,
+        clientId: formData.clientId,
+        gender: formData.gender,
+        age: parseInt(formData.age),
+        weight: parseInt(formData.weight),
+        height: parseInt(formData.height),
+        activityLevel: formData.activityLevel,
+        goal: formData.goal,
+        restrictions: formData.restrictions,
+        meals: parseInt(formData.meals),
+        dietType: formData.dietType,
+        calories: nutritionPlan.dailyCalories,
+        protein: nutritionPlan.macros.protein,
+        carbs: nutritionPlan.macros.carbs,
+        fat: nutritionPlan.macros.fat,
+        bmr: nutritionPlan.bmr,
+        tdee: nutritionPlan.tdee,
+        mealDistribution,
+        // Na vida real, aqui você adicionaria os alimentos de cada refeição
+        // usando alguma API de alimentos ou banco de dados
+        createdAt: new Date().toISOString()
+      };
+      
+      // Salvar dieta no histórico
+      if (user?.uid) {
+        await saveDietToHistory(user.uid, diet);
+        
+        // Debitar crédito se for dieta IA
+        if (formData.dietType === "ai") {
+          await updateUserCredits(user.uid, 1);
+        }
+      }
+      
+      // Simular atraso para finalização
+      setTimeout(() => {
+        setIsGenerating(false);
+        toast.success("Dieta gerada com sucesso!");
+        
+        // Redirecionar para a página de resultado
+        router.push("/calculator/result");
+      }, 500);
+    } catch (error) {
+      console.error("Erro ao finalizar dieta:", error);
+      toast.error("Ocorreu um erro ao finalizar a dieta. Tente novamente.");
+      setIsGenerating(false);
     }
   };
   
@@ -128,6 +302,15 @@ export default function Calculator() {
       setCurrentStep(currentStep - 1);
     }
   };
+  
+  // Mock de clientes para exemplo
+  const mockClients = [
+    { id: "A-01", name: "João Silva", info: "32 anos, 78kg" },
+    { id: "A-02", name: "Maria Santos", info: "28 anos, 64kg" },
+    { id: "A-03", name: "Pedro Oliveira", info: "35 anos, 85kg" },
+    { id: "A-04", name: "Ana Souza", info: "42 anos, 70kg" },
+    { id: "A-05", name: "Carlos Ferreira", info: "25 anos, 92kg" },
+  ];
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -136,6 +319,14 @@ export default function Calculator() {
           <h1 className="text-2xl font-bold">Calculadora de Dietas</h1>
           <p className="text-gray-500">Crie dietas personalizadas para seus clientes</p>
         </div>
+        
+        {user && (
+          <div className="bg-primary-50 px-3 py-1 rounded-full border border-primary-100">
+            <span className="text-primary-700 text-sm font-medium">
+              {user.credits || 0} créditos disponíveis
+            </span>
+          </div>
+        )}
       </div>
 
       {isGenerating ? (
@@ -176,23 +367,23 @@ export default function Calculator() {
                       </div>
                       
                       <div className="space-y-2 max-h-60 overflow-y-auto pr-2">
-                        {Array.from({ length: 5 }).map((_, i) => (
+                        {mockClients.map((client) => (
                           <div 
-                            key={i}
+                            key={client.id}
                             className={`p-3 border rounded-lg cursor-pointer transition-all hover:border-primary-300 hover:bg-primary-50 ${
-                              selectedClient === `client-${i}` ? "border-primary-500 bg-primary-50" : "border-gray-200"
+                              selectedClient === client.id ? "border-primary-500 bg-primary-50" : "border-gray-200"
                             }`}
-                            onClick={() => setSelectedClient(`client-${i}`)}
+                            onClick={() => handleSelectClient(client)}
                           >
                             <div className="flex items-center">
                               <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center mr-3">
                                 <User className="h-5 w-5 text-gray-500" />
                               </div>
                               <div>
-                                <h4 className="font-medium">Cliente Exemplo {i + 1}</h4>
-                                <p className="text-sm text-gray-500">ID: A-0{i+1}</p>
+                                <h4 className="font-medium">{client.name}</h4>
+                                <p className="text-sm text-gray-500">ID: {client.id}</p>
                               </div>
-                              {selectedClient === `client-${i}` && (
+                              {selectedClient === client.id && (
                                 <ChevronRight className="ml-auto h-5 w-5 text-primary-500" />
                               )}
                             </div>
@@ -207,7 +398,12 @@ export default function Calculator() {
                       <div className="grid grid-cols-1 gap-4">
                         <div className="space-y-2">
                           <Label htmlFor="name">Nome Completo</Label>
-                          <Input id="name" placeholder="Nome do cliente" />
+                          <Input 
+                            id="name" 
+                            placeholder="Nome do cliente" 
+                            value={formData.clientName}
+                            onChange={(e) => handleChange("clientName", e.target.value)}
+                          />
                         </div>
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -235,7 +431,10 @@ export default function Calculator() {
                   <div className="space-y-4">
                     <div className="space-y-2">
                       <Label htmlFor="gender">Sexo</Label>
-                      <Select defaultValue="male">
+                      <Select 
+                        value={formData.gender}
+                        onValueChange={(value) => handleChange("gender", value)}
+                      >
                         <SelectTrigger>
                           <SelectValue placeholder="Selecione o sexo" />
                         </SelectTrigger>
@@ -253,7 +452,13 @@ export default function Calculator() {
                           <span>Idade</span>
                         </div>
                       </Label>
-                      <Input id="age" type="number" placeholder="Anos" />
+                      <Input 
+                        id="age" 
+                        type="number" 
+                        placeholder="Anos" 
+                        value={formData.age}
+                        onChange={(e) => handleChange("age", e.target.value)}
+                      />
                     </div>
                   </div>
                   
@@ -265,7 +470,13 @@ export default function Calculator() {
                           <span>Peso (kg)</span>
                         </div>
                       </Label>
-                      <Input id="weight" type="number" placeholder="Quilogramas" />
+                      <Input 
+                        id="weight" 
+                        type="number" 
+                        placeholder="Quilogramas" 
+                        value={formData.weight}
+                        onChange={(e) => handleChange("weight", e.target.value)}
+                      />
                     </div>
                     
                     <div className="space-y-2">
@@ -275,14 +486,23 @@ export default function Calculator() {
                           <span>Altura (cm)</span>
                         </div>
                       </Label>
-                      <Input id="height" type="number" placeholder="Centímetros" />
+                      <Input 
+                        id="height" 
+                        type="number" 
+                        placeholder="Centímetros" 
+                        value={formData.height}
+                        onChange={(e) => handleChange("height", e.target.value)}
+                      />
                     </div>
                   </div>
                 </div>
                 
                 <div className="space-y-2">
                   <Label htmlFor="activity">Nível de Atividade Física</Label>
-                  <Select defaultValue="moderate">
+                  <Select 
+                    value={formData.activityLevel}
+                    onValueChange={(value) => handleChange("activityLevel", value)}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Selecione o nível" />
                     </SelectTrigger>
@@ -295,6 +515,18 @@ export default function Calculator() {
                     </SelectContent>
                   </Select>
                 </div>
+                
+                {formData.weight && formData.height && (
+                  <div className="bg-primary-50 p-4 rounded-lg border border-primary-100 mt-4">
+                    <div className="flex items-center mb-2">
+                      <Info className="h-4 w-4 text-primary-500 mr-2" />
+                      <h4 className="font-medium text-primary-700">Informações Calculadas</h4>
+                    </div>
+                    <p className="text-sm text-gray-600">
+                      IMC: <span className="font-medium">{(parseInt(formData.weight) / Math.pow(parseInt(formData.height) / 100, 2)).toFixed(1)}</span>
+                    </p>
+                  </div>
+                )}
               </div>
             )}
             
@@ -305,7 +537,10 @@ export default function Calculator() {
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="goal">Objetivo Principal</Label>
-                    <Select defaultValue="maintain">
+                    <Select 
+                      value={formData.goal}
+                      onValueChange={(value) => handleChange("goal", value)}
+                    >
                       <SelectTrigger>
                         <SelectValue placeholder="Selecione o objetivo" />
                       </SelectTrigger>
@@ -320,7 +555,10 @@ export default function Calculator() {
                   
                   <div className="space-y-2">
                     <Label htmlFor="restrictions">Restrições Alimentares</Label>
-                    <Select defaultValue="none">
+                    <Select 
+                      value={formData.restrictions}
+                      onValueChange={(value) => handleChange("restrictions", value)}
+                    >
                       <SelectTrigger>
                         <SelectValue placeholder="Selecione as restrições" />
                       </SelectTrigger>
@@ -336,7 +574,10 @@ export default function Calculator() {
                   
                   <div className="space-y-2">
                     <Label htmlFor="meals">Número de Refeições</Label>
-                    <Select defaultValue="5">
+                    <Select 
+                      value={formData.meals}
+                      onValueChange={(value) => handleChange("meals", value)}
+                    >
                       <SelectTrigger>
                         <SelectValue placeholder="Selecione o número" />
                       </SelectTrigger>
@@ -349,6 +590,48 @@ export default function Calculator() {
                     </Select>
                   </div>
                 </div>
+                
+                {formData.weight && formData.height && formData.age && formData.goal && (
+                  <div className="bg-primary-50 p-4 rounded-lg border border-primary-100 mt-4">
+                    <div className="flex items-center mb-3">
+                      <Info className="h-4 w-4 text-primary-500 mr-2" />
+                      <h4 className="font-medium text-primary-700">Prévia de Calorias e Macros</h4>
+                    </div>
+                    
+                    {(() => {
+                      // Calcular prévia
+                      const previewPlan = calculateNutritionPlan({
+                        gender: formData.gender,
+                        age: parseInt(formData.age),
+                        weight: parseInt(formData.weight),
+                        height: parseInt(formData.height),
+                        activityLevel: formData.activityLevel,
+                        goal: formData.goal
+                      });
+                      
+                      return (
+                        <div className="grid grid-cols-2 gap-3 text-sm">
+                          <div>
+                            <p className="text-gray-600">Calorias Diárias:</p>
+                            <p className="font-medium">{previewPlan.dailyCalories} kcal</p>
+                          </div>
+                          <div>
+                            <p className="text-gray-600">Proteínas:</p>
+                            <p className="font-medium">{previewPlan.macros.protein}g</p>
+                          </div>
+                          <div>
+                            <p className="text-gray-600">Carboidratos:</p>
+                            <p className="font-medium">{previewPlan.macros.carbs}g</p>
+                          </div>
+                          <div>
+                            <p className="text-gray-600">Gorduras:</p>
+                            <p className="font-medium">{previewPlan.macros.fat}g</p>
+                          </div>
+                        </div>
+                      );
+                    })()}
+                  </div>
+                )}
               </div>
             )}
             
@@ -357,11 +640,15 @@ export default function Calculator() {
                 <h3 className="text-lg font-medium">Tipo de Dieta</h3>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <CardPremium 
-                    variant="outline" 
-                    className="cursor-pointer hover:border-primary-300 hover:shadow-medium transition-all"
+                  <div 
+                    className={`cursor-pointer transition-all duration-200 ${
+                      formData.dietType === "ai" 
+                        ? "border-2 border-primary-300 shadow-md" 
+                        : "border border-gray-200"
+                    } rounded-xl overflow-hidden`}
+                    onClick={() => handleSelectDietType("ai")}
                   >
-                    <CardContent className="p-6">
+                    <div className="p-6">
                       <div className="flex flex-col items-center text-center">
                         <div className="w-12 h-12 rounded-full bg-primary-100 flex items-center justify-center mb-4">
                           <ActivitySquare className="h-6 w-6 text-primary-600" />
@@ -374,14 +661,29 @@ export default function Calculator() {
                           1 crédito
                         </div>
                       </div>
-                    </CardContent>
-                  </CardPremium>
+                    </div>
+                    
+                    <div className="p-4 border-t border-gray-100 flex justify-center">
+                      {formData.dietType === "ai" ? (
+                        <div className="flex items-center text-primary-600">
+                          <CheckCircle className="h-4 w-4 mr-2" />
+                          <span className="text-sm font-medium">Selecionado</span>
+                        </div>
+                      ) : (
+                        <div className="text-sm text-gray-500">Clique para selecionar</div>
+                      )}
+                    </div>
+                  </div>
                   
-                  <CardPremium 
-                    variant="outline" 
-                    className="cursor-pointer hover:border-primary-300 hover:shadow-medium transition-all"
+                  <div 
+                    className={`cursor-pointer transition-all duration-200 ${
+                      formData.dietType === "template" 
+                        ? "border-2 border-secondary-300 shadow-md" 
+                        : "border border-gray-200"
+                    } rounded-xl overflow-hidden`}
+                    onClick={() => handleSelectDietType("template")}
                   >
-                    <CardContent className="p-6">
+                    <div className="p-6">
                       <div className="flex flex-col items-center text-center">
                         <div className="w-12 h-12 rounded-full bg-secondary-100 flex items-center justify-center mb-4">
                           <Plus className="h-6 w-6 text-secondary-600" />
@@ -394,8 +696,36 @@ export default function Calculator() {
                           0 créditos
                         </div>
                       </div>
-                    </CardContent>
-                  </CardPremium>
+                    </div>
+                    
+                    <div className="p-4 border-t border-gray-100 flex justify-center">
+                      {formData.dietType === "template" ? (
+                        <div className="flex items-center text-secondary-600">
+                          <CheckCircle className="h-4 w-4 mr-2" />
+                          <span className="text-sm font-medium">Selecionado</span>
+                        </div>
+                      ) : (
+                        <div className="text-sm text-gray-500">Clique para selecionar</div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 mt-4">
+                  <div className="flex items-start">
+                    <Info className="h-5 w-5 text-gray-500 mr-2 mt-0.5" />
+                    <div>
+                      <h4 className="font-medium mb-1">Informações sobre os tipos de dieta</h4>
+                      <p className="text-sm text-gray-600 mb-2">
+                        <strong>Dieta Personalizada IA:</strong> Criada especificamente para o seu cliente com base em todos os dados fornecidos. 
+                        Utiliza IA para selecionar os melhores alimentos e porções para atingir os objetivos.
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        <strong>Template Predefinido:</strong> Utiliza um plano alimentar padrão, apenas ajustando as calorias e macronutrientes 
+                        para o seu cliente. Ideal para casos mais simples.
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
