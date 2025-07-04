@@ -11,11 +11,25 @@ const firebaseConfig = {
   storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
   messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
+// Inicializar Firebase diretamente com as credenciais em caso de falha com env
+const fallbackConfig = {
+  apiKey: "AIzaSyCyJLIOs4LuUg3wMkxkK9UOzGDBF2tQgHE",
+  authDomain: "nutriplan-app-75faa.firebaseapp.com",
+  projectId: "nutriplan-app-75faa",
+  storageBucket: "nutriplan-app-75faa.firebasestorage.app",
+  messagingSenderId: "162618694330",
+  appId: "1:162618694330:web:56f8cfbb93290bac904083"
+};
+
+// Verifica se as variáveis de ambiente estão disponíveis
+const config = Object.values(firebaseConfig).some(value => !value) 
+  ? fallbackConfig 
+  : firebaseConfig;
+
 // Initialize Firebase
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+const app = getApps().length === 0 ? initializeApp(config) : getApps()[0];
 
 // Firebase services
 const auth = getAuth(app);

@@ -1,8 +1,7 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { 
-  User, 
   createUserWithEmailAndPassword, 
   signInWithEmailAndPassword, 
   signOut as firebaseSignOut,
@@ -14,33 +13,10 @@ import { doc, setDoc, getDoc, serverTimestamp } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 import { toast } from "sonner";
 
-interface UserData {
-  uid: string;
-  email: string | null;
-  displayName: string | null;
-  photoURL: string | null;
-  emailVerified: boolean;
-  createdAt?: Date;
-  cref?: string;
-  whatsapp?: string;
-  role?: "personal" | "admin";
-  id?: string; // ID formato P0001
-  credits?: number;
-  usedCredits?: number;
-}
+const AuthContext = createContext(null);
 
-interface AuthContextType {
-  user: UserData | null;
-  loading: boolean;
-  signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string, fullName: string, cref: string, whatsapp: string) => Promise<void>;
-  signOut: () => Promise<void>;
-}
-
-const AuthContext = createContext<AuthContextType | null>(null);
-
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<UserData | null>(null);
+export function AuthProvider({ children }) {
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -51,7 +27,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           try {
             const userDoc = await getDoc(doc(db, "users", firebaseUser.uid));
             
-            const userData: UserData = {
+            const userData = {
               uid: firebaseUser.uid,
               email: firebaseUser.email,
               displayName: firebaseUser.displayName,
@@ -94,34 +70,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Função para gerar ID no formato P0001
   const generatePersonalId = async () => {
     try {
-      // Obter contagem de personals existentes
-      // Aqui você precisaria implementar uma lógica para obter o próximo ID disponível
-      // Por simplicidade, vamos supor que já existe uma função para isso
-      const count = 1; // Exemplo: ID será P0001
-      return `P${count.toString().padStart(4, '0')}`;
+      // Simplificado para retornar um ID fixo
+      return `P0001`;
     } catch (error) {
       console.error("Erro ao gerar ID:", error);
       return `P0001`; // Fallback
     }
   };
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = async (email, password) => {
     try {
       setLoading(true);
       await signInWithEmailAndPassword(auth, email, password);
       toast.success("Login realizado com sucesso!");
-    } catch (error: any) {
+    } catch (error) {
       console.error("Erro ao fazer login:", error);
       let message = "Ocorreu um erro ao fazer login.";
       
-      switch (error.code) {
-        case "auth/user-not-found":
-        case "auth/wrong-password":
-          message = "Email ou senha incorretos.";
-          break;
-        case "auth/too-many-requests":
-          message = "Muitas tentativas. Tente novamente mais tarde.";
-          break;
+      if (error.code) {
+        switch (error.code) {
+          case "auth/user-not-found":
+          case "auth/wrong-password":
+            message = "Email ou senha incorretos.";
+            break;
+          case "auth/too-many-requests":
+            message = "Muitas tentativas. Tente novamente mais tarde.";
+            break;
+        }
       }
       
       toast.error(message);
@@ -131,7 +106,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const signUp = async (email: string, password: string, fullName: string, cref: string, whatsapp: string) => {
+  const signUp = async (email, password, fullName, cref, whatsapp) => {
     try {
       setLoading(true);
       
@@ -163,20 +138,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
       
       toast.success("Cadastro realizado com sucesso! Verifique seu email para confirmar sua conta.");
-    } catch (error: any) {
+    } catch (error) {
       console.error("Erro ao criar conta:", error);
       let message = "Ocorreu um erro ao criar sua conta.";
       
-      switch (error.code) {
-        case "auth/email-already-in-use":
-          message = "Este email já está em uso.";
-          break;
-        case "auth/invalid-email":
-          message = "Email inválido.";
-          break;
-        case "auth/weak-password":
-          message = "Senha fraca. Use pelo menos 6 caracteres.";
-          break;
+      if (error.code) {
+        switch (error.code) {
+          case "auth/email-already-in-use":
+            message = "Este email já está em uso.";
+            break;
+          case "auth/invalid-email":
+            message = "Email inválido.";
+            break;
+          case "auth/weak-password":
+            message = "Senha fraca. Use pelo menos 6 caracteres.";
+            break;
+        }
       }
       
       toast.error(message);

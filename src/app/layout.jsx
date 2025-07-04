@@ -1,14 +1,7 @@
-import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
-import dynamic from 'next/dynamic';
-
-// Importar o AuthProvider de forma dinâmica para evitar problemas no SSR
-const AuthProviderDynamic = dynamic(
-  () => import('@/contexts/auth-context').then(mod => mod.AuthProvider),
-  { ssr: false }
-);
+import { AuthProvider } from "@/contexts/auth-context";
 
 // Observe que precisaríamos da fonte Helvetica Now Display, 
 // mas como é proprietária, usaremos Inter como substituta
@@ -17,23 +10,19 @@ const inter = Inter({
   variable: "--font-helvetica",
 });
 
-export const metadata: Metadata = {
+export const metadata = {
   title: "NutriPlan - Plataforma de Dietas para Personal Trainers",
   description: "Gere dietas personalizadas de forma simples e profissional para seus clientes",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }) {
   return (
     <html lang="pt-BR" suppressHydrationWarning>
       <body className={`${inter.variable} antialiased min-h-screen`}>
-        <AuthProviderDynamic>
+        <AuthProvider>
           {children}
           <Toaster richColors position="top-right" />
-        </AuthProviderDynamic>
+        </AuthProvider>
       </body>
     </html>
   );
