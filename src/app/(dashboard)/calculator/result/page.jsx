@@ -13,7 +13,8 @@ import {
   Utensils, 
   Calendar, 
   Clock, 
-  Printer
+  Printer,
+  Edit
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
@@ -254,6 +255,11 @@ export default function DietResult() {
     }
   };
 
+  // Função para editar a dieta
+  const handleEditDiet = () => {
+    router.push(`/calculator/edit?dietId=${diet.id}`);
+  };
+
   // Função para imprimir a dieta
   const handlePrint = () => {
     window.print();
@@ -279,6 +285,14 @@ export default function DietResult() {
         </div>
         
         <div className="flex flex-wrap gap-2">
+          <Button 
+            variant="outline" 
+            onClick={handleEditDiet}
+          >
+            <Edit className="mr-2 h-4 w-4" />
+            Editar Dieta
+          </Button>
+          
           <Button 
             variant="outline" 
             onClick={handleDownloadPDF}

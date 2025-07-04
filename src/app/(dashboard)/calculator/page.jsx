@@ -25,6 +25,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/contexts/auth-context";
 import { calculateNutritionPlan, distributeMeals } from "@/lib/nutrition-calculator";
 import { saveDietToHistory, updateUserCredits } from "@/lib/firebase-services";
+import { getDietTemplate, adjustDietTemplate } from "@/lib/diet-templates";
 
 // Componente de passos da calculadora
 const CalculatorSteps = ({ currentStep }) => {
@@ -242,38 +243,79 @@ export default function Calculator() {
         goal: formData.goal
       });
       
-      // Distribuir refeições
-      const mealDistribution = distributeMeals(nutritionPlan, parseInt(formData.meals));
+      let dietData;
       
-      // Criar objeto da dieta
-      const diet = {
-        title: `Dieta para ${formData.goal === 'gain' ? 'Ganho Muscular' : formData.goal === 'lose' ? 'Perda de Peso' : 'Manutenção'}`,
-        clientName: formData.clientName,
-        clientId: formData.clientId,
-        gender: formData.gender,
-        age: parseInt(formData.age),
-        weight: parseInt(formData.weight),
-        height: parseInt(formData.height),
-        activityLevel: formData.activityLevel,
-        goal: formData.goal,
-        restrictions: formData.restrictions,
-        meals: parseInt(formData.meals),
-        dietType: formData.dietType,
-        calories: nutritionPlan.dailyCalories,
-        protein: nutritionPlan.macros.protein,
-        carbs: nutritionPlan.macros.carbs,
-        fat: nutritionPlan.macros.fat,
-        bmr: nutritionPlan.bmr,
-        tdee: nutritionPlan.tdee,
-        mealDistribution,
-        // Na vida real, aqui você adicionaria os alimentos de cada refeição
-        // usando alguma API de alimentos ou banco de dados
-        createdAt: new Date().toISOString()
-      };
+      if (formData.dietType === "template") {
+        // Usar um template de dieta predefinido
+        const template = getDietTemplate(formData.goal, formData.restrictions);
+        
+        // Ajustar o template para as necessidades calóricas do cliente
+        const adjustedTemplate = adjustDietTemplate(template, nutritionPlan);
+        
+        // Criar objeto da dieta
+        dietData = {
+          title: template.title,
+          description: template.description,
+          clientName: formData.clientName,
+          clientId: formData.clientId,
+          gender: formData.gender,
+          age: parseInt(formData.age),
+          weight: parseInt(formData.weight),
+          height: parseInt(formData.height),
+          activityLevel: formData.activityLevel,
+          goal: formData.goal,
+          restrictions: formData.restrictions,
+          meals: parseInt(formData.meals),
+          dietType: formData.dietType,
+          calories: nutritionPlan.dailyCalories,
+          protein: nutritionPlan.macros.protein,
+          carbs: nutritionPlan.macros.carbs,
+          fat: nutritionPlan.macros.fat,
+          bmr: nutritionPlan.bmr,
+          tdee: nutritionPlan.tdee,
+          mealPlan: adjustedTemplate.meals,
+          createdAt: new Date().toISOString()
+        };
+      } else {
+        // Distribuir refeições para dieta personalizada IA
+        const mealDistribution = distributeMeals(nutritionPlan, parseInt(formData.meals));
+        
+        // Em um ambiente real, aqui você usaria a IA para gerar uma dieta personalizada
+        // baseada nas necessidades calóricas e preferências do cliente
+        
+        // Para este exemplo, vamos usar o template mais adequado como base e depois permitir edição manual
+        const template = getDietTemplate(formData.goal, formData.restrictions);
+        const adjustedTemplate = adjustDietTemplate(template, nutritionPlan);
+        
+        // Criar objeto da dieta
+        dietData = {
+          title: `Dieta Personalizada para ${formData.goal === 'gain' ? 'Ganho Muscular' : formData.goal === 'lose' ? 'Perda de Peso' : 'Manutenção'}`,
+          description: "Dieta personalizada gerada com IA",
+          clientName: formData.clientName,
+          clientId: formData.clientId,
+          gender: formData.gender,
+          age: parseInt(formData.age),
+          weight: parseInt(formData.weight),
+          height: parseInt(formData.height),
+          activityLevel: formData.activityLevel,
+          goal: formData.goal,
+          restrictions: formData.restrictions,
+          meals: parseInt(formData.meals),
+          dietType: formData.dietType,
+          calories: nutritionPlan.dailyCalories,
+          protein: nutritionPlan.macros.protein,
+          carbs: nutritionPlan.macros.carbs,
+          fat: nutritionPlan.macros.fat,
+          bmr: nutritionPlan.bmr,
+          tdee: nutritionPlan.tdee,
+          mealPlan: adjustedTemplate.meals,
+          createdAt: new Date().toISOString()
+        };
+      }
       
       // Salvar dieta no histórico
       if (user?.uid) {
-        await saveDietToHistory(user.uid, diet);
+        await saveDietToHistory(user.uid, dietData);
         
         // Debitar crédito se for dieta IA
         if (formData.dietType === "ai") {
@@ -566,8 +608,8 @@ export default function Calculator() {
                         <SelectItem value="none">Nenhuma</SelectItem>
                         <SelectItem value="vegetarian">Vegetariano</SelectItem>
                         <SelectItem value="vegan">Vegano</SelectItem>
-                        <SelectItem value="lactose">Intolerância à Lactose</SelectItem>
                         <SelectItem value="gluten">Intolerância ao Glúten</SelectItem>
+                        <SelectItem value="lactose">Intolerância à Lactose</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
