@@ -1,0 +1,40 @@
+{
+  "name": "nutriplan-plataforma",
+  "version": "1.0.0",
+  "description": "Plataforma completa para nutricionistas - Criação e gestão de dietas personalizadas",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "serve . -l 3000",
+    "start": "serve . -l 3000",
+    "build": "echo 'No build process needed for this project'",
+    "preview": "serve . -l 4173"
+  },
+  "keywords": [
+    "nutrição",
+    "dietas",
+    "nutricionista",
+    "plataforma",
+    "react",
+    "javascript"
+  ],
+  "author": "NutriApp Team",
+  "license": "MIT",
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "framer-motion": "^10.0.0",
+    "lucide-react": "^0.263.1"
+  },
+  "devDependencies": {
+    "serve": "^14.2.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nutriapp/nutriplan-plataforma.git"
+  },
+  "bugs": {
+    "url": "https://github.com/nutriapp/nutriplan-plataforma/issues"
+  },
+  "homepage": "https://github.com/nutriapp/nutriplan-plataforma#readme"
+} 
