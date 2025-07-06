@@ -16,6 +16,21 @@ export const config = {
       templates: '/templates'
     }
   },
+  firebase: {
+    apiKey: "AIzaSyCyJLIOs4LuUg3wMkxkK9UOzGDBF2tQgHE",
+    authDomain: "nutriplan-app-75faa.firebaseapp.com",
+    projectId: "nutriplan-app-75faa",
+    storageBucket: "nutriplan-app-75faa.firebasestorage.app",
+    messagingSenderId: "162618694330",
+    appId: "1:162618694330:web:56f8cfbb93290bac904083"
+  },
+  evolution: {
+    baseURL: "https://dev-studiogirardi-evolution-api.lt0sh0.easypanel.host",
+    apiKey: "02314644FB70-4D08-A756-A53CED8621A9",
+    instanceName: "teste_nutriplan",
+    enabled: true,
+    phone: "+553591619970"
+  },
   features: {
     enableNotifications: true,
     enableAnalytics: true,
