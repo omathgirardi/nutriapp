@@ -27,14 +27,23 @@ import {
   getDownloadURL, 
   deleteObject 
 } from 'firebase/storage';
-import { config } from '../config/index.js';
+
+// Configuração do Firebase
+const firebaseConfig = {
+  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.REACT_APP_FIREBASE_APP_ID
+};
 
 // Inicializar Firebase
-const app = initializeApp(config.firebase);
+const app = initializeApp(firebaseConfig);
 
 // Serviços Firebase
 export const auth = getAuth(app);
-export const db = getFirestore(app);
+export const firestore = getFirestore(app);
 export const storage = getStorage(app);
 
 // Serviços de Autenticação
@@ -46,7 +55,7 @@ export const authService = {
       const user = userCredential.user;
       
       // Salvar dados adicionais do usuário
-      await setDoc(doc(db, 'users', user.uid), {
+      await setDoc(doc(firestore, 'users', user.uid), {
         ...userData,
         email: user.email,
         uid: user.uid,
@@ -94,7 +103,7 @@ export const dbService = {
   // Criar documento
   async create(collectionName, data) {
     try {
-      const docRef = await addDoc(collection(db, collectionName), {
+      const docRef = await addDoc(collection(firestore, collectionName), {
         ...data,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
@@ -109,7 +118,7 @@ export const dbService = {
   // Buscar documento por ID
   async getById(collectionName, id) {
     try {
-      const docRef = doc(db, collectionName, id);
+      const docRef = doc(firestore, collectionName, id);
       const docSnap = await getDoc(docRef);
       
       if (docSnap.exists()) {
@@ -127,7 +136,7 @@ export const dbService = {
   async getAll(collectionName, orderField = 'createdAt', orderDirection = 'desc') {
     try {
       const q = query(
-        collection(db, collectionName),
+        collection(firestore, collectionName),
         orderBy(orderField, orderDirection)
       );
       const querySnapshot = await getDocs(q);
@@ -148,7 +157,7 @@ export const dbService = {
   async getByFilter(collectionName, field, operator, value) {
     try {
       const q = query(
-        collection(db, collectionName),
+        collection(firestore, collectionName),
         where(field, operator, value)
       );
       const querySnapshot = await getDocs(q);
@@ -168,7 +177,7 @@ export const dbService = {
   // Atualizar documento
   async update(collectionName, id, data) {
     try {
-      const docRef = doc(db, collectionName, id);
+      const docRef = doc(firestore, collectionName, id);
       await updateDoc(docRef, {
         ...data,
         updatedAt: new Date().toISOString()
@@ -183,7 +192,7 @@ export const dbService = {
   // Excluir documento
   async delete(collectionName, id) {
     try {
-      await deleteDoc(doc(db, collectionName, id));
+      await deleteDoc(doc(firestore, collectionName, id));
       return { success: true };
     } catch (error) {
       console.error('Erro ao excluir documento:', error);
@@ -221,8 +230,4 @@ export const storageService = {
   }
 };
 
-export default {
-  auth: authService,
-  db: dbService,
-  storage: storageService
-}; 
+export default app; 

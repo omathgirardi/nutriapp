@@ -47,6 +47,30 @@ export const config = {
   storage: {
     prefix: 'nutriapp_',
     version: '1.0'
+  },
+  isDevelopment: process.env.NODE_ENV === 'development',
+  useMockData: process.env.REACT_APP_USE_MOCK_DATA === 'true',
+  tenant: {
+    plans: {
+      basic: {
+        maxClients: 25,
+        maxDiets: 50,
+        maxTemplates: 10,
+        features: ['basic_reports']
+      },
+      pro: {
+        maxClients: 100,
+        maxDiets: 200,
+        maxTemplates: 30,
+        features: ['basic_reports', 'whatsapp_integration', 'custom_templates']
+      },
+      premium: {
+        maxClients: 500,
+        maxDiets: 1000,
+        maxTemplates: 100,
+        features: ['basic_reports', 'whatsapp_integration', 'custom_templates', 'advanced_analytics', 'priority_support']
+      }
+    }
   }
 };
 
@@ -69,4 +93,17 @@ export const getCurrentConfig = () => {
     ...config,
     ...environmentConfig[env]
   };
+};
+
+export const shouldUseMockData = () => {
+  return config.isDevelopment && config.useMockData;
+};
+
+export const getPlanLimits = (planName) => {
+  return config.tenant.plans[planName] || config.tenant.plans.basic;
+};
+
+export const hasFeature = (planName, featureName) => {
+  const plan = getPlanLimits(planName);
+  return plan.features.includes(featureName);
 }; 
