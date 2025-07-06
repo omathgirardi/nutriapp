@@ -8,7 +8,10 @@
     "dev": "serve . -l 3000",
     "start": "serve . -l 3000",
     "build": "echo 'No build process needed for this project'",
-    "preview": "serve . -l 4173"
+    "preview": "serve . -l 4173",
+    "firebase:init": "node scripts/initFirebase.js",
+    "firebase:seed": "node scripts/seedFirebase.js",
+    "firebase:setup": "npm run firebase:init && npm run firebase:seed"
   },
   "keywords": [
     "nutrição",
@@ -26,7 +29,8 @@
     "framer-motion": "^10.0.0",
     "lucide-react": "^0.263.1",
     "firebase": "^10.7.1",
-    "axios": "^1.6.2"
+    "axios": "^1.6.2",
+    "firebase-admin": "^11.11.1"
   },
   "devDependencies": {
     "serve": "^14.2.1"

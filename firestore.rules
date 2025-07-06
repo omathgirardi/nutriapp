@@ -1,0 +1,65 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Funções auxiliares
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isUserAuthenticated(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function belongsToTenant(tenantId) {
+      return isAuthenticated() && 
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.tenantId == tenantId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && 
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // Regras para coleção de tenants
+    match /tenants/{tenantId} {
+      allow read: if belongsToTenant(tenantId);
+      allow create: if isAuthenticated();
+      allow update: if belongsToTenant(tenantId) && isAdmin();
+      allow delete: if false; // Não permitir deleção de tenants
+    }
+
+    // Regras para coleção de usuários
+    match /users/{userId} {
+      allow read: if isUserAuthenticated(userId);
+      allow create: if isAuthenticated();
+      allow update: if isUserAuthenticated(userId);
+      allow delete: if false; // Não permitir deleção de usuários
+    }
+
+    // Regras para coleção de clientes
+    match /clients/{clientId} {
+      allow read, write: if belongsToTenant(resource.data.tenantId);
+    }
+
+    // Regras para coleção de dietas
+    match /diets/{dietId} {
+      allow read, write: if belongsToTenant(resource.data.tenantId);
+    }
+
+    // Regras para coleção de templates
+    match /templates/{templateId} {
+      allow read, write: if belongsToTenant(resource.data.tenantId);
+    }
+
+    // Regras para coleção de consultas
+    match /appointments/{appointmentId} {
+      allow read, write: if belongsToTenant(resource.data.tenantId);
+    }
+
+    // Regras para coleção de alimentos (foods)
+    match /foods/{foodId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+  }
+} 

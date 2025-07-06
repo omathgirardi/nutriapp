@@ -35,18 +35,34 @@ export const nutriService = {
     // Criar novo cliente
     async create(clientData) {
       try {
-        const result = await firebaseService.db.create('clients', clientData);
+        // Gerar código de ativação
+        const activationCode = Math.random().toString(36).slice(-6).toUpperCase();
+        
+        // Adicionar código e data de expiração aos dados do cliente
+        const completeClientData = {
+          ...clientData,
+          activationCode,
+          activationExpiry: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // 24 horas
+          isActivated: false,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        };
+
+        const result = await firebaseService.db.create('clients', completeClientData);
         
         if (result.success && clientData.phone) {
           // Verificar se o número existe no WhatsApp
           const whatsappCheck = await evolutionService.checkWhatsAppNumber(clientData.phone);
           
           if (whatsappCheck.exists) {
-            // Enviar mensagem de boas-vindas
-            await nutriWhatsAppService.sendTextMessage(
+            // Enviar mensagem de boas-vindas com código de ativação
+            await evolutionService.sendTextMessage(
               clientData.phone,
               `🎉 *Bem-vindo(a) ao NutriApp!*\n\n` +
               `Olá, ${clientData.name}!\n\n` +
+              `🔐 *Seu código de ativação:*\n` +
+              `*${activationCode}*\n\n` +
+              `⚠️ Este código expira em 24 horas.\n\n` +
               `Agora você está conectado(a) conosco e receberá:\n` +
               `• Planos alimentares personalizados\n` +
               `• Lembretes de consultas\n` +
@@ -57,9 +73,67 @@ export const nutriService = {
           }
         }
         
-        return result;
+        return { ...result, activationCode };
       } catch (error) {
         console.error('Erro ao criar cliente:', error);
+        return { error: error.message, success: false };
+      }
+    },
+
+    // Confirmar código de ativação do cliente
+    async confirmActivation(clientId, activationCode) {
+      try {
+        // Buscar cliente
+        const clientResult = await firebaseService.db.getById('clients', clientId);
+        
+        if (!clientResult.success) {
+          return { error: 'Cliente não encontrado', success: false };
+        }
+
+        const client = clientResult.data;
+
+        // Verificar se já está ativado
+        if (client.isActivated) {
+          return { error: 'Cliente já está ativado', success: false };
+        }
+
+        // Verificar se o código está correto
+        if (client.activationCode !== activationCode) {
+          return { error: 'Código de ativação inválido', success: false };
+        }
+
+        // Verificar se não expirou
+        if (new Date() > new Date(client.activationExpiry)) {
+          return { error: 'Código de ativação expirado', success: false };
+        }
+
+        // Ativar cliente
+        const updateResult = await firebaseService.db.update('clients', clientId, {
+          isActivated: true,
+          activationCode: null,
+          activationExpiry: null,
+          updatedAt: new Date().toISOString()
+        });
+
+        if (updateResult.success && client.phone) {
+          // Enviar mensagem de confirmação
+          await evolutionService.sendTextMessage(
+            client.phone,
+            `✅ *Conta Ativada com Sucesso!*\n\n` +
+            `Parabéns ${client.name}! 🎉\n\n` +
+            `Sua conta no NutriApp foi ativada com sucesso!\n\n` +
+            `Agora você pode aproveitar todos os recursos:\n` +
+            `• Acompanhar seu plano alimentar\n` +
+            `• Receber lembretes de consultas\n` +
+            `• Interagir com seu nutricionista\n\n` +
+            `Bem-vindo à família NutriApp! 💚\n\n` +
+            `_Enviado via NutriApp_`
+          );
+        }
+
+        return updateResult;
+      } catch (error) {
+        console.error('Erro ao confirmar ativação:', error);
         return { error: error.message, success: false };
       }
     },

@@ -1,305 +1,216 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { db } from '../services/firebase';
-import {
-  collection,
-  query,
-  where,
-  getDocs,
-  doc,
-  addDoc,
-  updateDoc,
-  deleteDoc
-} from 'firebase/firestore';
+import { firebaseService } from '../services/firebase';
 
-// Hook para gerenciar clientes
-export const useClients = () => {
-  const [clients, setClients] = useState([]);
+// Hook base para operações CRUD no tenant
+const useTenantData = (collectionName) => {
+  const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { currentUser, currentTenant } = useAuth();
+  const { currentTenant } = useAuth();
 
   useEffect(() => {
-    if (!currentUser || !currentTenant) return;
+    if (!currentTenant) return;
 
-    const fetchClients = async () => {
+    const loadData = async () => {
+      setLoading(true);
       try {
-        const clientsRef = collection(db, 'clients');
-        const q = query(
-          clientsRef,
-          where('tenantId', '==', currentTenant.id)
-        );
-        const snapshot = await getDocs(q);
-        const clientsData = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
-        setClients(clientsData);
-        setError(null);
+        const result = await firebaseService.getAll(collectionName, currentTenant.tenantId);
+        if (result.success) {
+          setData(result.data);
+          setError(null);
+        } else {
+          setError(result.error);
+        }
       } catch (err) {
-        console.error('Erro ao buscar clientes:', err);
         setError(err.message);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchClients();
-  }, [currentUser, currentTenant]);
+    loadData();
+  }, [collectionName, currentTenant]);
 
-  const createClient = async (clientData) => {
-    try {
-      const clientsRef = collection(db, 'clients');
-      const newClient = {
-        ...clientData,
-        tenantId: currentTenant.id,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
-      const docRef = await addDoc(clientsRef, newClient);
-      setClients(prev => [...prev, { id: docRef.id, ...newClient }]);
-      return { success: true };
-    } catch (error) {
-      console.error('Erro ao criar cliente:', error);
-      return { success: false, error: error.message };
+  const create = async (itemData) => {
+    if (!currentTenant) {
+      return { success: false, error: 'Tenant não encontrado' };
     }
-  };
 
-  const updateClient = async (clientId, clientData) => {
     try {
-      const clientRef = doc(db, 'clients', clientId);
-      const updatedClient = {
-        ...clientData,
-        updatedAt: new Date().toISOString()
-      };
-      await updateDoc(clientRef, updatedClient);
-      setClients(prev =>
-        prev.map(client =>
-          client.id === clientId
-            ? { ...client, ...updatedClient }
-            : client
-        )
+      const result = await firebaseService.create(
+        collectionName,
+        itemData,
+        currentTenant.tenantId
       );
-      return { success: true };
-    } catch (error) {
-      console.error('Erro ao atualizar cliente:', error);
-      return { success: false, error: error.message };
+
+      if (result.success) {
+        // Recarregar dados após criação
+        const updatedResult = await firebaseService.getAll(
+          collectionName,
+          currentTenant.tenantId
+        );
+        if (updatedResult.success) {
+          setData(updatedResult.data);
+        }
+      }
+
+      return result;
+    } catch (err) {
+      return { success: false, error: err.message };
     }
   };
 
-  const deleteClient = async (clientId) => {
+  const update = async (id, itemData) => {
+    if (!currentTenant) {
+      return { success: false, error: 'Tenant não encontrado' };
+    }
+
     try {
-      const clientRef = doc(db, 'clients', clientId);
-      await deleteDoc(clientRef);
-      setClients(prev => prev.filter(client => client.id !== clientId));
-      return { success: true };
-    } catch (error) {
-      console.error('Erro ao excluir cliente:', error);
-      return { success: false, error: error.message };
+      const result = await firebaseService.update(
+        collectionName,
+        id,
+        itemData,
+        currentTenant.tenantId
+      );
+
+      if (result.success) {
+        // Recarregar dados após atualização
+        const updatedResult = await firebaseService.getAll(
+          collectionName,
+          currentTenant.tenantId
+        );
+        if (updatedResult.success) {
+          setData(updatedResult.data);
+        }
+      }
+
+      return result;
+    } catch (err) {
+      return { success: false, error: err.message };
     }
   };
+
+  const remove = async (id) => {
+    if (!currentTenant) {
+      return { success: false, error: 'Tenant não encontrado' };
+    }
+
+    try {
+      const result = await firebaseService.delete(
+        collectionName,
+        id,
+        currentTenant.tenantId
+      );
+
+      if (result.success) {
+        // Recarregar dados após remoção
+        const updatedResult = await firebaseService.getAll(
+          collectionName,
+          currentTenant.tenantId
+        );
+        if (updatedResult.success) {
+          setData(updatedResult.data);
+        }
+      }
+
+      return result;
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
+  };
+
+  return {
+    data,
+    loading,
+    error,
+    create,
+    update,
+    remove
+  };
+};
+
+// Hook para clientes
+export const useClients = () => {
+  const {
+    data: clients,
+    loading,
+    error,
+    create,
+    update,
+    remove
+  } = useTenantData('clients');
 
   return {
     clients,
     loading,
     error,
-    createClient,
-    updateClient,
-    deleteClient
+    createClient: create,
+    updateClient: update,
+    deleteClient: remove
   };
 };
 
-// Hook para gerenciar dietas
+// Hook para dietas
 export const useDiets = () => {
-  const [diets, setDiets] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const { currentUser, currentTenant } = useAuth();
-
-  useEffect(() => {
-    if (!currentUser || !currentTenant) return;
-
-    const fetchDiets = async () => {
-      try {
-        const dietsRef = collection(db, 'diets');
-        const q = query(
-          dietsRef,
-          where('tenantId', '==', currentTenant.id)
-        );
-        const snapshot = await getDocs(q);
-        const dietsData = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
-        setDiets(dietsData);
-        setError(null);
-      } catch (err) {
-        console.error('Erro ao buscar dietas:', err);
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchDiets();
-  }, [currentUser, currentTenant]);
-
-  const createDiet = async (dietData) => {
-    try {
-      const dietsRef = collection(db, 'diets');
-      const newDiet = {
-        ...dietData,
-        tenantId: currentTenant.id,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
-      const docRef = await addDoc(dietsRef, newDiet);
-      setDiets(prev => [...prev, { id: docRef.id, ...newDiet }]);
-      return { success: true };
-    } catch (error) {
-      console.error('Erro ao criar dieta:', error);
-      return { success: false, error: error.message };
-    }
-  };
-
-  const updateDiet = async (dietId, dietData) => {
-    try {
-      const dietRef = doc(db, 'diets', dietId);
-      const updatedDiet = {
-        ...dietData,
-        updatedAt: new Date().toISOString()
-      };
-      await updateDoc(dietRef, updatedDiet);
-      setDiets(prev =>
-        prev.map(diet =>
-          diet.id === dietId
-            ? { ...diet, ...updatedDiet }
-            : diet
-        )
-      );
-      return { success: true };
-    } catch (error) {
-      console.error('Erro ao atualizar dieta:', error);
-      return { success: false, error: error.message };
-    }
-  };
-
-  const deleteDiet = async (dietId) => {
-    try {
-      const dietRef = doc(db, 'diets', dietId);
-      await deleteDoc(dietRef);
-      setDiets(prev => prev.filter(diet => diet.id !== dietId));
-      return { success: true };
-    } catch (error) {
-      console.error('Erro ao excluir dieta:', error);
-      return { success: false, error: error.message };
-    }
-  };
+  const {
+    data: diets,
+    loading,
+    error,
+    create,
+    update,
+    remove
+  } = useTenantData('diets');
 
   return {
     diets,
     loading,
     error,
-    createDiet,
-    updateDiet,
-    deleteDiet
+    createDiet: create,
+    updateDiet: update,
+    deleteDiet: remove
   };
 };
 
-// Hook para gerenciar templates
+// Hook para templates
 export const useTemplates = () => {
-  const [templates, setTemplates] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const { currentUser, currentTenant } = useAuth();
-
-  useEffect(() => {
-    if (!currentUser || !currentTenant) return;
-
-    const fetchTemplates = async () => {
-      try {
-        const templatesRef = collection(db, 'templates');
-        const q = query(
-          templatesRef,
-          where('tenantId', '==', currentTenant.id)
-        );
-        const snapshot = await getDocs(q);
-        const templatesData = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
-        setTemplates(templatesData);
-        setError(null);
-      } catch (err) {
-        console.error('Erro ao buscar templates:', err);
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchTemplates();
-  }, [currentUser, currentTenant]);
-
-  const createTemplate = async (templateData) => {
-    try {
-      const templatesRef = collection(db, 'templates');
-      const newTemplate = {
-        ...templateData,
-        tenantId: currentTenant.id,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
-      const docRef = await addDoc(templatesRef, newTemplate);
-      setTemplates(prev => [...prev, { id: docRef.id, ...newTemplate }]);
-      return { success: true };
-    } catch (error) {
-      console.error('Erro ao criar template:', error);
-      return { success: false, error: error.message };
-    }
-  };
-
-  const updateTemplate = async (templateId, templateData) => {
-    try {
-      const templateRef = doc(db, 'templates', templateId);
-      const updatedTemplate = {
-        ...templateData,
-        updatedAt: new Date().toISOString()
-      };
-      await updateDoc(templateRef, updatedTemplate);
-      setTemplates(prev =>
-        prev.map(template =>
-          template.id === templateId
-            ? { ...template, ...updatedTemplate }
-            : template
-        )
-      );
-      return { success: true };
-    } catch (error) {
-      console.error('Erro ao atualizar template:', error);
-      return { success: false, error: error.message };
-    }
-  };
-
-  const deleteTemplate = async (templateId) => {
-    try {
-      const templateRef = doc(db, 'templates', templateId);
-      await deleteDoc(templateRef);
-      setTemplates(prev => prev.filter(template => template.id !== templateId));
-      return { success: true };
-    } catch (error) {
-      console.error('Erro ao excluir template:', error);
-      return { success: false, error: error.message };
-    }
-  };
+  const {
+    data: templates,
+    loading,
+    error,
+    create,
+    update,
+    remove
+  } = useTenantData('templates');
 
   return {
     templates,
     loading,
     error,
-    createTemplate,
-    updateTemplate,
-    deleteTemplate
+    createTemplate: create,
+    updateTemplate: update,
+    deleteTemplate: remove
+  };
+};
+
+// Hook para consultas
+export const useAppointments = () => {
+  const {
+    data: appointments,
+    loading,
+    error,
+    create,
+    update,
+    remove
+  } = useTenantData('appointments');
+
+  return {
+    appointments,
+    loading,
+    error,
+    createAppointment: create,
+    updateAppointment: update,
+    deleteAppointment: remove
   };
 };
 

@@ -1,23 +1,10 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { auth, firestore } from '../services/firebase';
-import { 
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged
-} from 'firebase/auth';
-import { 
-  doc, 
-  getDoc, 
-  setDoc, 
-  collection,
-  query,
-  where,
-  getDocs
-} from 'firebase/firestore';
+import { firebaseService } from '../services/firebase';
 
+// Criar contexto
 const AuthContext = createContext();
 
+// Hook personalizado para usar o contexto
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
@@ -26,124 +13,139 @@ export const useAuth = () => {
   return context;
 };
 
+// Provider do contexto
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [tenant, setTenant] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [currentTenant, setCurrentTenant] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Função para buscar dados do tenant
-  const fetchTenantData = async (tenantId) => {
-    try {
-      const tenantDoc = await getDoc(doc(firestore, 'tenants', tenantId));
-      if (tenantDoc.exists()) {
-        setTenant({ id: tenantDoc.id, ...tenantDoc.data() });
-      }
-    } catch (error) {
-      console.error('Erro ao buscar dados do tenant:', error);
-    }
-  };
-
-  // Função para buscar dados do usuário
-  const fetchUserData = async (uid) => {
-    try {
-      const userDoc = await getDoc(doc(firestore, 'users', uid));
-      if (userDoc.exists()) {
-        const userData = userDoc.data();
-        if (userData.tenantId) {
-          await fetchTenantData(userData.tenantId);
-        }
-        return userData;
-      }
-    } catch (error) {
-      console.error('Erro ao buscar dados do usuário:', error);
-    }
-    return null;
-  };
-
-  // Observar mudanças no estado de autenticação
+  // Efeito para observar mudanças na autenticação
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    const unsubscribe = firebaseService.auth.onAuthStateChanged(async (user) => {
       if (user) {
-        const userData = await fetchUserData(user.uid);
-        setUser({ ...user, ...userData });
+        try {
+          // Buscar dados do usuário
+          const userDoc = await firebaseService.getById('users', user.uid);
+          
+          if (userDoc.success) {
+            const userData = userDoc.data;
+            
+            // Se o usuário tem um tenantId, buscar dados do tenant
+            if (userData.tenantId) {
+              const tenantDoc = await firebaseService.getTenantById(userData.tenantId);
+              
+              if (tenantDoc.success) {
+                setCurrentTenant(tenantDoc.data);
+              } else {
+                console.error('Erro ao carregar tenant:', tenantDoc.error);
+                setError('Erro ao carregar dados da organização');
+              }
+            }
+            
+            setCurrentUser({ ...user, ...userData });
+          } else {
+            console.error('Erro ao carregar usuário:', userDoc.error);
+            setError('Erro ao carregar dados do usuário');
+          }
+        } catch (err) {
+          console.error('Erro ao processar autenticação:', err);
+          setError(err.message);
+        }
       } else {
-        setUser(null);
-        setTenant(null);
+        setCurrentUser(null);
+        setCurrentTenant(null);
       }
+      
       setLoading(false);
     });
 
-    return () => unsubscribe();
+    return unsubscribe;
   }, []);
 
-  // Login com email/senha
-  const login = async (email, password) => {
+  // Criar novo usuário com tenant
+  const signUp = async (email, password, userData, tenantData) => {
     try {
-      const result = await signInWithEmailAndPassword(auth, email, password);
-      const userData = await fetchUserData(result.user.uid);
-      return { success: true, user: { ...result.user, ...userData } };
-    } catch (error) {
-      return { success: false, error: error.message };
+      setError(null);
+      
+      // Criar tenant primeiro
+      const tenantResult = await firebaseService.createTenant(tenantData);
+      
+      if (!tenantResult.success) {
+        throw new Error(tenantResult.error);
+      }
+      
+      // Criar usuário com referência ao tenant
+      const userResult = await firebaseService.createUser(email, password);
+      
+      if (!userResult.success) {
+        throw new Error(userResult.error);
+      }
+      
+      // Salvar dados adicionais do usuário
+      const completeUserData = {
+        ...userData,
+        tenantId: tenantResult.tenantId,
+        role: 'admin', // Primeiro usuário do tenant é admin
+        email: userResult.user.email,
+        uid: userResult.user.uid
+      };
+      
+      await firebaseService.create('users', completeUserData, tenantResult.tenantId);
+      
+      return { success: true };
+    } catch (err) {
+      setError(err.message);
+      return { success: false, error: err.message };
     }
   };
 
-  // Registro de novo usuário com tenant
-  const register = async (email, password, tenantData) => {
+  // Login
+  const signIn = async (email, password) => {
     try {
-      // 1. Criar usuário no Firebase Auth
-      const authResult = await createUserWithEmailAndPassword(auth, email, password);
-
-      // 2. Criar tenant no Firestore
-      const tenantRef = doc(collection(firestore, 'tenants'));
-      const newTenant = {
-        name: tenantData.name,
-        plan: tenantData.plan || 'basic',
-        createdAt: new Date().toISOString(),
-        ownerId: authResult.user.uid,
-        status: 'active'
-      };
-      await setDoc(tenantRef, newTenant);
-
-      // 3. Criar usuário no Firestore
-      const userRef = doc(firestore, 'users', authResult.user.uid);
-      const userData = {
-        email,
-        name: tenantData.name,
-        role: 'owner',
-        tenantId: tenantRef.id,
-        createdAt: new Date().toISOString()
-      };
-      await setDoc(userRef, userData);
-
-      // 4. Atualizar estados
-      setUser({ ...authResult.user, ...userData });
-      setTenant({ id: tenantRef.id, ...newTenant });
-
-      return { success: true, user: { ...authResult.user, ...userData }, tenant: { id: tenantRef.id, ...newTenant } };
-    } catch (error) {
-      return { success: false, error: error.message };
+      setError(null);
+      return await firebaseService.signIn(email, password);
+    } catch (err) {
+      setError(err.message);
+      return { success: false, error: err.message };
     }
   };
 
   // Logout
-  const logout = async () => {
+  const signOut = async () => {
     try {
-      await signOut(auth);
-      setUser(null);
-      setTenant(null);
+      setError(null);
+      await firebaseService.signOut();
+      setCurrentUser(null);
+      setCurrentTenant(null);
       return { success: true };
-    } catch (error) {
-      return { success: false, error: error.message };
+    } catch (err) {
+      setError(err.message);
+      return { success: false, error: err.message };
     }
   };
 
+  // Reset de senha
+  const resetPassword = async (email) => {
+    try {
+      setError(null);
+      return await firebaseService.resetPassword(email);
+    } catch (err) {
+      setError(err.message);
+      return { success: false, error: err.message };
+    }
+  };
+
+  // Valor do contexto
   const value = {
-    user,
-    tenant,
+    currentUser,
+    currentTenant,
     loading,
-    login,
-    register,
-    logout
+    error,
+    signUp,
+    signIn,
+    signOut,
+    resetPassword
   };
 
   return (

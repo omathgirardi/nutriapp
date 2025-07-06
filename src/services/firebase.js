@@ -4,7 +4,8 @@ import {
   createUserWithEmailAndPassword, 
   signInWithEmailAndPassword, 
   signOut, 
-  onAuthStateChanged 
+  onAuthStateChanged,
+  sendPasswordResetEmail
 } from 'firebase/auth';
 import { 
   getFirestore, 
@@ -18,7 +19,8 @@ import {
   getDocs, 
   query, 
   where, 
-  orderBy 
+  orderBy,
+  serverTimestamp
 } from 'firebase/firestore';
 import { 
   getStorage, 
@@ -27,179 +29,229 @@ import {
   getDownloadURL, 
   deleteObject 
 } from 'firebase/storage';
-
-// Configuração do Firebase
-const firebaseConfig = {
-  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
-  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.REACT_APP_FIREBASE_APP_ID
-};
+import { config } from '../config';
 
 // Inicializar Firebase
-const app = initializeApp(firebaseConfig);
+const app = initializeApp(config.firebase);
+const db = getFirestore(app);
+const auth = getAuth(app);
 
 // Serviços Firebase
-export const auth = getAuth(app);
-export const firestore = getFirestore(app);
+export const firestore = db;
 export const storage = getStorage(app);
 
-// Serviços de Autenticação
-export const authService = {
-  // Criar usuário
-  async createUser(email, password, userData) {
-    try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-      
-      // Salvar dados adicionais do usuário
-      await setDoc(doc(firestore, 'users', user.uid), {
-        ...userData,
-        email: user.email,
-        uid: user.uid,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      });
-      
-      return { user, success: true };
-    } catch (error) {
-      console.error('Erro ao criar usuário:', error);
-      return { error: error.message, success: false };
-    }
-  },
-
-  // Fazer login
-  async login(email, password) {
-    try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      return { user: userCredential.user, success: true };
-    } catch (error) {
-      console.error('Erro ao fazer login:', error);
-      return { error: error.message, success: false };
-    }
-  },
-
-  // Logout
-  async logout() {
-    try {
-      await signOut(auth);
-      return { success: true };
-    } catch (error) {
-      console.error('Erro ao fazer logout:', error);
-      return { error: error.message, success: false };
-    }
-  },
-
-  // Observar mudanças de autenticação
-  onAuthStateChange(callback) {
-    return onAuthStateChanged(auth, callback);
+// Serviço de Banco de Dados com suporte a multi-tenant
+class FirebaseService {
+  constructor() {
+    this.db = db;
+    this.auth = auth;
   }
-};
 
-// Serviços de Banco de Dados
-export const dbService = {
-  // Criar documento
-  async create(collectionName, data) {
+  // Gerar ID do tenant
+  generateTenantId() {
+    return `T${Date.now().toString(36).toUpperCase()}`;
+  }
+
+  // Criar novo tenant
+  async createTenant(tenantData) {
     try {
-      const docRef = await addDoc(collection(firestore, collectionName), {
-        ...data,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      });
-      return { id: docRef.id, success: true };
+      const tenantsRef = collection(this.db, 'tenants');
+      const tenantId = this.generateTenantId();
+      
+      const newTenant = {
+        ...tenantData,
+        tenantId,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+        status: 'active'
+      };
+
+      const docRef = await addDoc(tenantsRef, newTenant);
+      return { success: true, id: docRef.id, tenantId };
     } catch (error) {
-      console.error('Erro ao criar documento:', error);
-      return { error: error.message, success: false };
+      console.error('Erro ao criar tenant:', error);
+      return { success: false, error: error.message };
     }
-  },
+  }
 
-  // Buscar documento por ID
-  async getById(collectionName, id) {
+  // Buscar tenant por ID
+  async getTenantById(id) {
     try {
-      const docRef = doc(firestore, collectionName, id);
+      const docRef = doc(this.db, 'tenants', id);
       const docSnap = await getDoc(docRef);
       
       if (docSnap.exists()) {
-        return { data: { id: docSnap.id, ...docSnap.data() }, success: true };
+        return { success: true, data: { id: docSnap.id, ...docSnap.data() } };
       } else {
-        return { error: 'Documento não encontrado', success: false };
+        return { success: false, error: 'Tenant não encontrado' };
       }
     } catch (error) {
-      console.error('Erro ao buscar documento:', error);
-      return { error: error.message, success: false };
-    }
-  },
-
-  // Buscar todos os documentos de uma coleção
-  async getAll(collectionName, orderField = 'createdAt', orderDirection = 'desc') {
-    try {
-      const q = query(
-        collection(firestore, collectionName),
-        orderBy(orderField, orderDirection)
-      );
-      const querySnapshot = await getDocs(q);
-      
-      const documents = [];
-      querySnapshot.forEach((doc) => {
-        documents.push({ id: doc.id, ...doc.data() });
-      });
-      
-      return { data: documents, success: true };
-    } catch (error) {
-      console.error('Erro ao buscar documentos:', error);
-      return { error: error.message, success: false };
-    }
-  },
-
-  // Buscar documentos com filtro
-  async getByFilter(collectionName, field, operator, value) {
-    try {
-      const q = query(
-        collection(firestore, collectionName),
-        where(field, operator, value)
-      );
-      const querySnapshot = await getDocs(q);
-      
-      const documents = [];
-      querySnapshot.forEach((doc) => {
-        documents.push({ id: doc.id, ...doc.data() });
-      });
-      
-      return { data: documents, success: true };
-    } catch (error) {
-      console.error('Erro ao buscar documentos por filtro:', error);
-      return { error: error.message, success: false };
-    }
-  },
-
-  // Atualizar documento
-  async update(collectionName, id, data) {
-    try {
-      const docRef = doc(firestore, collectionName, id);
-      await updateDoc(docRef, {
-        ...data,
-        updatedAt: new Date().toISOString()
-      });
-      return { success: true };
-    } catch (error) {
-      console.error('Erro ao atualizar documento:', error);
-      return { error: error.message, success: false };
-    }
-  },
-
-  // Excluir documento
-  async delete(collectionName, id) {
-    try {
-      await deleteDoc(doc(firestore, collectionName, id));
-      return { success: true };
-    } catch (error) {
-      console.error('Erro ao excluir documento:', error);
-      return { error: error.message, success: false };
+      console.error('Erro ao buscar tenant:', error);
+      return { success: false, error: error.message };
     }
   }
-};
+
+  // CRUD genérico com suporte a tenant
+  async create(collectionName, data, tenantId) {
+    try {
+      // Adicionar tenantId e timestamps aos dados
+      const completeData = {
+        ...data,
+        tenantId,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      };
+
+      const collectionRef = collection(this.db, collectionName);
+      const docRef = await addDoc(collectionRef, completeData);
+      
+      return { success: true, id: docRef.id };
+    } catch (error) {
+      console.error(`Erro ao criar documento em ${collectionName}:`, error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  async getById(collectionName, id, tenantId) {
+    try {
+      const docRef = doc(this.db, collectionName, id);
+      const docSnap = await getDoc(docRef);
+      
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        // Verificar se o documento pertence ao tenant correto
+        if (data.tenantId === tenantId) {
+          return { success: true, data: { id: docSnap.id, ...data } };
+        } else {
+          return { success: false, error: 'Acesso negado' };
+        }
+      } else {
+        return { success: false, error: 'Documento não encontrado' };
+      }
+    } catch (error) {
+      console.error(`Erro ao buscar documento em ${collectionName}:`, error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  async getAll(collectionName, tenantId, orderByField = 'createdAt') {
+    try {
+      const q = query(
+        collection(this.db, collectionName),
+        where('tenantId', '==', tenantId),
+        orderBy(orderByField, 'desc')
+      );
+      
+      const querySnapshot = await getDocs(q);
+      const documents = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      
+      return { success: true, data: documents };
+    } catch (error) {
+      console.error(`Erro ao buscar documentos em ${collectionName}:`, error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  async update(collectionName, id, data, tenantId) {
+    try {
+      // Verificar se o documento existe e pertence ao tenant
+      const docRef = doc(this.db, collectionName, id);
+      const docSnap = await getDoc(docRef);
+      
+      if (!docSnap.exists()) {
+        return { success: false, error: 'Documento não encontrado' };
+      }
+      
+      const currentData = docSnap.data();
+      if (currentData.tenantId !== tenantId) {
+        return { success: false, error: 'Acesso negado' };
+      }
+
+      // Atualizar documento
+      const updateData = {
+        ...data,
+        updatedAt: serverTimestamp()
+      };
+      
+      await updateDoc(docRef, updateData);
+      return { success: true };
+    } catch (error) {
+      console.error(`Erro ao atualizar documento em ${collectionName}:`, error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  async delete(collectionName, id, tenantId) {
+    try {
+      // Verificar se o documento existe e pertence ao tenant
+      const docRef = doc(this.db, collectionName, id);
+      const docSnap = await getDoc(docRef);
+      
+      if (!docSnap.exists()) {
+        return { success: false, error: 'Documento não encontrado' };
+      }
+      
+      const data = docSnap.data();
+      if (data.tenantId !== tenantId) {
+        return { success: false, error: 'Acesso negado' };
+      }
+
+      // Deletar documento
+      await deleteDoc(docRef);
+      return { success: true };
+    } catch (error) {
+      console.error(`Erro ao deletar documento em ${collectionName}:`, error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  // Métodos de autenticação
+  async createUser(email, password) {
+    try {
+      const userCredential = await createUserWithEmailAndPassword(this.auth, email, password);
+      return { success: true, user: userCredential.user };
+    } catch (error) {
+      console.error('Erro ao criar usuário:', error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  async signIn(email, password) {
+    try {
+      const userCredential = await signInWithEmailAndPassword(this.auth, email, password);
+      return { success: true, user: userCredential.user };
+    } catch (error) {
+      console.error('Erro ao fazer login:', error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  async signOut() {
+    try {
+      await signOut(this.auth);
+      return { success: true };
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  async resetPassword(email) {
+    try {
+      await sendPasswordResetEmail(this.auth, email);
+      return { success: true };
+    } catch (error) {
+      console.error('Erro ao resetar senha:', error);
+      return { success: false, error: error.message };
+    }
+  }
+}
+
+// Exportar instância única do serviço
+export const firebaseService = new FirebaseService();
 
 // Serviços de Storage
 export const storageService = {

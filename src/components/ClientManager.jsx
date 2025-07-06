@@ -9,6 +9,8 @@ const ClientManager = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedClient, setSelectedClient] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
   const {
     clients,
@@ -21,14 +23,21 @@ const ClientManager = () => {
 
   const handleCreateClient = async (clientData) => {
     setLoading(true);
+    setSuccessMessage('');
+    setErrorMessage('');
+    
     try {
       const result = await createClient(clientData);
       if (result.success) {
-        setShowModal(false);
-        setSelectedClient(null);
+        setSuccessMessage(`Cliente ${clientData.name} criado com sucesso! Um código de ativação foi enviado para o WhatsApp.`);
+        return result;
       } else {
-        alert('Erro ao criar cliente: ' + result.error);
+        setErrorMessage('Erro ao criar cliente: ' + result.error);
+        return result;
       }
+    } catch (error) {
+      setErrorMessage('Erro ao criar cliente: ' + error.message);
+      return { success: false, error: error.message };
     } finally {
       setLoading(false);
     }
@@ -37,14 +46,20 @@ const ClientManager = () => {
   const handleUpdateClient = async (clientData) => {
     if (!selectedClient) return;
     setLoading(true);
+    setSuccessMessage('');
+    setErrorMessage('');
+    
     try {
       const result = await updateClient(selectedClient.id, clientData);
       if (result.success) {
         setShowModal(false);
         setSelectedClient(null);
+        setSuccessMessage(`Cliente ${clientData.name} atualizado com sucesso!`);
       } else {
-        alert('Erro ao atualizar cliente: ' + result.error);
+        setErrorMessage('Erro ao atualizar cliente: ' + result.error);
       }
+    } catch (error) {
+      setErrorMessage('Erro ao atualizar cliente: ' + error.message);
     } finally {
       setLoading(false);
     }
@@ -53,13 +68,18 @@ const ClientManager = () => {
   const handleDeleteClient = async (clientId) => {
     if (!window.confirm('Tem certeza que deseja excluir este cliente?')) return;
     
+    setSuccessMessage('');
+    setErrorMessage('');
+    
     try {
       const result = await deleteClient(clientId);
-      if (!result.success) {
-        alert('Erro ao excluir cliente: ' + result.error);
+      if (result.success) {
+        setSuccessMessage('Cliente excluído com sucesso!');
+      } else {
+        setErrorMessage('Erro ao excluir cliente: ' + result.error);
       }
     } catch (error) {
-      alert('Erro ao excluir cliente: ' + error.message);
+      setErrorMessage('Erro ao excluir cliente: ' + error.message);
     }
   };
 
@@ -73,6 +93,19 @@ const ClientManager = () => {
 
   return (
     <div className="space-y-6">
+      {/* Mensagens de Sucesso/Erro */}
+      {successMessage && (
+        <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
+          {successMessage}
+        </div>
+      )}
+      
+      {errorMessage && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+          {errorMessage}
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-900">Clientes</h2>
@@ -80,6 +113,8 @@ const ClientManager = () => {
           onClick={() => {
             setSelectedClient(null);
             setShowModal(true);
+            setSuccessMessage('');
+            setErrorMessage('');
           }}
         >
           Novo Cliente
@@ -97,6 +132,14 @@ const ClientManager = () => {
                 {client.phone && (
                   <p className="text-sm text-gray-600">{client.phone}</p>
                 )}
+                {/* Status de Ativação */}
+                <div className={`mt-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                  client.isActivated 
+                    ? 'bg-green-100 text-green-800' 
+                    : 'bg-yellow-100 text-yellow-800'
+                }`}>
+                  {client.isActivated ? '✅ Ativado' : '⏳ Pendente'}
+                </div>
               </div>
               <div className="flex gap-2">
                 <Button
@@ -105,6 +148,8 @@ const ClientManager = () => {
                   onClick={() => {
                     setSelectedClient(client);
                     setShowModal(true);
+                    setSuccessMessage('');
+                    setErrorMessage('');
                   }}
                 >
                   Editar
@@ -163,6 +208,8 @@ const ClientManager = () => {
         onClose={() => {
           setShowModal(false);
           setSelectedClient(null);
+          setSuccessMessage('');
+          setErrorMessage('');
         }}
         title={selectedClient ? 'Editar Cliente' : 'Novo Cliente'}
       >
