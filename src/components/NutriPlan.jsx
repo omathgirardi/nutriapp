@@ -70,6 +70,7 @@ import { useTenantStats } from '../hooks/useTenantData';
 import ClientManager from './ClientManager';
 import DietManager from './DietManager';
 import TemplateManager from './TemplateManager';
+import WhatsAppDiagnostic from './WhatsAppDiagnostic';
 
 const { useStoredState } = hatch;
 
@@ -312,7 +313,8 @@ const NutriPlan = () => {
   const tabs = [
     { id: 'clients', label: 'Clientes' },
     { id: 'diets', label: 'Dietas' },
-    { id: 'templates', label: 'Templates' }
+    { id: 'templates', label: 'Templates' },
+    { id: 'whatsapp', label: '📱 WhatsApp' }
   ];
 
   return (
@@ -342,9 +344,10 @@ const NutriPlan = () => {
         {activeTab === 'clients' && <ClientManager />}
         {activeTab === 'diets' && <DietManager />}
         {activeTab === 'templates' && <TemplateManager />}
+        {activeTab === 'whatsapp' && <WhatsAppDiagnostic />}
       </div>
     </div>
   );
 };
 
-export default NutriPlan; 
+export default NutriPlan;

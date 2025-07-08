@@ -7,7 +7,8 @@
   "scripts": {
     "dev": "serve . -l 3000",
     "start": "serve . -l 3000",
-    "build": "echo 'No build process needed for this project'",
+    "build": "cp -r . dist/ || xcopy . dist\\ /E /I",
+    "vercel-build": "echo 'Static files ready for deployment'",
     "preview": "serve . -l 4173",
     "firebase:init": "node scripts/initFirebase.js",
     "firebase:seed": "node scripts/seedFirebase.js",
@@ -43,4 +44,4 @@
     "url": "https://github.com/nutriapp/nutriplan-plataforma/issues"
   },
   "homepage": "https://github.com/nutriapp/nutriplan-plataforma#readme"
-} 
+}
