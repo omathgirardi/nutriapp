@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { evolutionService } from '../services/evolutionApi.js';
 import { config } from '../config/index.js';
+import { deploymentCheck } from '../utils/deploymentCheck.js';
 
 const WhatsAppDiagnostic = () => {
   const [status, setStatus] = useState({
@@ -16,6 +17,8 @@ const WhatsAppDiagnostic = () => {
   const [testMessage, setTestMessage] = useState('Teste de mensagem do NutriApp');
   const [testResult, setTestResult] = useState(null);
   const [testing, setTesting] = useState(false);
+  const [deploymentStatus, setDeploymentStatus] = useState(null);
+  const [showDeploymentCheck, setShowDeploymentCheck] = useState(false);
 
   const checkStatus = async () => {
     setStatus(prev => ({ ...prev, loading: true, error: null }));
@@ -135,8 +138,33 @@ const WhatsAppDiagnostic = () => {
     }
   };
 
+  // Executar verificação completa de deployment
+  const runDeploymentCheck = async () => {
+    setDeploymentStatus({ loading: true });
+    try {
+      const results = await deploymentCheck.runAllChecks();
+      const report = deploymentCheck.generateReport(results);
+      setDeploymentStatus({ 
+        loading: false, 
+        results, 
+        report,
+        success: results.variables.success && results.firebase.success && results.evolutionAPI.success
+      });
+    } catch (error) {
+      setDeploymentStatus({ 
+        loading: false, 
+        error: error.message,
+        success: false
+      });
+    }
+  };
+
   useEffect(() => {
     checkStatus();
+    // Verificar se está em produção para mostrar check de deployment
+    if (window.location.hostname.includes('vercel.app') || process.env.NODE_ENV === 'production') {
+      setShowDeploymentCheck(true);
+    }
   }, []);
 
   return (
@@ -145,6 +173,55 @@ const WhatsAppDiagnostic = () => {
         <h2 className="text-2xl font-bold text-gray-800 mb-2">🔧 Diagnóstico WhatsApp</h2>
         <p className="text-gray-600">Verificação do status da integração com WhatsApp via Evolution API</p>
       </div>
+
+      {/* Verificação de Deployment (apenas em produção) */}
+      {showDeploymentCheck && (
+        <div className="mb-6 p-4 border-2 border-blue-200 bg-blue-50 rounded-lg">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h3 className="text-lg font-semibold text-blue-900">🔍 Verificação de Deployment</h3>
+              <p className="text-sm text-blue-700">Verificar se todas as configurações estão corretas em produção</p>
+            </div>
+            <button 
+              onClick={runDeploymentCheck}
+              disabled={deploymentStatus?.loading}
+              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+            >
+              {deploymentStatus?.loading ? 'Verificando...' : 'Verificar Sistema'}
+            </button>
+          </div>
+          
+          {deploymentStatus && !deploymentStatus.loading && (
+            <div className={`p-4 rounded-lg ${deploymentStatus.success ? 'bg-green-100 border border-green-300' : 'bg-red-100 border border-red-300'}`}>
+              <div className="flex items-center mb-2">
+                <span className={`text-lg mr-2 ${deploymentStatus.success ? 'text-green-600' : 'text-red-600'}`}>
+                  {deploymentStatus.success ? '✅' : '❌'}
+                </span>
+                <span className={`font-semibold ${deploymentStatus.success ? 'text-green-800' : 'text-red-800'}`}>
+                  {deploymentStatus.success ? 'Sistema Funcionando Perfeitamente!' : 'Problemas Encontrados'}
+                </span>
+              </div>
+              
+              {deploymentStatus.report && (
+                <details className="mt-3">
+                  <summary className="cursor-pointer text-sm font-medium text-gray-700 hover:text-gray-900">
+                    Ver Relatório Detalhado
+                  </summary>
+                  <pre className="mt-2 text-xs bg-white p-3 rounded border overflow-auto max-h-64">
+                    {deploymentStatus.report}
+                  </pre>
+                </details>
+              )}
+              
+              {deploymentStatus.error && (
+                <p className="text-red-700 text-sm mt-2">
+                  Erro: {deploymentStatus.error}
+                </p>
+              )}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Configurações */}
       <div className="mb-6 p-4 bg-gray-50 rounded-lg">
