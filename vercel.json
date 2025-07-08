@@ -30,11 +30,6 @@
     "NODE_ENV": "production",
     "REACT_APP_USE_MOCK_DATA": "false"
   },
-  "functions": {
-    "src/services/*.js": {
-      "maxDuration": 30
-    }
-  },
   "headers": [
     {
       "source": "/(.*)",
