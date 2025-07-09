@@ -2450,7 +2450,7 @@ const NutriPlan = () => {
                 </div>
                 <div className="flex-1">
                   <h4 className="text-sm font-semibold text-orange-900">Créditos Baixos!</h4>
-                  <p className="text-xs text-orange-700">Apenas <strong>5 créditos</strong> restantes.</p>
+                  <p className="text-xs text-orange-700">Apenas <strong>{credits || 0} créditos</strong> restantes.</p>
                 </div>
               </div>
               <Button 
@@ -2521,11 +2521,11 @@ const NutriPlan = () => {
                     <Card className="p-4 md:p-6">
                       <div className="flex items-center justify-between">
                         <div className="min-w-0 flex-1">
-                          <h3 className="text-xl md:text-2xl font-bold text-gray-900">1247</h3>
-                          <p className="text-gray-500 text-sm mb-2">Clientes Cadastrados</p>
-                          <div className="flex items-center text-xs">
-                            <span className="text-green-600 bg-green-50 px-2 py-1 rounded-full whitespace-nowrap">+12% vs. mês anterior</span>
-                          </div>
+                          <h3 className="text-xl md:text-2xl font-bold text-gray-900">{clients.length || 0}</h3>
+                      <p className="text-gray-500 text-sm mb-2">Clientes Cadastrados</p>
+                      <div className="flex items-center text-xs">
+                        <span className="text-gray-600 bg-gray-50 px-2 py-1 rounded-full whitespace-nowrap">Dados reais do Firebase</span>
+                      </div>
                         </div>
                         <div className="w-10 h-10 md:w-12 md:h-12 bg-blue-50 rounded-xl flex items-center justify-center flex-shrink-0 ml-3">
                           <Users className="text-blue-600" size={20} />
@@ -2536,11 +2536,11 @@ const NutriPlan = () => {
                     <Card className="p-4 md:p-6">
                       <div className="flex items-center justify-between">
                         <div className="min-w-0 flex-1">
-                          <h3 className="text-xl md:text-2xl font-bold text-gray-900">3456</h3>
-                          <p className="text-gray-500 text-sm mb-2">Dietas Geradas</p>
-                          <div className="flex items-center text-xs">
-                            <span className="text-green-600 bg-green-50 px-2 py-1 rounded-full whitespace-nowrap">+8% vs. mês anterior</span>
-                          </div>
+                          <h3 className="text-xl md:text-2xl font-bold text-gray-900">{diets.length || 0}</h3>
+                      <p className="text-gray-500 text-sm mb-2">Dietas Geradas</p>
+                      <div className="flex items-center text-xs">
+                        <span className="text-gray-600 bg-gray-50 px-2 py-1 rounded-full whitespace-nowrap">Dados reais do Firebase</span>
+                      </div>
                         </div>
                         <div className="w-10 h-10 md:w-12 md:h-12 bg-green-50 rounded-xl flex items-center justify-center flex-shrink-0 ml-3">
                           <FileText className="text-green-600" size={20} />
@@ -2551,11 +2551,11 @@ const NutriPlan = () => {
                     <Card className="p-4 md:p-6 sm:col-span-2 lg:col-span-1">
                       <div className="flex items-center justify-between">
                         <div className="min-w-0 flex-1">
-                          <h3 className="text-xl md:text-2xl font-bold text-gray-900">94%</h3>
-                          <p className="text-gray-500 text-sm mb-2">Taxa de Sucesso</p>
-                          <div className="flex items-center text-xs">
-                            <span className="text-green-600 bg-green-50 px-2 py-1 rounded-full whitespace-nowrap">+2% vs. mês anterior</span>
-                          </div>
+                          <h3 className="text-xl md:text-2xl font-bold text-gray-900">{clients.length > 0 ? Math.round((clients.filter(c => c.status === 'ativo').length / clients.length) * 100) : 0}%</h3>
+                      <p className="text-gray-500 text-sm mb-2">Taxa de Sucesso</p>
+                      <div className="flex items-center text-xs">
+                        <span className="text-gray-600 bg-gray-50 px-2 py-1 rounded-full whitespace-nowrap">Baseado em clientes ativos</span>
+                      </div>
                         </div>
                         <div className="w-10 h-10 md:w-12 md:h-12 bg-emerald-50 rounded-xl flex items-center justify-center flex-shrink-0 ml-3">
                           <TrendingUp className="text-emerald-600" size={20} />
@@ -2574,88 +2574,72 @@ const NutriPlan = () => {
                       </div>
                       
                       <div className="space-y-3 md:space-y-4">
-                        {/* Ranking dos Personal Trainers */}
-                        <div className="bg-gradient-to-r from-yellow-50 to-amber-50 border border-yellow-200 rounded-xl p-3 md:p-4">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center space-x-3 md:space-x-4 min-w-0 flex-1">
-                              <div className="w-10 h-10 md:w-12 md:h-12 rounded-full overflow-hidden flex items-center justify-center flex-shrink-0 bg-yellow-100">
-                                {profilePhoto || currentUser.photo ? (
-                                  <img 
-                                    src={profilePhoto || currentUser.photo} 
-                                    alt="João Silva"
-                                    className="w-full h-full object-cover"
-                                  />
-                                ) : (
-                                  <Crown className="text-yellow-600" size={20} />
-                                )}
-                              </div>
-                              <div className="min-w-0 flex-1">
-                                <h4 className="font-semibold text-gray-900 text-sm md:text-base truncate">João Silva</h4>
-                                <p className="text-xs md:text-sm text-gray-600">Personal Trainer</p>
-                                <div className="flex flex-wrap items-center gap-2 mt-1">
-                                  <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full whitespace-nowrap">127 dietas</span>
-                                  <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full whitespace-nowrap">45 clientes</span>
+                        {/* Ranking dos Personal Trainers - Dados dinâmicos do Firebase */}
+                        {personalTrainers && personalTrainers.length > 0 ? (
+                          personalTrainers.slice(0, 3).map((trainer, index) => (
+                            <div key={trainer.id} className={`rounded-xl p-3 md:p-4 ${
+                              index === 0 
+                                ? 'bg-gradient-to-r from-yellow-50 to-amber-50 border border-yellow-200'
+                                : 'bg-gray-50'
+                            }`}>
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center space-x-3 md:space-x-4 min-w-0 flex-1">
+                                  <div className={`w-10 h-10 md:w-12 md:h-12 rounded-full overflow-hidden flex items-center justify-center flex-shrink-0 ${
+                                    index === 0 ? 'bg-yellow-100' : 'bg-gray-100'
+                                  }`}>
+                                    {trainer.photo ? (
+                                      <img 
+                                        src={trainer.photo} 
+                                        alt={trainer.name}
+                                        className="w-full h-full object-cover"
+                                      />
+                                    ) : (
+                                      index === 0 ? (
+                                        <Crown className="text-yellow-600" size={20} />
+                                      ) : (
+                                        <User className="text-gray-600" size={20} />
+                                      )
+                                    )}
+                                  </div>
+                                  <div className="min-w-0 flex-1">
+                                    <h4 className="font-semibold text-gray-900 text-sm md:text-base truncate">{trainer.name}</h4>
+                                    <p className="text-xs md:text-sm text-gray-600">Personal Trainer</p>
+                                    <div className="flex flex-wrap items-center gap-2 mt-1">
+                                      <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full whitespace-nowrap">
+                                        {trainer.dietsCount || 0} dietas
+                                      </span>
+                                      <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full whitespace-nowrap">
+                                        {trainer.clientsCount || 0} clientes
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="text-right flex-shrink-0 ml-2">
+                                  <p className={`text-xl md:text-2xl font-bold ${
+                                    index === 0 ? 'text-yellow-600' : 'text-gray-600'
+                                  }`}>#{index + 1}</p>
+                                  <p className="text-xs md:text-sm text-gray-500">
+                                    {index === 0 ? 'Líder' : index === 1 ? 'Vice-líder' : `${index + 1}º lugar`}
+                                  </p>
                                 </div>
                               </div>
                             </div>
-                            <div className="text-right flex-shrink-0 ml-2">
-                              <p className="text-xl md:text-2xl font-bold text-yellow-600">#1</p>
-                              <p className="text-xs md:text-sm text-gray-500">Líder</p>
-                            </div>
+                          ))
+                        ) : (
+                          <div className="bg-gray-50 rounded-xl p-4 text-center">
+                            <User className="text-gray-400 mx-auto mb-2" size={32} />
+                            <p className="text-gray-500 text-sm">Nenhum personal trainer cadastrado</p>
+                            <p className="text-gray-400 text-xs">Dados virão do Firebase</p>
                           </div>
-                        </div>
-
-                        <div className="bg-gray-50 rounded-xl p-3 md:p-4">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center space-x-3 md:space-x-4 min-w-0 flex-1">
-                              <div className="w-10 h-10 md:w-12 md:h-12 bg-gray-100 rounded-full overflow-hidden flex items-center justify-center flex-shrink-0">
-                                <User className="text-gray-600" size={20} />
-                              </div>
-                              <div className="min-w-0 flex-1">
-                                <h4 className="font-semibold text-gray-900 text-sm md:text-base truncate">Maria Santos</h4>
-                                <p className="text-xs md:text-sm text-gray-600">Personal Trainer</p>
-                                <div className="flex flex-wrap items-center gap-2 mt-1">
-                                  <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full whitespace-nowrap">98 dietas</span>
-                                  <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full whitespace-nowrap">32 clientes</span>
-                                </div>
-                              </div>
-                            </div>
-                            <div className="text-right flex-shrink-0 ml-2">
-                              <p className="text-xl md:text-2xl font-bold text-gray-600">#2</p>
-                              <p className="text-xs md:text-sm text-gray-500">Vice-líder</p>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="bg-gray-50 rounded-xl p-3 md:p-4">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center space-x-3 md:space-x-4 min-w-0 flex-1">
-                              <div className="w-10 h-10 md:w-12 md:h-12 bg-gray-100 rounded-full overflow-hidden flex items-center justify-center flex-shrink-0">
-                                <User className="text-gray-600" size={20} />
-                              </div>
-                              <div className="min-w-0 flex-1">
-                                <h4 className="font-semibold text-gray-900 text-sm md:text-base truncate">Carlos Oliveira</h4>
-                                <p className="text-xs md:text-sm text-gray-600">Personal Trainer</p>
-                                <div className="flex flex-wrap items-center gap-2 mt-1">
-                                  <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full whitespace-nowrap">87 dietas</span>
-                                  <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full whitespace-nowrap">28 clientes</span>
-                                </div>
-                              </div>
-                            </div>
-                            <div className="text-right flex-shrink-0 ml-2">
-                              <p className="text-xl md:text-2xl font-bold text-gray-600">#3</p>
-                              <p className="text-xs md:text-sm text-gray-500">3º lugar</p>
-                            </div>
-                          </div>
-                        </div>
+                        )}
 
                         <div className="grid grid-cols-2 gap-3 md:gap-4 mt-4 md:mt-6">
                           <div className="bg-blue-50 p-3 md:p-4 rounded-lg text-center">
-                            <p className="text-xl md:text-2xl font-bold text-blue-600">312</p>
+                            <p className="text-xl md:text-2xl font-bold text-blue-600">{diets.length || 0}</p>
                             <p className="text-xs md:text-sm text-gray-600">Total de Dietas</p>
                           </div>
                           <div className="bg-green-50 p-3 md:p-4 rounded-lg text-center">
-                            <p className="text-xl md:text-2xl font-bold text-green-600">105</p>
+                            <p className="text-xl md:text-2xl font-bold text-green-600">{clients.length || 0}</p>
                             <p className="text-xs md:text-sm text-gray-600">Total de Clientes</p>
                           </div>
                         </div>
@@ -2666,45 +2650,38 @@ const NutriPlan = () => {
                     <Card className="p-4 md:p-6">
                       <h3 className="text-lg font-semibold text-gray-900 mb-4 md:mb-6">Atividade Recente</h3>
                       <div className="space-y-3 md:space-y-4">
-                        <div className="flex items-start space-x-3 p-3 bg-blue-50 rounded-lg">
-                          <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                            <User size={16} className="text-blue-600" />
+                        {recentActivities && recentActivities.length > 0 ? (
+                          recentActivities.slice(0, 4).map((activity, index) => (
+                            <div key={index} className={`flex items-start space-x-3 p-3 rounded-lg ${
+                              activity.type === 'diet' ? 'bg-blue-50' :
+                              activity.type === 'sale' ? 'bg-emerald-50' :
+                              activity.type === 'client' ? 'bg-purple-50' :
+                              'bg-gray-50'
+                            }`}>
+                              <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                                activity.type === 'diet' ? 'bg-blue-100' :
+                                activity.type === 'sale' ? 'bg-emerald-100' :
+                                activity.type === 'client' ? 'bg-purple-100' :
+                                'bg-gray-100'
+                              }`}>
+                                {activity.type === 'diet' && <FileText size={16} className="text-blue-600" />}
+                                {activity.type === 'sale' && <DollarSign size={16} className="text-emerald-600" />}
+                                {activity.type === 'client' && <User size={16} className="text-purple-600" />}
+                                {activity.type === 'achievement' && <Star size={16} className="text-yellow-600" />}
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <p className="font-medium text-gray-900 text-sm truncate">{activity.title}</p>
+                                <p className="text-xs text-gray-500">{activity.description}</p>
+                              </div>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="text-center py-6">
+                            <Activity className="text-gray-400 mx-auto mb-2" size={32} />
+                            <p className="text-gray-500 text-sm">Nenhuma atividade recente</p>
+                            <p className="text-gray-400 text-xs">Dados virão do Firebase</p>
                           </div>
-                          <div className="min-w-0 flex-1">
-                            <p className="font-medium text-gray-900 text-sm truncate">Maria Silva</p>
-                            <p className="text-xs text-gray-500">2 horas atrás • 1800 kcal</p>
-                          </div>
-                        </div>
-
-                        <div className="flex items-start space-x-3 p-3 bg-emerald-50 rounded-lg">
-                          <div className="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center flex-shrink-0">
-                            <DollarSign size={16} className="text-emerald-600" />
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <p className="font-medium text-gray-900 text-sm">Venda nova - João comprou 500 créditos</p>
-                            <p className="text-xs text-gray-500">1 dia atrás</p>
-                          </div>
-                        </div>
-
-                        <div className="flex items-start space-x-3 p-3 bg-blue-50 rounded-lg">
-                          <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                            <User size={16} className="text-blue-600" />
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <p className="font-medium text-gray-900 text-sm truncate">Ana Costa</p>
-                            <p className="text-xs text-gray-500">2 dias atrás • 2000 kcal</p>
-                          </div>
-                        </div>
-
-                        <div className="flex items-start space-x-3 p-3 bg-blue-50 rounded-lg">
-                          <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                            <Star size={16} className="text-blue-600" />
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <p className="font-medium text-gray-900 text-sm">Conquista desbloqueada: 50 Dietas</p>
-                            <p className="text-xs text-gray-500">3 dias atrás</p>
-                          </div>
-                        </div>
+                        )}
                       </div>
                     </Card>
                   </div>
@@ -2723,10 +2700,10 @@ const NutriPlan = () => {
                     <Card className="p-4 md:p-6">
                       <div className="flex items-center justify-between">
                         <div className="min-w-0 flex-1">
-                          <h3 className="text-xl md:text-2xl font-bold text-gray-900">23</h3>
+                          <h3 className="text-xl md:text-2xl font-bold text-gray-900">{clients?.length || 0}</h3>
                           <p className="text-gray-500 text-sm mb-2">Alunos Cadastrados</p>
                           <div className="flex items-center text-xs">
-                            <span className="text-green-600 bg-green-50 px-2 py-1 rounded-full whitespace-nowrap">+3 este mês</span>
+                            <span className="text-blue-600 bg-blue-50 px-2 py-1 rounded-full whitespace-nowrap">Dados do Firebase</span>
                           </div>
                         </div>
                         <div className="w-10 h-10 md:w-12 md:h-12 bg-blue-50 rounded-xl flex items-center justify-center flex-shrink-0 ml-3">
@@ -2738,10 +2715,10 @@ const NutriPlan = () => {
                     <Card className="p-4 md:p-6">
                       <div className="flex items-center justify-between">
                         <div className="min-w-0 flex-1">
-                          <h3 className="text-xl md:text-2xl font-bold text-gray-900">187</h3>
+                          <h3 className="text-xl md:text-2xl font-bold text-gray-900">{diets?.length || 0}</h3>
                           <p className="text-gray-500 text-sm mb-2">Receitas Geradas</p>
                           <div className="flex items-center text-xs">
-                            <span className="text-green-600 bg-green-50 px-2 py-1 rounded-full whitespace-nowrap">+15 esta semana</span>
+                            <span className="text-green-600 bg-green-50 px-2 py-1 rounded-full whitespace-nowrap">Dados do Firebase</span>
                           </div>
                         </div>
                         <div className="w-10 h-10 md:w-12 md:h-12 bg-green-50 rounded-xl flex items-center justify-center flex-shrink-0 ml-3">
@@ -2756,10 +2733,12 @@ const NutriPlan = () => {
                     >
                       <div className="flex items-center justify-between">
                         <div className="min-w-0 flex-1">
-                          <h3 className="text-xl md:text-2xl font-bold text-orange-600">5</h3>
+                          <h3 className="text-xl md:text-2xl font-bold text-orange-600">{credits || 0}</h3>
                           <p className="text-orange-700 text-sm mb-2">Créditos Restantes</p>
                           <div className="flex items-center text-xs">
-                            <span className="text-red-600 bg-red-100 px-2 py-1 rounded-full whitespace-nowrap animate-pulse">⚠️ Créditos baixos</span>
+                            {credits <= 5 && (
+                              <span className="text-red-600 bg-red-100 px-2 py-1 rounded-full whitespace-nowrap animate-pulse">⚠️ Créditos baixos</span>
+                            )}
                           </div>
                         </div>
                         <div className="w-10 h-10 md:w-12 md:h-12 bg-orange-100 rounded-xl flex items-center justify-center flex-shrink-0 ml-3">
@@ -2774,11 +2753,11 @@ const NutriPlan = () => {
                           <h3 className="text-lg md:text-xl font-bold text-emerald-800">Expert</h3>
                           <p className="text-emerald-600 text-sm mb-3">Gere 100 dietas</p>
                           <div className="w-full bg-emerald-100 rounded-full h-2 mb-2">
-                            <div className="bg-emerald-500 h-2 rounded-full" style={{width: '86%'}}></div>
+                            <div className="bg-emerald-500 h-2 rounded-full" style={{width: `${Math.min((diets?.length || 0) / 100 * 100, 100)}%`}}></div>
                           </div>
                           <div className="flex justify-between text-xs text-emerald-600">
-                            <span>86/100</span>
-                            <span>86%</span>
+                            <span>{diets?.length || 0}/100</span>
+                            <span>{Math.min((diets?.length || 0), 100)}%</span>
                           </div>
                         </div>
                         <div className="flex flex-col items-end flex-shrink-0 ml-3">
@@ -2805,110 +2784,75 @@ const NutriPlan = () => {
                       
                       <div className="space-y-3 md:space-y-4">
                         {/* Lista de clientes com detalhes */}
-                        <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-3 md:p-4">
-                          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                            <div className="flex items-center space-x-3 md:space-x-4 min-w-0 flex-1">
-                              <div className="w-10 h-10 md:w-12 md:h-12 bg-green-100 rounded-full overflow-hidden flex items-center justify-center flex-shrink-0">
-                                <User className="text-green-600" size={20} />
-                              </div>
-                              <div className="min-w-0 flex-1">
-                                <h4 className="font-semibold text-gray-900 text-sm md:text-base">Ana Costa</h4>
-                                <p className="text-xs md:text-sm text-gray-600">28 anos • 65kg • Perda de peso</p>
-                                <p className="text-xs text-gray-500">Frequência: 4x por semana</p>
-                                <div className="flex flex-wrap items-center gap-2 mt-1">
-                                  <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full whitespace-nowrap">1800 kcal</span>
-                                  <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full whitespace-nowrap">Ativa</span>
+                        {clients && clients.length > 0 ? (
+                          clients.slice(0, 3).map((client, index) => (
+                            <div key={index} className={`${index === 0 ? 'bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200' : 'bg-gray-50'} rounded-xl p-3 md:p-4`}>
+                              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                                <div className="flex items-center space-x-3 md:space-x-4 min-w-0 flex-1">
+                                  <div className="w-10 h-10 md:w-12 md:h-12 bg-gray-100 rounded-full overflow-hidden flex items-center justify-center flex-shrink-0">
+                                    <User className={index === 0 ? "text-green-600" : "text-gray-600"} size={20} />
+                                  </div>
+                                  <div className="min-w-0 flex-1">
+                                    <h4 className="font-semibold text-gray-900 text-sm md:text-base">{client.name}</h4>
+                                    <p className="text-xs md:text-sm text-gray-600">{client.age} anos • {client.weight}kg • {client.goal}</p>
+                                    <p className="text-xs text-gray-500">Frequência: {client.frequency || '3x'} por semana</p>
+                                    <div className="flex flex-wrap items-center gap-2 mt-1">
+                                      <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full whitespace-nowrap">{client.calories || '2000'} kcal</span>
+                                      <span className={`text-xs ${client.status === 'inactive' ? 'bg-orange-100 text-orange-700' : 'bg-green-100 text-green-700'} px-2 py-1 rounded-full whitespace-nowrap`}>
+                                        {client.status === 'inactive' ? 'Pausado' : 'Ativo'}
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="flex items-center justify-end w-full sm:w-auto">
+                                  <Button 
+                                    size="sm" 
+                                    className="w-full sm:w-auto"
+                                    onClick={() => {
+                                      setCalculatorData({
+                                        clientId: client.id || '',
+                                        name: client.name || '',
+                                        age: client.age || '',
+                                        gender: client.gender || 'male',
+                                        weight: client.weight || '',
+                                        height: client.height || '',
+                                        activityLevel: client.activityLevel || 'moderate',
+                                        goal: client.goal || 'maintenance',
+                                        restrictions: client.restrictions || []
+                                      });
+                                      setActiveSection('calculator');
+                                    }}
+                                  >
+                                    <FileText size={14} />
+                                    <span className="ml-1">Nova Dieta</span>
+                                  </Button>
                                 </div>
                               </div>
                             </div>
-                            <div className="flex items-center justify-end w-full sm:w-auto">
-                              <Button 
-                                size="sm" 
-                                className="w-full sm:w-auto"
-                                onClick={() => {
-                                  // Mock client data removed - using Firebase data only
-                                  setCalculatorData({
-                                    clientId: '',
-                                    name: '',
-                                    age: '',
-                                    gender: 'male',
-                                    weight: '',
-                                    height: '',
-                                    activityLevel: 'moderate',
-                                    goal: 'maintenance',
-                                    restrictions: []
-                                  });
-                                  setActiveSection('calculator');
-                                }}
-                              >
-                                <FileText size={14} />
-                                <span className="ml-1">Nova Dieta</span>
-                              </Button>
-                            </div>
+                          ))
+                        ) : (
+                          <div className="text-center py-6 bg-gray-50 rounded-xl">
+                            <Users className="text-gray-400 mx-auto mb-2" size={32} />
+                            <p className="text-gray-500 text-sm">Nenhum cliente cadastrado</p>
+                            <p className="text-gray-400 text-xs">Adicione clientes usando o botão acima</p>
                           </div>
-                        </div>
-
-                        <div className="bg-gray-50 rounded-xl p-3 md:p-4">
-                          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                            <div className="flex items-center space-x-3 md:space-x-4 min-w-0 flex-1">
-                              <div className="w-10 h-10 md:w-12 md:h-12 bg-gray-100 rounded-full overflow-hidden flex items-center justify-center flex-shrink-0">
-                                <User className="text-gray-600" size={20} />
-                              </div>
-                              <div className="min-w-0 flex-1">
-                                <h4 className="font-semibold text-gray-900 text-sm md:text-base">Pedro Lima</h4>
-                                <p className="text-xs md:text-sm text-gray-600">35 anos • 80kg • Ganho de massa</p>
-                                <p className="text-xs text-gray-500">Frequência: 5x por semana</p>
-                                <div className="flex flex-wrap items-center gap-2 mt-1">
-                                  <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full whitespace-nowrap">2500 kcal</span>
-                                  <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full whitespace-nowrap">Ativo</span>
-                                </div>
-                              </div>
-                            </div>
-                            <div className="flex items-center justify-end w-full sm:w-auto">
-                              <Button size="sm" className="w-full sm:w-auto">
-                                <FileText size={14} />
-                                <span className="ml-1">Nova Dieta</span>
-                              </Button>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="bg-gray-50 rounded-xl p-3 md:p-4">
-                          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                            <div className="flex items-center space-x-3 md:space-x-4 min-w-0 flex-1">
-                              <div className="w-10 h-10 md:w-12 md:h-12 bg-gray-100 rounded-full overflow-hidden flex items-center justify-center flex-shrink-0">
-                                <User className="text-gray-600" size={20} />
-                              </div>
-                              <div className="min-w-0 flex-1">
-                                <h4 className="font-semibold text-gray-900 text-sm md:text-base">Julia Rodrigues</h4>
-                                <p className="text-xs md:text-sm text-gray-600">42 anos • 70kg • Manutenção</p>
-                                <p className="text-xs text-gray-500">Frequência: 3x por semana</p>
-                                <div className="flex flex-wrap items-center gap-2 mt-1">
-                                  <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full whitespace-nowrap">2000 kcal</span>
-                                  <span className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-full whitespace-nowrap">Pausada</span>
-                                </div>
-                              </div>
-                            </div>
-                            <div className="flex items-center justify-end w-full sm:w-auto">
-                              <Button size="sm" className="w-full sm:w-auto">
-                                <FileText size={14} />
-                                <span className="ml-1">Nova Dieta</span>
-                              </Button>
-                            </div>
-                          </div>
-                        </div>
+                        )}
 
                         <div className="grid grid-cols-3 gap-3 md:gap-4 mt-4 md:mt-6">
                           <div className="bg-blue-50 p-2 md:p-3 rounded-lg text-center">
-                            <p className="text-lg md:text-xl font-bold text-blue-600">23</p>
+                            <p className="text-lg md:text-xl font-bold text-blue-600">{clients?.length || 0}</p>
                             <p className="text-xs text-gray-600">Total Clientes</p>
                           </div>
                           <div className="bg-green-50 p-2 md:p-3 rounded-lg text-center">
-                            <p className="text-lg md:text-xl font-bold text-green-600">18</p>
+                            <p className="text-lg md:text-xl font-bold text-green-600">
+                              {clients?.filter(client => client.status !== 'inactive').length || 0}
+                            </p>
                             <p className="text-xs text-gray-600">Ativos</p>
                           </div>
                           <div className="bg-orange-50 p-2 md:p-3 rounded-lg text-center">
-                            <p className="text-lg md:text-xl font-bold text-orange-600">5</p>
+                            <p className="text-lg md:text-xl font-bold text-orange-600">
+                              {clients?.filter(client => client.status === 'inactive').length || 0}
+                            </p>
                             <p className="text-xs text-gray-600">Pausados</p>
                           </div>
                         </div>
@@ -2919,45 +2863,38 @@ const NutriPlan = () => {
                     <Card className="p-4 md:p-6">
                       <h3 className="text-lg font-semibold text-gray-900 mb-4 md:mb-6">Atividade Recente</h3>
                       <div className="space-y-3 md:space-y-4">
-                        <div className="flex items-start space-x-3 p-3 bg-green-50 rounded-lg">
-                          <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                            <FileText size={16} className="text-green-600" />
+                        {recentActivities && recentActivities.length > 0 ? (
+                          recentActivities.slice(0, 4).map((activity, index) => (
+                            <div key={index} className={`flex items-start space-x-3 p-3 rounded-lg ${
+                              activity.type === 'diet' ? 'bg-green-50' :
+                              activity.type === 'client' ? 'bg-blue-50' :
+                              activity.type === 'achievement' ? 'bg-emerald-50' :
+                              'bg-gray-50'
+                            }`}>
+                              <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                                activity.type === 'diet' ? 'bg-green-100' :
+                                activity.type === 'client' ? 'bg-blue-100' :
+                                activity.type === 'achievement' ? 'bg-emerald-100' :
+                                'bg-gray-100'
+                              }`}>
+                                {activity.type === 'diet' && <FileText size={16} className="text-green-600" />}
+                                {activity.type === 'client' && <Users size={16} className="text-blue-600" />}
+                                {activity.type === 'achievement' && <Award size={16} className="text-emerald-600" />}
+                                {activity.type === 'sale' && <DollarSign size={16} className="text-purple-600" />}
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <p className="font-medium text-gray-900 text-sm truncate">{activity.title}</p>
+                                <p className="text-xs text-gray-500">{activity.description}</p>
+                              </div>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="text-center py-6">
+                            <Activity className="text-gray-400 mx-auto mb-2" size={32} />
+                            <p className="text-gray-500 text-sm">Nenhuma atividade recente</p>
+                            <p className="text-gray-400 text-xs">Dados virão do Firebase</p>
                           </div>
-                          <div className="min-w-0 flex-1">
-                            <p className="font-medium text-gray-900 text-sm truncate">Ana Costa</p>
-                            <p className="text-xs text-gray-500">2 horas atrás • 1800 kcal</p>
-                          </div>
-                        </div>
-
-                        <div className="flex items-start space-x-3 p-3 bg-blue-50 rounded-lg">
-                          <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                            <Users size={16} className="text-blue-600" />
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <p className="font-medium text-gray-900 text-sm">Novo cliente: Maria Silva</p>
-                            <p className="text-xs text-gray-500">1 dia atrás</p>
-                          </div>
-                        </div>
-
-                        <div className="flex items-start space-x-3 p-3 bg-green-50 rounded-lg">
-                          <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                            <FileText size={16} className="text-green-600" />
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <p className="font-medium text-gray-900 text-sm truncate">Pedro Lima</p>
-                            <p className="text-xs text-gray-500">2 dias atrás • 2500 kcal</p>
-                          </div>
-                        </div>
-
-                        <div className="flex items-start space-x-3 p-3 bg-emerald-50 rounded-lg">
-                          <div className="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center flex-shrink-0">
-                            <Award size={16} className="text-emerald-600" />
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <p className="font-medium text-gray-900 text-sm">Conquista: Mentor desbloqueada!</p>
-                            <p className="text-xs text-gray-500">3 dias atrás</p>
-                          </div>
-                        </div>
+                        )}
                       </div>
                     </Card>
                   </div>
@@ -3206,7 +3143,29 @@ const NutriPlan = () => {
                           <option key={template.id} value={template.id}>
                             {template.name} - {template.description}
                           </option>
-                        ))}
+                        )) : [
+                        { action: 'Base de dados ativa', item: `${foodDatabase.length} alimentos carregados`, time: 'Tempo real', type: 'sync' }
+                      ].map((activity, index) => (
+                        <div key={index} className="flex items-center space-x-4 p-3 bg-gray-50 rounded-lg">
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                            activity.type === 'add' ? 'bg-green-100' :
+                            activity.type === 'update' ? 'bg-blue-100' :
+                            activity.type === 'sync' ? 'bg-purple-100' :
+                            activity.type === 'fix' ? 'bg-orange-100' : 'bg-gray-100'
+                          }`}>
+                            {activity.type === 'add' ? <Plus size={16} className="text-green-600" /> :
+                             activity.type === 'update' ? <Edit size={16} className="text-blue-600" /> :
+                             activity.type === 'sync' ? <Database size={16} className="text-purple-600" /> :
+                             activity.type === 'fix' ? <CheckCircle size={16} className="text-orange-600" /> :
+                             <Archive size={16} className="text-gray-600" />}
+                          </div>
+                          <div className="flex-1">
+                            <p className="font-medium text-gray-900">{activity.action}</p>
+                            <p className="text-sm text-gray-600">{activity.item}</p>
+                          </div>
+                          <span className="text-xs text-gray-500">{activity.time}</span>
+                        </div>
+                      ))}
                       </select>
                     </div>
                   )}
@@ -4426,19 +4385,20 @@ const NutriPlan = () => {
                     <Card className="p-6">
                       <h3 className="text-lg font-semibold text-gray-900 mb-4">Análise por Categoria</h3>
                       <div className="space-y-4">
-                        {[
-                          { name: 'Carboidratos', count: 847, color: 'bg-yellow-100 text-yellow-700' },
-                          { name: 'Proteínas', count: 623, color: 'bg-red-100 text-red-700' },
-                          { name: 'Gorduras', count: 412, color: 'bg-purple-100 text-purple-700' },
-                          { name: 'Vegetais', count: 534, color: 'bg-green-100 text-green-700' },
-                          { name: 'Frutas', count: 289, color: 'bg-orange-100 text-orange-700' },
-                          { name: 'Diversos', count: 142, color: 'bg-gray-100 text-gray-700' }
-                        ].map((category, index) => (
+                        {/* Dados dinâmicos do Firebase - categorias serão carregadas automaticamente */}
+                      {foodDatabase && foodDatabase.length > 0 ? [
+                        { name: 'Carboidratos', count: foodDatabase.filter(f => f.category === 'carboidratos').length, color: 'bg-yellow-100 text-yellow-700' },
+                        { name: 'Proteínas', count: foodDatabase.filter(f => f.category === 'proteinas').length, color: 'bg-red-100 text-red-700' },
+                        { name: 'Gorduras', count: foodDatabase.filter(f => f.category === 'gorduras').length, color: 'bg-purple-100 text-purple-700' },
+                        { name: 'Vegetais', count: foodDatabase.filter(f => f.category === 'vegetais').length, color: 'bg-green-100 text-green-700' },
+                        { name: 'Frutas', count: foodDatabase.filter(f => f.category === 'frutas').length, color: 'bg-orange-100 text-orange-700' },
+                        { name: 'Diversos', count: foodDatabase.filter(f => !f.category || f.category === 'diversos').length, color: 'bg-gray-100 text-gray-700' }
+                      ].map((category, index) => (
                           <div key={index} className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
                             onClick={() => {
                               showInfoPopup(
                                 `📂 Categoria: ${category.name}`,
-                                `📊 Estatísticas detalhadas:\n• Total de alimentos: ${category.count}\n• Mais usado: ${foodDatabase[index % foodDatabase.length].name}\n• Média calórica: ${Math.floor(Math.random() * 200 + 100)} kcal\n• Adicionados este mês: ${Math.floor(Math.random() * 20 + 5)}\n\n🎯 Esta categoria representa ${Math.floor((category.count / 2847) * 100)}% da base de dados.\n\n💡 Categoria bem estruturada e atualizada!`,
+                                `📊 Estatísticas da categoria:\n• Total de alimentos: ${category.count}\n• Categoria: ${category.name}\n\n📈 Dados atualizados em tempo real do Firebase\n\n💡 Base de dados limpa e pronta para uso!`,
                                 'info'
                               );
                             }}
@@ -4454,7 +4414,7 @@ const NutriPlan = () => {
                               <div className="w-20 bg-gray-200 rounded-full h-2">
                                 <div 
                                   className={`h-2 rounded-full ${category.color.replace('text-', 'bg-').replace('-700', '-500')}`}
-                                  style={{ width: `${(category.count / 847) * 100}%` }}
+                                  style={{ width: `${category.count > 0 ? Math.min((category.count / Math.max(...[foodDatabase.filter(f => f.category === 'carboidratos').length, foodDatabase.filter(f => f.category === 'proteinas').length, foodDatabase.filter(f => f.category === 'gorduras').length, foodDatabase.filter(f => f.category === 'vegetais').length, foodDatabase.filter(f => f.category === 'frutas').length, foodDatabase.filter(f => !f.category || f.category === 'diversos').length])) * 100, 100) : 0}%` }}
                                 ></div>
                               </div>
                             </div>
@@ -4468,12 +4428,10 @@ const NutriPlan = () => {
                   <Card className="p-6">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">Atividade Recente da Base</h3>
                     <div className="space-y-3">
-                      {[
-                        { action: 'Novo alimento adicionado', item: 'Quinoa Tricolor', time: '2 horas atrás', type: 'add' },
-                        { action: 'Dados nutricionais atualizados', item: 'Salmão Grelhado', time: '5 horas atrás', type: 'update' },
-                        { action: 'Sincronização TACO concluída', item: '47 novos alimentos', time: '1 dia atrás', type: 'sync' },
-                        { action: 'Correção nutricional aplicada', item: 'Batata Doce', time: '2 dias atrás', type: 'fix' },
-                        { action: 'Backup automático realizado', item: 'Base completa', time: '3 dias atrás', type: 'backup' }
+                      {/* Atividades serão carregadas dinamicamente do Firebase */}
+                      {foodDatabase && foodDatabase.length === 0 ? [
+                        { action: 'Sistema iniciado', item: 'Base de dados limpa', time: 'Agora', type: 'add' },
+                        { action: 'Pronto para uso', item: 'Adicione seus primeiros alimentos', time: 'Agora', type: 'sync' }
                       ].map((activity, index) => (
                         <div key={index} className="flex items-center space-x-4 p-3 bg-gray-50 rounded-lg">
                           <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
