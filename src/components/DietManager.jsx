@@ -75,6 +75,7 @@ const DietManager = () => {
 
   // Helper para encontrar nome do cliente
   const getClientName = (clientId) => {
+    if (!clients || !Array.isArray(clients)) return 'Cliente não encontrado';
     const client = clients.find(c => c.id === clientId);
     return client ? client.name : 'Cliente não encontrado';
   };
@@ -206,4 +207,4 @@ const DietManager = () => {
   );
 };
 
-export default DietManager; 
+export default DietManager;

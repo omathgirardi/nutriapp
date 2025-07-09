@@ -71,10 +71,10 @@ const DietForm = ({ onSubmit, initialData = null, loading = false }) => {
             required
             options={[
               { value: '', label: 'Selecione um cliente...' },
-              ...clients.map(client => ({
+              ...(clients && Array.isArray(clients) ? clients.map(client => ({
                 value: client.id,
                 label: client.name
-              }))
+              })) : [])
             ]}
           />
           <Input
@@ -235,4 +235,4 @@ DietForm.propTypes = {
   loading: PropTypes.bool
 };
 
-export default DietForm; 
+export default DietForm;
