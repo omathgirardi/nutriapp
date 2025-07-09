@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDiets, useClients } from '../hooks/useTenantData';
 import Button from './Button';
 import Modal from './Modal';
@@ -9,6 +9,7 @@ const DietManager = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedDiet, setSelectedDiet] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [clientsLoaded, setClientsLoaded] = useState(false);
 
   const {
     diets,
@@ -19,7 +20,14 @@ const DietManager = () => {
     deleteDiet
   } = useDiets();
 
-  const { clients } = useClients();
+  const { clients, loading: clientsLoading } = useClients();
+
+  // Verificar quando os clientes são carregados
+  useEffect(() => {
+    if (!clientsLoading && clients) {
+      setClientsLoaded(true);
+    }
+  }, [clients, clientsLoading]);
 
   const handleCreateDiet = async (dietData) => {
     setLoading(true);
@@ -66,16 +74,37 @@ const DietManager = () => {
   };
 
   if (dietsLoading) {
-    return <div>Carregando...</div>;
+    return <div className="p-4 text-center">Carregando dietas...</div>;
   }
 
   if (dietsError) {
-    return <div>Erro ao carregar dietas: {dietsError}</div>;
+    return <div className="p-4 text-center text-red-600">Erro ao carregar dietas: {dietsError}</div>;
+  }
+
+  if (!diets || diets.length === 0) {
+    return (
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex justify-between items-center">
+          <h2 className="text-2xl font-bold text-gray-900">Dietas</h2>
+          <Button
+            onClick={() => {
+              setSelectedDiet(null);
+              setShowModal(true);
+            }}
+          >
+            Nova Dieta
+          </Button>
+        </div>
+        <div className="p-4 text-center text-gray-500">Nenhuma dieta encontrada. Crie uma nova dieta para começar.</div>
+      </div>
+    );
   }
 
   // Helper para encontrar nome do cliente
   const getClientName = (clientId) => {
-    if (!clients || !Array.isArray(clients)) return 'Cliente não encontrado';
+    if (!clients) return 'Cliente não encontrado';
+    if (!Array.isArray(clients)) return 'Cliente não encontrado';
     const client = clients.find(c => c.id === clientId);
     return client ? client.name : 'Cliente não encontrado';
   };

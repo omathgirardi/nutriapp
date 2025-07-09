@@ -305,6 +305,8 @@ const Chart = ({ data, height = 300 }) => {
 // Componente principal NutriPlan
 const NutriPlan = () => {
   const [activeTab, setActiveTab] = useState('clients');
+  // Importar o hook useClients para ter acesso à variável clients
+  const { clients } = useClients();
 
   const tabs = [
     { id: 'clients', label: 'Clientes' },

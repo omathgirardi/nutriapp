@@ -10,20 +10,26 @@ const useTenantData = (collectionName) => {
   const { currentTenant } = useAuth();
 
   useEffect(() => {
-    if (!currentTenant) return;
+    if (!currentTenant) {
+      setLoading(false);
+      return;
+    }
 
     const loadData = async () => {
       setLoading(true);
       try {
         const result = await firebaseService.getAll(collectionName, currentTenant.tenantId);
         if (result.success) {
-          setData(result.data);
+          setData(result.data || []);
           setError(null);
         } else {
           setError(result.error);
+          setData([]);
         }
       } catch (err) {
+        console.error(`Erro ao carregar dados de ${collectionName}:`, err);
         setError(err.message);
+        setData([]);
       } finally {
         setLoading(false);
       }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Button from './Button';
 import Input from './Input';
@@ -6,7 +6,24 @@ import Select from './Select';
 import { useClients } from '../hooks/useTenantData';
 
 const DietForm = ({ onSubmit, initialData = null, loading = false }) => {
-  const { clients } = useClients();
+  const { clients, loading: clientsLoading } = useClients();
+  const [clientOptions, setClientOptions] = useState([]);
+
+  // Atualizar opções de clientes quando clients for carregado
+  useEffect(() => {
+    if (clients && Array.isArray(clients)) {
+      const options = [
+        { value: '', label: 'Selecione um cliente...' },
+        ...clients.map(client => ({
+          value: client.id,
+          label: client.name
+        }))
+      ];
+      setClientOptions(options);
+    } else {
+      setClientOptions([{ value: '', label: 'Carregando clientes...' }]);
+    }
+  }, [clients]);
 
   const [formData, setFormData] = useState({
     title: initialData?.title || '',
@@ -52,6 +69,18 @@ const DietForm = ({ onSubmit, initialData = null, loading = false }) => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {clientsLoading && (
+        <div className="mb-4 p-2 bg-blue-50 text-blue-700 rounded-md text-sm">
+          Carregando dados dos clientes...
+        </div>
+      )}
+      
+      {!clients || (Array.isArray(clients) && clients.length === 0) ? (
+        <div className="mb-4 p-2 bg-yellow-50 text-yellow-700 rounded-md text-sm">
+          Nenhum cliente encontrado. Por favor, adicione clientes antes de criar uma dieta.
+        </div>
+      ) : null}
+
       {/* Informações Básicas */}
       <div className="space-y-4">
         <h4 className="font-medium text-gray-900">Informações Básicas</h4>
@@ -69,13 +98,8 @@ const DietForm = ({ onSubmit, initialData = null, loading = false }) => {
             value={formData.clientId}
             onChange={handleChange}
             required
-            options={[
-              { value: '', label: 'Selecione um cliente...' },
-              ...(clients && Array.isArray(clients) ? clients.map(client => ({
-                value: client.id,
-                label: client.name
-              })) : [])
-            ]}
+            options={clientOptions}
+            disabled={clientsLoading}
           />
           <Input
             label="Data de Início"
