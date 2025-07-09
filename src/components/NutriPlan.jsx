@@ -47,10 +47,6 @@ import {
 // Importações locais
 import { colors } from '../styles/colors.js';
 import { customStyles } from '../styles/customStyles.js';
-import { mockUsers } from '../data/mockUsers.js';
-import { mockClients } from '../data/mockClients.js';
-import { mockDiets } from '../data/mockDiets.js';
-import { mockTemplates } from '../data/mockTemplates.js';
 import { 
   calculateBMR, 
   calculateCalories, 

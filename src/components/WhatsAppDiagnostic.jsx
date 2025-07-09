@@ -162,7 +162,7 @@ const WhatsAppDiagnostic = () => {
   useEffect(() => {
     checkStatus();
     // Verificar se está em produção para mostrar check de deployment
-    if (window.location.hostname.includes('vercel.app') || process.env.NODE_ENV === 'production') {
+    if (process.env.NODE_ENV === 'production') {
       setShowDeploymentCheck(true);
     }
   }, []);

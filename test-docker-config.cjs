@@ -27,7 +27,7 @@ const dockerChecks = [
   { check: dockerfile.includes('FROM node:18-alpine AS builder'), desc: 'Multi-stage build configurado' },
   { check: dockerfile.includes('nginx:alpine'), desc: 'Nginx como servidor web' },
   { check: dockerfile.includes('EXPOSE 80'), desc: 'Porta 80 exposta' },
-  { check: dockerfile.includes('npm run vercel-build'), desc: 'Build command correto' }
+  { check: dockerfile.includes('# Build step removed'), desc: 'Build command atualizado (vercel removido)' }
 ];
 
 dockerChecks.forEach(({check, desc}) => {
@@ -80,7 +80,7 @@ ignoreChecks.forEach(({check, desc}) => {
 console.log('\n📦 Analisando package.json:');
 const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
 const packageChecks = [
-  { check: packageJson.scripts && packageJson.scripts['vercel-build'], desc: 'Script vercel-build existe' },
+  { check: packageJson.scripts && !packageJson.scripts['vercel-build'], desc: 'Script vercel-build removido' },
   { check: packageJson.dependencies && packageJson.dependencies.firebase, desc: 'Firebase dependency' },
   { check: packageJson.dependencies && packageJson.dependencies.react, desc: 'React dependency' }
 ];

@@ -86,26 +86,11 @@ var colors = {
     950: "#0C111D"
   }
 };
-var mockUsers = [
-  { id: "P0001", name: "Jo\xE3o Silva", email: "joao@example.com", phone: "11999999999", credits: 150, isActive: true },
-  { id: "P0002", name: "Maria Santos", email: "maria@example.com", phone: "11888888888", credits: 75, isActive: true },
-  { id: "P0003", name: "Carlos Oliveira", email: "carlos@example.com", phone: "11777777777", credits: 200, isActive: false }
-];
-var mockClients = [
-  { id: "A-01-P0001", name: "Ana Costa", age: 28, weight: 65, height: 165, goal: "Perda de peso", personalId: "P0001", trainingFrequency: "4x por semana", email: "ana.costa@email.com", phone: "(11) 99999-1234" },
-  { id: "A-02-P0001", name: "Pedro Lima", age: 35, weight: 80, height: 175, goal: "Ganho de massa", personalId: "P0001", trainingFrequency: "5x por semana", email: "pedro.lima@email.com", phone: "(11) 99999-5678" },
-  { id: "A-03-P0001", name: "Julia Rodrigues", age: 42, weight: 70, height: 160, goal: "Manuten\xE7\xE3o", personalId: "P0001", trainingFrequency: "3x por semana", email: "julia.rodrigues@email.com", phone: "(11) 99999-9012" }
-];
-var mockDiets = [
-  { id: "D001", clientName: "Ana Costa", calories: 1800, createdAt: "2025-01-15", type: "Personalizada" },
-  { id: "D002", clientName: "Pedro Lima", calories: 2500, createdAt: "2025-01-14", type: "Template" },
-  { id: "D003", clientName: "Julia Rodrigues", calories: 2e3, createdAt: "2025-01-13", type: "Personalizada" }
-];
-var mockTemplates = [
-  { id: "T001", name: "Dieta Hipertrofia", description: "Para ganho de massa muscular", meals: 6 },
-  { id: "T002", name: "Dieta Cutting", description: "Para perda de gordura", meals: 5 },
-  { id: "T003", name: "Dieta Manuten\xE7\xE3o", description: "Para manuten\xE7\xE3o do peso", meals: 4 }
-];
+// Mock data removed - using Firebase data only
+var mockUsers = [];
+var mockClients = [];
+var mockDiets = [];
+var mockTemplates = [];
 var Button = ({ variant = "primary", size = "md", children, className = "", ...props }) => {
   const baseClasses = "font-medium rounded-lg transition-all duration-200 flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-offset-2";
   const variants = {
@@ -1612,16 +1597,16 @@ NutriApp - Sistema Profissional de Nutri\xE7\xE3o
       size: "sm",
       className: "w-full sm:w-auto",
       onClick: () => {
-        const client = mockClients[0];
+        // Mock data removed - now using only Firebase data
         setCalculatorData({
-          clientId: client.id,
-          name: client.name,
-          age: client.age.toString(),
+          clientId: "",
+          name: "",
+          age: "",
           gender: "male",
-          weight: client.weight.toString(),
-          height: client.height.toString(),
+          weight: "",
+          height: "",
           activityLevel: "moderate",
-          goal: client.goal === "Perda de peso" ? "weightLoss" : client.goal === "Ganho de massa" ? "muscleGain" : "maintenance",
+          goal: "maintenance",
           restrictions: []
         });
         setActiveSection("calculator");

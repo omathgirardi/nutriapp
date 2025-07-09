@@ -66,10 +66,7 @@ firebase-credentials.json
 firestore.rules
 firestore.indexes.json
 
-# Vercel
-vercel.json
-.vercel/
-.vercelignore
+# Vercel (removed - no longer needed)
 
 # Trae
 .trae/

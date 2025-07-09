@@ -90,29 +90,14 @@ const colors = {
 };
 
 // Mock Data
-const mockUsers = [
-  { id: 'P0001', name: 'João Silva', email: 'joao@example.com', phone: '11999999999', credits: 150, isActive: true },
-  { id: 'P0002', name: 'Maria Santos', email: 'maria@example.com', phone: '11888888888', credits: 75, isActive: true },
-  { id: 'P0003', name: 'Carlos Oliveira', email: 'carlos@example.com', phone: '11777777777', credits: 200, isActive: false }
-];
+// Mock data removed - using Firebase data only
+const mockUsers = [];
 
-const mockClients = [
-  { id: 'A-01-P0001', name: 'Ana Costa', age: 28, weight: 65, height: 165, goal: 'Perda de peso', personalId: 'P0001', trainingFrequency: '4x por semana', email: 'ana.costa@email.com', phone: '(11) 99999-1234' },
-  { id: 'A-02-P0001', name: 'Pedro Lima', age: 35, weight: 80, height: 175, goal: 'Ganho de massa', personalId: 'P0001', trainingFrequency: '5x por semana', email: 'pedro.lima@email.com', phone: '(11) 99999-5678' },
-  { id: 'A-03-P0001', name: 'Julia Rodrigues', age: 42, weight: 70, height: 160, goal: 'Manutenção', personalId: 'P0001', trainingFrequency: '3x por semana', email: 'julia.rodrigues@email.com', phone: '(11) 99999-9012' }
-];
+const mockClients = [];
 
-const mockDiets = [
-  { id: 'D001', clientName: 'Ana Costa', calories: 1800, createdAt: '2025-01-15', type: 'Personalizada' },
-  { id: 'D002', clientName: 'Pedro Lima', calories: 2500, createdAt: '2025-01-14', type: 'Template' },
-  { id: 'D003', clientName: 'Julia Rodrigues', calories: 2000, createdAt: '2025-01-13', type: 'Personalizada' }
-];
+const mockDiets = [];
 
-const mockTemplates = [
-  { id: 'T001', name: 'Dieta Hipertrofia', description: 'Para ganho de massa muscular', meals: 6 },
-  { id: 'T002', name: 'Dieta Cutting', description: 'Para perda de gordura', meals: 5 },
-  { id: 'T003', name: 'Dieta Manutenção', description: 'Para manutenção do peso', meals: 4 }
-];
+const mockTemplates = [];
 
 // Clean Modern Chart Component
 const CleanChart = () => {
@@ -2841,17 +2826,16 @@ const NutriPlan = () => {
                                 size="sm" 
                                 className="w-full sm:w-auto"
                                 onClick={() => {
-                                  const client = mockClients[0]; // Ana Costa
+                                  // Mock client data removed - using Firebase data only
                                   setCalculatorData({
-                                    clientId: client.id,
-                                    name: client.name,
-                                    age: client.age.toString(),
+                                    clientId: '',
+                                    name: '',
+                                    age: '',
                                     gender: 'male',
-                                    weight: client.weight.toString(),
-                                    height: client.height.toString(),
+                                    weight: '',
+                                    height: '',
                                     activityLevel: 'moderate',
-                                    goal: client.goal === 'Perda de peso' ? 'weightLoss' : 
-                                         client.goal === 'Ganho de massa' ? 'muscleGain' : 'maintenance',
+                                    goal: 'maintenance',
                                     restrictions: []
                                   });
                                   setActiveSection('calculator');

@@ -219,26 +219,42 @@ export const useTenantStats = () => {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { tenant } = useAuth();
+  const { currentTenant } = useAuth();
 
   const fetchStats = async () => {
     try {
       setLoading(true);
-      if (!tenant) {
-        // Em desenvolvimento, usar dados mockados
+      if (!currentTenant) {
+        // Sem tenant, retornar stats vazias
         setStats({
-          totalClients: mockClients.length,
-          totalDiets: mockDiets.length,
-          totalTemplates: mockTemplates.length,
-          activeClients: mockClients.length
+          totalClients: 0,
+          totalDiets: 0,
+          totalTemplates: 0,
+          activeClients: 0
         });
       } else {
-        const data = await tenantDataService.getTenantStats(tenant.id);
-        setStats(data);
+        // Buscar stats reais do Firebase
+        const result = await firebaseService.getTenantStats(currentTenant.tenantId);
+        if (result.success) {
+          setStats(result.data);
+        } else {
+          setStats({
+            totalClients: 0,
+            totalDiets: 0,
+            totalTemplates: 0,
+            activeClients: 0
+          });
+        }
       }
       setError(null);
     } catch (err) {
       setError(err.message);
+      setStats({
+        totalClients: 0,
+        totalDiets: 0,
+        totalTemplates: 0,
+        activeClients: 0
+      });
     } finally {
       setLoading(false);
     }
@@ -246,7 +262,7 @@ export const useTenantStats = () => {
 
   useEffect(() => {
     fetchStats();
-  }, [tenant]);
+  }, [currentTenant]);
 
   return {
     stats,
@@ -254,4 +270,4 @@ export const useTenantStats = () => {
     error,
     refreshStats: fetchStats
   };
-}; 
+};

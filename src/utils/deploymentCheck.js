@@ -80,12 +80,12 @@ export const deploymentCheck = {
   // Verificar se está em produção
   checkProductionMode() {
     const isProduction = process.env.NODE_ENV === 'production';
-    const isVercel = window.location.hostname.includes('vercel.app');
+    const isEasyPanel = window.location.hostname.includes('easypanel.host');
     const hasHTTPS = window.location.protocol === 'https:';
     
     return {
       isProduction,
-      isVercel,
+      isEasyPanel,
       hasHTTPS,
       hostname: window.location.hostname,
       protocol: window.location.protocol
@@ -134,7 +134,7 @@ export const deploymentCheck = {
     // Ambiente
     report.push('## 🌐 Ambiente');
     report.push(`- **Produção**: ${results.environment.isProduction ? '✅' : '❌'}`);
-    report.push(`- **Vercel**: ${results.environment.isVercel ? '✅' : '❌'}`);
+    report.push(`- **EasyPanel**: ${results.environment.isEasyPanel ? '✅' : '❌'}`);
     report.push(`- **HTTPS**: ${results.environment.hasHTTPS ? '✅' : '❌'}`);
     report.push(`- **Hostname**: ${results.environment.hostname}`);
     report.push('');

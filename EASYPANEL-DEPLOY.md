@@ -1,41 +1,36 @@
-# 🚀 Guia Completo: Deploy NutriApp no EasyPanel
+# 🚀 Deploy NutriApp no EasyPanel
 
-## 📋 O que você precisa antes de começar
+## 📋 Pré-requisitos
 
-1. **Conta no EasyPanel** (criar em easypanel.io)
-2. **Código no GitHub** (já está pronto!)
-3. **10 minutos** do seu tempo
+- [ ] Conta no EasyPanel configurada
+- [ ] Repositório Git com o código
+- [ ] Firebase configurado
+- [ ] Evolution API configurada
 
----
+## 🔧 Configuração da Aplicação no EasyPanel
 
-## 🎯 Passo a Passo SIMPLES
+### 1. Criar Nova Aplicação
 
-### **PASSO 1: Entrar no EasyPanel**
+1. Acesse o painel do EasyPanel
+2. Clique em **"Create Service"**
+3. Selecione **"App"**
+4. Configure:
+   - **Name**: `nutriapp`
+   - **Source**: GitHub/GitLab
+   - **Repository**: `seu-usuario/nutriapp`
+   - **Branch**: `feature`
+   - **Build Method**: `Docker`
+   - **File**: `Dockerfile`
+   - **Build Path**: `/` (deixar vazio ou usar `/`)
 
-1. Acesse: https://easypanel.io
-2. Faça login na sua conta
-3. Clique em **"Create Project"** ou **"New App"**
+### 2. Configurar Variáveis de Ambiente
 
-### **PASSO 2: Conectar seu GitHub**
+⚠️ **IMPORTANTE**: As variáveis de ambiente já estão configuradas no Dockerfile para produção. O EasyPanel usará automaticamente:
 
-1. Escolha **"Deploy from Git"**
-2. Conecte sua conta do GitHub
-3. Selecione o repositório: `nutriapp`
-4. Branch: `feature` (ou `main`)
-
-### **PASSO 3: Configurar a Aplicação**
-
-**Nome da App:** `nutriapp`
-**Tipo:** `Web Service`
-**Build Method:** `Docker`
-
-### **PASSO 4: Variáveis de Ambiente**
-
-Copie e cole EXATAMENTE estas variáveis:
-
-```env
+```bash
+# Ambiente
 NODE_ENV=production
-REACT_APP_USE_MOCK_DATA=false
+REACT_APP_USE_MOCK_DATA=false  # ✅ DADOS MOCK DESABILITADOS
 
 # Firebase
 REACT_APP_FIREBASE_API_KEY=AIzaSyCyJLIOs4LuUg3wMkxkK9UOzGDBF2tQgHE
@@ -45,7 +40,10 @@ REACT_APP_FIREBASE_STORAGE_BUCKET=nutriplan-app-75faa.firebasestorage.app
 REACT_APP_FIREBASE_MESSAGING_SENDER_ID=162618694330
 REACT_APP_FIREBASE_APP_ID=1:162618694330:web:56f8cfbb93290bac904083
 
-# WhatsApp (Evolution API)
+# API
+REACT_APP_API_URL=https://dev-studiogirardi-nutriapp.lt0sh0.easypanel.host
+
+# Evolution API
 REACT_APP_EVOLUTION_BASE_URL=https://dev-studiogirardi-evolution-api.lt0sh0.easypanel.host
 REACT_APP_EVOLUTION_API_KEY=02314644FB70-4D08-A756-A53CED8621A9
 REACT_APP_EVOLUTION_INSTANCE_NAME=teste_nutriplan
@@ -171,6 +169,56 @@ https://dev-studiogirardi-evolution-api.lt0sh0.easypanel.host
 2. Testar todas as funcionalidades
 3. Coletar feedback
 4. Fazer melhorias
+
+---
+
+## ✅ Problemas Resolvidos nesta Versão
+
+### 🚫 Dados Mock Removidos
+- **Problema**: Aplicação mostrava dados pré-cadastrados em produção
+- **Solução**: Configurado `REACT_APP_USE_MOCK_DATA=false` no Dockerfile
+- **Resultado**: Aplicação inicia limpa, sem dados fictícios
+
+### 📱 Responsividade Mobile Corrigida
+- **Problema**: Tela mobile não funcionava corretamente
+- **Solução**: 
+  - Meta tags otimizadas para mobile
+  - CSS responsivo aprimorado
+  - Configuração Nginx otimizada
+- **Resultado**: Interface totalmente funcional em dispositivos móveis
+
+### 🔧 Configurações de Produção
+- **Problema**: Variáveis de ambiente não configuradas corretamente
+- **Solução**: 
+  - Arquivo `.env.production` criado
+  - Dockerfile atualizado com variáveis corretas
+  - Nginx otimizado para SPA
+
+## 🧪 Testes Pós-Deploy
+
+### Checklist de Verificação
+
+- [ ] **Aplicação carrega** sem erros
+- [ ] **Sem dados mock** (aplicação limpa)
+- [ ] **Login funciona** (Firebase)
+- [ ] **Cadastro de clientes** funciona
+- [ ] **Criação de dietas** funciona
+- [ ] **WhatsApp** envia mensagens
+- [ ] **Responsivo** no mobile ✅
+- [ ] **Registro de usuários** funciona no mobile ✅
+
+### URLs para Testar
+
+```
+# Aplicação Principal
+https://dev-studiogirardi-nutriapp.lt0sh0.easypanel.host
+
+# Teste Mobile (abrir no celular)
+https://dev-studiogirardi-nutriapp.lt0sh0.easypanel.host
+
+# Dashboard
+https://dev-studiogirardi-nutriapp.lt0sh0.easypanel.host/dashboard
+```
 
 ---
 
