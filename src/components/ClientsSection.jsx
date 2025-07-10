@@ -30,6 +30,18 @@ import { Button, Card, Input, Select, Modal } from './index.js';
 const ClientsSection = () => {
   const { clients, loading, error, createClient, updateClient, deleteClient, fetchClients } = useClients();
   
+  // Debug: Log mudanças na lista de clientes
+  useEffect(() => {
+    console.log('🔄 Lista de clientes atualizada:', clients);
+    console.log('📊 Total de clientes:', clients.length);
+  }, [clients]);
+  
+  // Debug: Log estados de loading e error
+  useEffect(() => {
+    console.log('⏳ Loading:', loading);
+    if (error) console.log('❌ Error:', error);
+  }, [loading, error]);
+  
   // Estados locais
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
@@ -168,16 +180,29 @@ const ClientsSection = () => {
   const handleSaveClient = async (e) => {
     e.preventDefault();
     
+    console.log('🔄 Iniciando salvamento do cliente...');
+    console.log('📝 Dados do formulário:', clientForm);
+    console.log('✏️ Modo de edição:', isEditing);
+    
     try {
+      let result;
       if (isEditing) {
-        await updateClient(selectedClient.id, clientForm);
+        console.log('🔄 Atualizando cliente existente...');
+        result = await updateClient(selectedClient.id, clientForm);
       } else {
-        await createClient(clientForm);
+        console.log('🔄 Criando novo cliente...');
+        result = await createClient(clientForm);
       }
+      
+      console.log('📊 Resultado da operação:', result);
+      console.log('👥 Lista atual de clientes:', clients);
+      
       setShowClientModal(false);
       resetForm();
+      
+      console.log('✅ Modal fechado e formulário resetado');
     } catch (err) {
-      console.error('Erro ao salvar cliente:', err);
+      console.error('❌ Erro ao salvar cliente:', err);
     }
   };
 

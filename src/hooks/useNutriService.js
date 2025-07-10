@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import nutriService from '../services/index.js';
+import { nutriService } from '../services/index.js';
 
 // Hook para gerenciar o estado dos serviços
 export const useNutriService = () => {
@@ -445,4 +445,4 @@ export const useAuth = () => {
   };
 };
 
-export default useNutriService; 
+export default useNutriService;
