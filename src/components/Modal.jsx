@@ -2,12 +2,19 @@ import React from 'react';
 import { X } from 'lucide-react';
 import { colors } from '../styles/colors.js';
 
-const Modal = ({ isOpen, onClose, title, children }) => {
+const Modal = ({ isOpen, onClose, title, children, size = 'md' }) => {
   if (!isOpen) return null;
+
+  const sizeClasses = {
+    sm: 'max-w-md',
+    md: 'max-w-2xl',
+    lg: 'max-w-4xl',
+    xl: 'max-w-6xl'
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 sm:p-4 z-50">
-      <div className="bg-white rounded-xl w-full max-w-2xl max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
+      <div className={`bg-white rounded-xl w-full ${sizeClasses[size]} max-h-[95vh] sm:max-h-[90vh] overflow-y-auto`}>
         <div className={`flex items-center justify-between p-4 sm:p-6 border-b border-[${colors.gray[200]}]`}>
           <h2 className={`text-lg sm:text-xl font-semibold text-[${colors.gray[900]}]`}>
             {title}
@@ -27,4 +34,4 @@ const Modal = ({ isOpen, onClose, title, children }) => {
   );
 };
 
-export default Modal; 
+export default Modal;

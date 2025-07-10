@@ -59,6 +59,7 @@ import {
   generateMealsFromTemplate 
 } from '../utils/dietGeneration.js';
 import { Button, Card, Input, Select, Modal } from './index.js';
+import ClientsSection from './ClientsSection.jsx';
 
 const { useStoredState } = hatch;
 
@@ -568,8 +569,11 @@ const NutriPlan = () => {
               </div>
             )}
 
+            {/* Seção de Clientes */}
+            {activeSection === 'clients' && <ClientsSection />}
+
             {/* Outras seções serão implementadas aqui */}
-            {activeSection !== 'dashboard' && (
+            {activeSection !== 'dashboard' && activeSection !== 'clients' && (
               <div className="text-center py-12">
                 <h2 className="text-xl font-semibold text-gray-900">
                   Seção {activeSection} em desenvolvimento

@@ -8,7 +8,11 @@
     "dev": "serve . -l 3000",
     "start": "serve . -l 3000",
     "build": "echo 'No build process needed for this project'",
-    "preview": "serve . -l 4173"
+    "preview": "serve . -l 4173",
+    "firebase:setup": "node firebase-setup.js",
+    "firebase:setup-auto": "./setup-firebase.sh",
+    "firebase:install": "npm install firebase",
+    "firebase:test": "node firebase-test.js"
   },
   "keywords": [
     "nutrição",
@@ -39,4 +43,4 @@
     "url": "https://github.com/nutriapp/nutriplan-plataforma/issues"
   },
   "homepage": "https://github.com/nutriapp/nutriplan-plataforma#readme"
-} 
+}

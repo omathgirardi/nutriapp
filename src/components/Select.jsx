@@ -1,7 +1,7 @@
 import React from 'react';
 import { colors } from '../styles/colors.js';
 
-const Select = ({ label, options, error, className = '', ...props }) => {
+const Select = ({ label, options, error, className = '', children, ...props }) => {
   return (
     <div className={className}>
       {label && (
@@ -13,11 +13,15 @@ const Select = ({ label, options, error, className = '', ...props }) => {
         className={`w-full px-3 py-2 border border-[${colors.gray[300]}] rounded-lg focus:outline-none focus:ring-2 focus:ring-[${colors.primary[500]}] focus:border-transparent ${error ? 'border-red-500' : ''}`}
         {...props}
       >
-        {options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
+        {options ? (
+          options.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))
+        ) : (
+          children
+        )}
       </select>
       {error && (
         <p className="mt-1 text-sm text-red-600">{error}</p>
@@ -26,4 +30,4 @@ const Select = ({ label, options, error, className = '', ...props }) => {
   );
 };
 
-export default Select; 
+export default Select;
