@@ -652,9 +652,9 @@ const NutriPlan = () => {
       setTimeout(() => {
         if (confirm('💬 Telegram não encontrado?\n\nDeseja copiar a mensagem para enviar manualmente?')) {
           navigator.clipboard.writeText(message.replace(/\*/g, '')).then(() => {
-            alert('✅ Mensagem copiada!\n\nCole no Telegram do seu cliente.');
+            showPushNotification('✅ Mensagem copiada! Cole no Telegram do seu cliente.', 'success');
           }).catch(() => {
-            alert('❌ Erro ao copiar.\n\nCopie manualmente a mensagem exibida.');
+            showPushNotification('❌ Erro ao copiar. Copie manualmente a mensagem exibida.', 'error');
             console.log('Mensagem para Telegram:', message);
           });
         }
@@ -662,7 +662,7 @@ const NutriPlan = () => {
       
     } catch (error) {
       console.error('Erro ao preparar Telegram:', error);
-      alert('Erro ao preparar mensagem. Tente novamente.');
+      showPushNotification('Erro ao preparar mensagem. Tente novamente.', 'error');
     }
   };
   
@@ -924,7 +924,7 @@ const NutriPlan = () => {
         // Cliente existente
         clientData = mockClients.find(c => c.id === calculatorData.clientId);
         if (!clientData) {
-          alert('Cliente não encontrado!');
+          showPushNotification('Cliente não encontrado!', 'error');
           setIsGenerating(false);
           setShowGenerationModal(false);
           return;
@@ -932,7 +932,7 @@ const NutriPlan = () => {
       } else {
         // Novo cliente - validar campos obrigatórios
         if (!calculatorData.name || !calculatorData.age || !calculatorData.weight || !calculatorData.height) {
-          alert('Por favor, preencha todos os campos obrigatórios!');
+          showPushNotification('Por favor, preencha todos os campos obrigatórios!', 'warning');
           setIsGenerating(false);
           setShowGenerationModal(false);
           return;
@@ -1050,7 +1050,7 @@ const NutriPlan = () => {
     } catch (error) {
       console.error('Erro ao gerar dieta:', error);
       setShowGenerationModal(false);
-      alert('Erro ao gerar dieta. Tente novamente.');
+      showPushNotification('Erro ao gerar dieta. Tente novamente.', 'error');
     } finally {
       setIsGenerating(false);
       setGenerationStage('');
@@ -1175,88 +1175,33 @@ const NutriPlan = () => {
       
     } catch (error) {
       console.error('Erro ao gerar PDF:', error);
-      alert('Erro ao gerar PDF. Verifique sua conexão e tente novamente.');
+      showPushNotification('Erro ao gerar PDF. Verifique sua conexão e tente novamente.', 'error');
     }
   };
 
-  // Send diet via WhatsApp with PDF
+  // Send diet via WhatsApp - Coming Soon
   const sendDietWhatsApp = async (diet) => {
-    try {
-      // Format client's phone number (if available)
-      let phoneNumber = '';
-      if (calculatorData.clientId) {
-        const client = mockClients.find(c => c.id === calculatorData.clientId);
-        if (client && client.phone) {
-          phoneNumber = client.phone.replace(/\D/g, ''); // Remove non-digits
-        }
-      }
-      
-      // Create WhatsApp message
-      const message = `🥗 Olá ${diet.clientName}!\n\nSegue sua dieta personalizada:\n📊 ${diet.calories} kcal/dia\n📅 ${new Date(diet.createdAt).toLocaleDateString('pt-BR')}\n\n💪 Vou enviar o PDF completo com todas as refeições!\n\nBons treinos!\n${currentUser.name}`;
-      
-      // Open WhatsApp with message
-      const encodedMessage = encodeURIComponent(message);
-      const whatsappUrl = phoneNumber 
-        ? `https://wa.me/55${phoneNumber}?text=${encodedMessage}`
-        : `https://wa.me/?text=${encodedMessage}`;
-      
-      window.open(whatsappUrl, '_blank');
-      
-
-      
-    } catch (error) {
-      console.error('Erro ao enviar WhatsApp:', error);
-      alert('Erro ao preparar envio. Tente novamente.');
-    }
+    showPushNotification('🚧 Função em breve! A integração com WhatsApp estará disponível em uma próxima atualização.', 'info');
   };
 
-  // Send diet via email with PDF attachment
-  const sendDietEmail = async (diet) => {
-    try {
-      // Buscar email do cliente no sistema
-      let clientEmail = '';
-      
-      // Se tem clientId, buscar email do cliente cadastrado
-      if (calculatorData.clientId) {
-        const client = mockClients.find(c => c.id === calculatorData.clientId);
-        if (client && client.email) {
-          clientEmail = client.email;
-        }
-      }
-      
-      // Se não tem email do cliente, solicitar ao usuário
-      if (!clientEmail) {
-        clientEmail = prompt(`📧 Digite o email de ${diet.clientName}:`, `${diet.clientName.toLowerCase().replace(/\s+/g, '.')}@email.com`);
-        
-        if (!clientEmail || clientEmail.trim() === '') {
-          alert('❌ Email é obrigatório para enviar por email!');
-          return;
-        }
-        
-        // Validar formato básico de email
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(clientEmail)) {
-          alert('❌ Por favor, digite um email válido!');
-          return;
-        }
-      }
-      
-      // Format date for email
-      const date = new Date(diet.createdAt);
-      const formattedDate = date.toLocaleDateString('pt-BR');
-      
-      const subject = `Seu Plano Alimentar Personalizado - ${diet.clientName}`;
-      const body = `Olá ${diet.clientName}!\n\nEspero que você esteja bem!\n\nSegue seu plano alimentar personalizado desenvolvido especialmente para você.\n\n📊 Resumo da sua dieta:\n• Calorias diárias: ${diet.calories} kcal\n• Data: ${formattedDate}\n• Personal: ${currentUser.name}\n\n🍽️ Refeições principais:\n${diet.meals.map(meal => `• ${meal.name}: ${meal.calories} kcal`).join('\n')}\n\n💡 ORIENTAÇÕES:\n• Siga as porções indicadas\n• Mantenha os horários das refeições\n• Hidrate-se adequadamente (2-3L água/dia)\n• Pratique atividade física regularmente\n• Em caso de dúvidas, entre em contato comigo\n\n📎 Para o PDF completo com detalhes, solicite pelo WhatsApp ou use o sistema.\n\nEstou à disposição para qualquer esclarecimento!\n\nAtenciosamente,\n${currentUser.name}\nPersonal Trainer\nNutriApp - Sistema Profissional de Nutrição\n\n---\n⚠️ Este plano foi desenvolvido especificamente para você.`;
-      
-      // Abrir email diretamente
-      window.open(`mailto:${clientEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`, '_self');
-      
+  // Add new client function
+  const handleAddClient = () => {
+    setShowAddClientModal(true);
+  };
 
-      
-    } catch (error) {
-      console.error('Erro ao preparar email:', error);
-      alert('Erro ao preparar email. Tente novamente.');
-    }
+  // Add client to calculator function
+  const handleNewClientCalculator = () => {
+    setCalculatorData({
+      clientId: '',
+      name: '',
+      age: '',
+      gender: 'male',
+      weight: '',
+      height: '',
+      activityLevel: 'moderate',
+      goal: 'maintenance',
+      restrictions: []
+    });
   };
 
   // Cálculo da Taxa Metabólica Basal (TMB) usando fórmula Harris-Benedict atualizada
@@ -1854,13 +1799,13 @@ const NutriPlan = () => {
 
     // Validate file type
     if (!file.type.startsWith('image/')) {
-      alert('Por favor, selecione apenas arquivos de imagem!');
+      showPushNotification('Por favor, selecione apenas arquivos de imagem!', 'warning');
       return;
     }
 
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      alert('A imagem deve ter no máximo 5MB!');
+      showPushNotification('A imagem deve ter no máximo 5MB!', 'warning');
       return;
     }
 
@@ -1953,7 +1898,7 @@ const NutriPlan = () => {
     } catch (error) {
       console.error('Payment error:', error);
       setIsProcessingPayment(false);
-      alert('Erro no pagamento. Tente novamente.');
+      showPushNotification('Erro no pagamento. Tente novamente.', 'error');
     }
   };
 
@@ -3040,7 +2985,7 @@ const NutriPlan = () => {
                         }
                         
                         if (dietType === 'template' && !selectedTemplate) {
-                          alert('Selecione um template!');
+                          showPushNotification('Selecione um template!', 'warning');
                           return;
                         }
                         
@@ -3910,7 +3855,7 @@ const NutriPlan = () => {
                         Exportar Dados
                       </Button>
                       <Button onClick={() => {
-                        alert('🔄 Sincronização iniciada!\n\n✅ Base TACO atualizada\n✅ Novos alimentos: 47\n✅ Correções nutricionais: 12\n\nTempo estimado: 2-3 minutos\nVocê será notificado quando concluído.');
+                        showInfoPopup('🔄 Sincronização da Base TACO', '✅ Base TACO atualizada\n✅ Novos alimentos: 47\n✅ Correções nutricionais: 12\n\nTempo estimado: 2-3 minutos\nVocê será notificado quando concluído.');
                       }}>
                         <Database size={16} />
                         Sincronizar TACO
@@ -3920,7 +3865,7 @@ const NutriPlan = () => {
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     <Card className="p-6 text-center hover:shadow-lg transition-shadow cursor-pointer" onClick={() => {
-                      alert('📊 Alimentos Cadastrados: 2,847\n\n📈 Crescimento mensal: +47 alimentos\n🔄 Última atualização: Hoje\n📋 Categorias: 23\n✅ Validados TACO: 2,635\n🆕 Adicionados manual: 212');
+                      showInfoPopup('📊 Alimentos Cadastrados', '📈 Total: 2,847 alimentos\n\n📈 Crescimento mensal: +47 alimentos\n🔄 Última atualização: Hoje\n📋 Categorias: 23\n✅ Validados TACO: 2,635\n🆕 Adicionados manual: 212');
                     }}>
                       <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                         <Database className="text-blue-600" size={24} />
@@ -3933,7 +3878,7 @@ const NutriPlan = () => {
                     </Card>
                     
                     <Card className="p-6 text-center hover:shadow-lg transition-shadow cursor-pointer" onClick={() => {
-                      alert('👥 Clientes Totais: 1,247\n\n📊 Distribuição:\n• Ativos: 987 (79%)\n• Pausados: 184 (15%)\n• Inativos: 76 (6%)\n\n🎯 Objetivos mais comuns:\n• Perda de peso: 45%\n• Ganho de massa: 32%\n• Manutenção: 23%');
+                      showInfoPopup('👥 Clientes Totais', '📊 Total: 1,247 clientes\n\n📊 Distribuição:\n• Ativos: 987 (79%)\n• Pausados: 184 (15%)\n• Inativos: 76 (6%)\n\n🎯 Objetivos mais comuns:\n• Perda de peso: 45%\n• Ganho de massa: 32%\n• Manutenção: 23%');
                     }}>
                       <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                         <Users className="text-green-600" size={24} />
@@ -3946,7 +3891,7 @@ const NutriPlan = () => {
                     </Card>
                     
                     <Card className="p-6 text-center hover:shadow-lg transition-shadow cursor-pointer" onClick={() => {
-                      alert('📋 Dietas Geradas: 8,432\n\n📈 Este mês: 547 dietas\n⚡ Média diária: 18 dietas\n🎯 Tipos mais gerados:\n• IA Personalizada: 67%\n• Templates: 28%\n• Manual: 5%\n\n🏆 Personal mais ativo:\nJoão Silva - 127 dietas');
+                      showInfoPopup('📋 Dietas Geradas', '📈 Total: 8,432 dietas\n\n📈 Este mês: 547 dietas\n⚡ Média diária: 18 dietas\n🎯 Tipos mais gerados:\n• IA Personalizada: 67%\n• Templates: 28%\n• Manual: 5%\n\n🏆 Personal mais ativo:\nJoão Silva - 127 dietas');
                     }}>
                       <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
                         <FileText className="text-orange-600" size={24} />
@@ -3959,7 +3904,7 @@ const NutriPlan = () => {
                     </Card>
                     
                     <Card className="p-6 text-center hover:shadow-lg transition-shadow cursor-pointer" onClick={() => {
-                      alert('📊 Taxa de Sucesso: 94.2%\n\n✅ Métricas:\n• Clientes satisfeitos: 94.2%\n• Dietas seguidas: 87.3%\n• Objetivos alcançados: 91.8%\n• Renovações: 89.4%\n\n📈 Tendência: +2.1% vs mês anterior\n🎯 Meta: 95% até fim do ano');
+                      showInfoPopup('📊 Taxa de Sucesso', '✅ Taxa atual: 94.2%\n\n✅ Métricas:\n• Clientes satisfeitos: 94.2%\n• Dietas seguidas: 87.3%\n• Objetivos alcançados: 91.8%\n• Renovações: 89.4%\n\n📈 Tendência: +2.1% vs mês anterior\n🎯 Meta: 95% até fim do ano');
                     }}>
                       <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
                         <BarChart3 className="text-purple-600" size={24} />
@@ -4002,7 +3947,7 @@ const NutriPlan = () => {
                           <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
                             onClick={() => {
                               const foodDetails = `🍽️ ${food.name}\n\n📊 Informações Nutricionais (por ${food.baseAmount}${food.unit}):\n• Calorias: ${food.calories} kcal\n• Proteínas: ${food.protein}g\n• Carboidratos: ${food.carbs}g\n• Gorduras: ${food.fat}g\n\n📈 Estatísticas de Uso:\n• Usado em: ${Math.floor(Math.random() * 200 + 50)} dietas\n• Popularidade: ${Math.floor(Math.random() * 40 + 60)}%\n• Categoria: ${index < 2 ? 'Carboidratos' : index < 4 ? 'Proteínas' : 'Diversos'}\n\n✅ Status: Ativo\n🔄 Última atualização: ${new Date().toLocaleDateString('pt-BR')}`;
-                              alert(foodDetails);
+                              showInfoPopup('🍎 Detalhes do Alimento', foodDetails);
                             }}
                           >
                             <div className="flex-1">
@@ -4221,7 +4166,7 @@ const NutriPlan = () => {
                       <h3 className="text-lg font-semibold text-gray-900 mb-4">Configurações de Email</h3>
                       <form className="space-y-4" onSubmit={(e) => {
                         e.preventDefault();
-                        alert('📧 Configurações de email salvas!\n\n✅ SMTP configurado\n✅ Templates atualizados\n✅ Teste de envio realizado\n\nSeus emails estão prontos para serem enviados.');
+                        showPushNotification('📧 Configurações de email salvas! SMTP configurado e templates atualizados. Seus emails estão prontos para serem enviados.', 'success');
                       }}>
                         <Input label="Servidor SMTP" defaultValue="smtp.gmail.com" />
                         <Input label="Porta" type="number" defaultValue="587" />
@@ -4381,7 +4326,7 @@ const NutriPlan = () => {
             initial={{ opacity: 0, x: 300, scale: 0.8 }}
             animate={{ opacity: 1, x: 0, scale: 1 }}
             exit={{ opacity: 0, x: 300, scale: 0.8 }}
-            className="fixed top-4 right-4 z-50"
+            className="fixed top-4 right-4 z-[9999]"
           >
             <div className={`px-6 py-4 rounded-xl shadow-xl flex items-start max-w-sm border-l-4 ${
               notificationType === 'success' ? 'bg-green-50 border-green-500 text-green-800' :
@@ -4417,7 +4362,7 @@ const NutriPlan = () => {
 
       {/* Success Message (legacy) */}
       {showSuccessMessage && (
-        <div className="fixed top-4 right-4 z-50">
+        <div className="fixed top-4 right-4 z-[9999]">
           <motion.div
             initial={{ opacity: 0, y: -50, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -4678,7 +4623,7 @@ const NutriPlan = () => {
             <Button 
               onClick={() => {
                 if (manualDiet.meals.length === 0) {
-                  alert('Adicione pelo menos uma refeição!');
+                  showPushNotification('Adicione pelo menos uma refeição!', 'warning');
                   return;
                 }
                 
@@ -5129,7 +5074,7 @@ const NutriPlan = () => {
             </div>
 
             {/* Clean Action Buttons */}
-            <div className="grid grid-cols-4 gap-3">
+            <div className="grid grid-cols-3 gap-4">
               <Button 
                 variant="outline" 
                 onClick={() => generateDietPDF(generatedDiet)}
@@ -5141,20 +5086,11 @@ const NutriPlan = () => {
               
               <Button 
                 variant="outline" 
-                onClick={() => sendDietEmail(generatedDiet)}
-                className="flex flex-col items-center justify-center p-4 h-20 border-gray-200 hover:bg-gray-50 transition-colors group"
-              >
-                <div className="text-lg mb-1 group-hover:scale-110 transition-transform">✉️</div>
-                <span className="text-xs text-gray-600 group-hover:text-blue-600">Email</span>
-              </Button>
-              
-              <Button 
-                variant="outline" 
                 onClick={() => sendDietWhatsApp(generatedDiet)}
                 className="flex flex-col items-center justify-center p-4 h-20 border-gray-200 hover:bg-gray-50 transition-colors group"
               >
                 <div className="text-lg mb-1 group-hover:scale-110 transition-transform">📱</div>
-                <span className="text-xs text-gray-600 group-hover:text-green-600">WhatsApp</span>
+                <span className="text-xs text-gray-600 group-hover:text-green-600">Função em breve</span>
               </Button>
               
               <Button 
@@ -5162,8 +5098,6 @@ const NutriPlan = () => {
                 onClick={() => {
                   setActiveSection('history');
                   setShowDietModal(false);
-                  setShowSuccessMessage(true);
-                  setTimeout(() => setShowSuccessMessage(false), 3000);
                 }}
                 className="flex flex-col items-center justify-center p-4 h-20 border-gray-200 hover:bg-gray-50 transition-colors group"
               >
@@ -5422,7 +5356,7 @@ const NutriPlan = () => {
                         handleAddPortion(amount);
                         e.target.value = '';
                       } else {
-                        alert('Por favor, digite uma quantidade válida!');
+                        showPushNotification('Por favor, digite uma quantidade válida!', 'warning');
                       }
                     }
                   }}
@@ -5436,7 +5370,7 @@ const NutriPlan = () => {
                     handleAddPortion(amount);
                     input.value = '';
                   } else {
-                    alert('Por favor, digite uma quantidade válida!');
+                    showPushNotification('Por favor, digite uma quantidade válida!', 'warning');
                   }
                 }}
                 className="mt-6"
@@ -5615,6 +5549,134 @@ const NutriPlan = () => {
               onClick={() => setShowPhotoModal(false)}
             >
               Fechar
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Add Client Modal */}
+      <Modal isOpen={showAddClientModal} onClose={() => setShowAddClientModal(false)} title="Adicionar Novo Cliente">
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Nome Completo *
+              </label>
+              <input
+                type="text"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Digite o nome do cliente"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Idade *
+              </label>
+              <input
+                type="number"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Idade"
+                min="1"
+                max="120"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Sexo *
+              </label>
+              <select className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                <option value="">Selecione o sexo</option>
+                <option value="masculino">Masculino</option>
+                <option value="feminino">Feminino</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Peso (kg) *
+              </label>
+              <input
+                type="number"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Peso em kg"
+                min="1"
+                step="0.1"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Altura (cm) *
+              </label>
+              <input
+                type="number"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Altura em cm"
+                min="1"
+                max="300"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Nível de Atividade *
+              </label>
+              <select className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                <option value="">Selecione o nível</option>
+                <option value="sedentario">Sedentário</option>
+                <option value="leve">Levemente ativo</option>
+                <option value="moderado">Moderadamente ativo</option>
+                <option value="intenso">Muito ativo</option>
+                <option value="extremo">Extremamente ativo</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Objetivo *
+            </label>
+            <select className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              <option value="">Selecione o objetivo</option>
+              <option value="perda">Perda de peso</option>
+              <option value="manutencao">Manutenção</option>
+              <option value="ganho">Ganho de peso</option>
+              <option value="musculo">Ganho de massa muscular</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Observações
+            </label>
+            <textarea
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              rows="3"
+              placeholder="Informações adicionais sobre o cliente (opcional)"
+            ></textarea>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-3 pt-4">
+            <Button 
+              variant="outline" 
+              onClick={() => setShowAddClientModal(false)}
+              className="w-full sm:w-auto"
+            >
+              Cancelar
+            </Button>
+            <Button 
+              onClick={() => {
+                // Aqui seria implementada a lógica para salvar o cliente
+                showPushNotification('Cliente adicionado com sucesso!', 'success');
+                setShowAddClientModal(false);
+              }}
+              className="w-full sm:flex-1 bg-blue-600 hover:bg-blue-700"
+            >
+              <Plus size={20} />
+              Adicionar Cliente
             </Button>
           </div>
         </div>
