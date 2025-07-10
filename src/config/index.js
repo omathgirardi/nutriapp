@@ -54,7 +54,7 @@ export const environmentConfig = {
   development: {
     debug: true,
     apiURL: 'http://localhost:3001',
-    enableMocks: true
+    enableMocks: false
   },
   production: {
     debug: false,
@@ -69,4 +69,4 @@ export const getCurrentConfig = () => {
     ...config,
     ...environmentConfig[env]
   };
-}; 
+};

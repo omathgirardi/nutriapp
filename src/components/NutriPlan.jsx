@@ -47,10 +47,7 @@ import {
 // Importações locais
 import { colors } from '../styles/colors.js';
 import { customStyles } from '../styles/customStyles.js';
-import { mockUsers } from '../data/mockUsers.js';
-import { mockClients } from '../data/mockClients.js';
-import { mockDiets } from '../data/mockDiets.js';
-import { mockTemplates } from '../data/mockTemplates.js';
+// Mock data imports removed - using empty arrays
 import { 
   calculateBMR, 
   calculateCalories, 
@@ -408,10 +405,10 @@ const NutriPlan = () => {
   });
 
   // Dados
-  const [users, setUsers] = useState(mockUsers);
-  const [clients, setClients] = useState(mockClients);
-  const [diets, setDiets] = useState(mockDiets);
-  const [templates, setTemplates] = useState(mockTemplates);
+  const [users, setUsers] = useState([]);
+  const [clients, setClients] = useState([]);
+  const [diets, setDiets] = useState([]);
+  const [templates, setTemplates] = useState([]);
 
   // Continuar com o resto do componente... (devido ao limite, vou dividir em partes)
   
@@ -589,4 +586,4 @@ const NutriPlan = () => {
   );
 };
 
-export default NutriPlan; 
+export default NutriPlan;
