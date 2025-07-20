@@ -28,6 +28,7 @@ import { useClients } from '../hooks/useNutriService.js';
 import { Button, Card, Input, Select, Modal } from './index.js';
 
 const ClientsSection = () => {
+  console.log('🚀 ClientsSection renderizado!');
   const { clients, loading, error, createClient, updateClient, deleteClient, fetchClients } = useClients();
   
   // Debug: Log mudanças na lista de clientes
@@ -184,25 +185,103 @@ const ClientsSection = () => {
     console.log('📝 Dados do formulário:', clientForm);
     console.log('✏️ Modo de edição:', isEditing);
     
+    // Validar campos obrigatórios
+    const requiredFields = {
+      name: 'Nome',
+      email: 'Email',
+      phone: 'Telefone',
+      age: 'Idade',
+      weight: 'Peso',
+      height: 'Altura',
+      goal: 'Objetivo',
+      activityLevel: 'Nível de atividade'
+    };
+    
+    for (const [field, label] of Object.entries(requiredFields)) {
+      if (!clientForm[field] || clientForm[field] === '') {
+        console.error(`❌ Campo obrigatório ausente: ${label}`);
+        alert(`Por favor, preencha o campo: ${label}`);
+        return;
+      }
+    }
+    
+    // Validar formato do email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(clientForm.email)) {
+      console.error('❌ Email inválido');
+      alert('Por favor, insira um email válido');
+      return;
+    }
+    
+    // Validar idade
+    const age = parseInt(clientForm.age);
+    if (isNaN(age) || age < 1 || age > 120) {
+      console.error('❌ Idade inválida');
+      alert('Por favor, insira uma idade válida (1-120 anos)');
+      return;
+    }
+    
+    // Validar peso
+    const weight = parseFloat(clientForm.weight);
+    if (isNaN(weight) || weight < 1 || weight > 500) {
+      console.error('❌ Peso inválido');
+      alert('Por favor, insira um peso válido (1-500 kg)');
+      return;
+    }
+    
+    // Validar altura
+    const height = parseInt(clientForm.height);
+    if (isNaN(height) || height < 50 || height > 250) {
+      console.error('❌ Altura inválida');
+      alert('Por favor, insira uma altura válida (50-250 cm)');
+      return;
+    }
+    
+    console.log('✅ Validação dos dados passou');
+    
     try {
+      // Preparar dados para envio
+      const clientData = {
+        ...clientForm,
+        age: age,
+        weight: weight,
+        height: height,
+        // Garantir que campos opcionais tenham valores padrão
+        restrictions: clientForm.restrictions || '',
+        notes: clientForm.notes || '',
+        status: clientForm.status || 'active'
+      };
+      
+      console.log('📦 Dados preparados para envio:', clientData);
+      
       let result;
       if (isEditing) {
         console.log('🔄 Atualizando cliente existente...');
-        result = await updateClient(selectedClient.id, clientForm);
+        result = await updateClient(selectedClient.id, clientData);
       } else {
         console.log('🔄 Criando novo cliente...');
-        result = await createClient(clientForm);
+        result = await createClient(clientData);
       }
       
       console.log('📊 Resultado da operação:', result);
+      
+      if (result && result.success) {
+        console.log('✅ Operação realizada com sucesso!');
+        setShowClientModal(false);
+        resetForm();
+        console.log('✅ Modal fechado e formulário resetado');
+        
+        // Mostrar mensagem de sucesso
+        alert(isEditing ? 'Cliente atualizado com sucesso!' : 'Cliente criado com sucesso!');
+      } else {
+        console.error('❌ Operação falhou:', result?.error || 'Erro desconhecido');
+        alert(`Erro ao ${isEditing ? 'atualizar' : 'criar'} cliente: ${result?.error || 'Erro desconhecido'}`);
+      }
+      
       console.log('👥 Lista atual de clientes:', clients);
-      
-      setShowClientModal(false);
-      resetForm();
-      
-      console.log('✅ Modal fechado e formulário resetado');
     } catch (err) {
       console.error('❌ Erro ao salvar cliente:', err);
+      alert(`Erro inesperado: ${err.message}`);
     }
   };
 
@@ -580,10 +659,18 @@ const ClientsSection = () => {
                 required
               />
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label 
+                  htmlFor="client-bmi"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   IMC
                 </label>
-                <div className="px-3 py-2 bg-gray-50 border border-gray-300 rounded-md text-sm text-gray-600">
+                <div 
+                  id="client-bmi"
+                  className="px-3 py-2 bg-gray-50 border border-gray-300 rounded-md text-sm text-gray-600"
+                  role="textbox"
+                  aria-readonly="true"
+                >
                   {clientForm.weight && clientForm.height
                     ? calculateBMI(clientForm.weight, clientForm.height)
                     : 'N/A'}
@@ -634,10 +721,15 @@ const ClientsSection = () => {
                 placeholder="Ex: Lactose, glúten, vegetariano..."
               />
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label 
+                  htmlFor="client-notes"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   Observações
                 </label>
                 <textarea
+                  id="client-notes"
+                  name="client-notes"
                   value={clientForm.notes}
                   onChange={(e) => setClientForm({ ...clientForm, notes: e.target.value })}
                   rows={3}

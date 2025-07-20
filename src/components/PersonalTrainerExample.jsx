@@ -48,8 +48,10 @@ const CreateTrainerForm = () => {
       
       <form onSubmit={handleSubmit}>
         <div style={{ marginBottom: '15px' }}>
-          <label>Nome:</label>
+          <label htmlFor="trainer-name">Nome:</label>
           <input
+            id="trainer-name"
+            name="trainer-name"
             type="text"
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -59,8 +61,10 @@ const CreateTrainerForm = () => {
         </div>
 
         <div style={{ marginBottom: '15px' }}>
-          <label>Email:</label>
+          <label htmlFor="trainer-email">Email:</label>
           <input
+            id="trainer-email"
+            name="trainer-email"
             type="email"
             value={formData.email}
             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -70,8 +74,10 @@ const CreateTrainerForm = () => {
         </div>
 
         <div style={{ marginBottom: '15px' }}>
-          <label>Telefone (WhatsApp):</label>
+          <label htmlFor="trainer-phone">Telefone (WhatsApp):</label>
           <input
+            id="trainer-phone"
+            name="trainer-phone"
             type="text"
             value={formData.phone}
             onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
@@ -82,8 +88,10 @@ const CreateTrainerForm = () => {
         </div>
 
         <div style={{ marginBottom: '15px' }}>
-          <label>CREF:</label>
+          <label htmlFor="trainer-cref">CREF:</label>
           <input
+            id="trainer-cref"
+            name="trainer-cref"
             type="text"
             value={formData.cref}
             onChange={(e) => setFormData({ ...formData, cref: e.target.value })}
@@ -94,8 +102,10 @@ const CreateTrainerForm = () => {
         </div>
 
         <div style={{ marginBottom: '15px' }}>
-          <label>Créditos Iniciais:</label>
+          <label htmlFor="trainer-credits">Créditos Iniciais:</label>
           <input
+            id="trainer-credits"
+            name="trainer-credits"
             type="number"
             value={formData.initialCredits}
             onChange={(e) => setFormData({ ...formData, initialCredits: parseInt(e.target.value) })}
@@ -161,8 +171,10 @@ const ConfirmTrainerForm = () => {
       
       <form onSubmit={handleSubmit}>
         <div style={{ marginBottom: '15px' }}>
-          <label>ID do Trainer:</label>
+          <label htmlFor="confirm-trainer-id">ID do Trainer:</label>
           <input
+            id="confirm-trainer-id"
+            name="confirm-trainer-id"
             type="text"
             value={trainerId}
             onChange={(e) => setTrainerId(e.target.value)}
@@ -173,8 +185,10 @@ const ConfirmTrainerForm = () => {
         </div>
 
         <div style={{ marginBottom: '15px' }}>
-          <label>Código de Confirmação:</label>
+          <label htmlFor="confirmation-code">Código de Confirmação:</label>
           <input
+            id="confirmation-code"
+            name="confirmation-code"
             type="text"
             value={confirmationCode}
             onChange={(e) => setConfirmationCode(e.target.value.toUpperCase())}
@@ -261,8 +275,10 @@ const CreditsManager = () => {
       <h3>💰 Gerenciar Créditos</h3>
       
       <div style={{ marginBottom: '15px' }}>
-        <label>ID do Trainer:</label>
+        <label htmlFor="credits-trainer-id">ID do Trainer:</label>
         <input
+          id="credits-trainer-id"
+          name="credits-trainer-id"
           type="text"
           value={trainerId}
           onChange={(e) => setTrainerId(e.target.value)}
@@ -276,8 +292,10 @@ const CreditsManager = () => {
           <h4>💳 Saldo Atual: {credits} créditos</h4>
           
           <div style={{ marginBottom: '15px' }}>
-            <label>Quantidade:</label>
+            <label htmlFor="credits-amount">Quantidade:</label>
             <input
+              id="credits-amount"
+              name="credits-amount"
               type="number"
               value={amount}
               onChange={(e) => setAmount(parseInt(e.target.value))}
@@ -287,8 +305,10 @@ const CreditsManager = () => {
           </div>
 
           <div style={{ marginBottom: '15px' }}>
-            <label>Descrição:</label>
+            <label htmlFor="credits-description">Descrição:</label>
             <input
+              id="credits-description"
+              name="credits-description"
               type="text"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
@@ -396,4 +416,4 @@ const PersonalTrainerExample = () => {
   );
 };
 
-export default PersonalTrainerExample; 
+export default PersonalTrainerExample;

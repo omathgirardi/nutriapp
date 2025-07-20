@@ -45,52 +45,77 @@ export const useNutriService = () => {
 
 // Hook para gerenciar clientes
 export const useClients = () => {
+  console.log('🎯 Hook useClients inicializado!');
   const [clients, setClients] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   // Buscar todos os clientes
   const fetchClients = async () => {
+    console.log('📋 fetchClients() iniciado');
     setLoading(true);
     setError(null);
     
     try {
+      console.log('🔍 Buscando clientes no Firebase...');
       const result = await nutriService.clients.getAll();
+      console.log('📊 Resultado da busca:', result);
       
       if (result.success) {
+        console.log('✅ Clientes encontrados:', result.data.length);
         setClients(result.data);
+        console.log('📝 Estado atualizado com', result.data.length, 'clientes');
       } else {
+        console.error('❌ Erro ao buscar clientes:', result.error);
         setError(result.error);
       }
     } catch (err) {
+      console.error('💥 Erro inesperado na busca:', err);
       setError(err.message);
     } finally {
       setLoading(false);
+      console.log('🏁 fetchClients() finalizado');
     }
   };
 
   // Criar novo cliente
   const createClient = async (clientData) => {
+    console.log('🔄 useClients.createClient() iniciado');
+    console.log('📝 Dados recebidos:', clientData);
+    console.log('👥 Lista atual antes da criação:', clients.length, 'clientes');
+    
     setLoading(true);
     setError(null);
     
     try {
+      console.log('🚀 Chamando nutriService.clients.create...');
       const result = await nutriService.clients.create(clientData);
+      console.log('📊 Resultado do nutriService:', result);
       
       if (result.success) {
-        await fetchClients(); // Atualizar lista
+        console.log('✅ Cliente criado com sucesso, atualizando lista...');
+        
+        // Forçar atualização da lista
+        await fetchClients();
+        
+        console.log('👥 Lista atualizada:', clients.length, 'clientes');
+        console.log('🔄 Retornando resultado de sucesso');
+        
         return result;
       } else {
+        console.error('❌ Falha na criação:', result.error);
         setError(result.error);
         return result;
       }
     } catch (err) {
+      console.error('💥 Erro inesperado na criação:', err);
       setError(err.message);
       return { error: err.message, success: false };
     } finally {
       setLoading(false);
-    }
-  };
+      console.log('🏁 useClients.createClient() finalizado');
+     }
+   };
 
   // Atualizar cliente
   const updateClient = async (id, data) => {
