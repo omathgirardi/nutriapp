@@ -427,7 +427,7 @@ const NutriPlan = () => {
               <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
                 <Utensils className="w-5 h-5 text-white" />
               </div>
-              <span className="ml-2 text-xl font-bold text-gray-900">NutriPlan</span>
+              <span className="ml-2 text-xl font-bold text-gray-900">NutriApp</span>
             </div>
             <button
               onClick={() => setIsSidebarOpen(false)}

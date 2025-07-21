@@ -599,6 +599,16 @@ const NutriPlan = () => {
   const [showRegisterModal, setShowRegisterModal] = useState(false);
   const [showVerificationModal, setShowVerificationModal] = useState(false);
   const [showAddClientModal, setShowAddClientModal] = useState(false);
+  const [newClientData, setNewClientData] = useState({
+    name: '',
+    age: '',
+    gender: '',
+    weight: '',
+    height: '',
+    activityLevel: '',
+    goal: '',
+    observations: ''
+  });
   const [showDietModal, setShowDietModal] = useState(false);
   const [showTemplateModal, setShowTemplateModal] = useState(false);
   const [selectedClient, setSelectedClient] = useState(null);
@@ -1956,12 +1966,11 @@ const NutriPlan = () => {
           <div className="max-w-md text-center">
             {/* Logo */}
             <div className="flex items-center justify-center mb-8">
-              <div className="w-20 h-20 bg-cyan-500 rounded-2xl flex items-center justify-center mr-4 shadow-lg">
-                <Utensils className="text-white" size={40} />
-              </div>
-              <div className="text-left">
-                <h1 className="text-4xl font-bold text-gray-900">NutriApp</h1>
-              </div>
+              <img 
+                src="/src/assets/images/logos/logo-primarycolor-v1.svg" 
+                alt="NutriApp Logo" 
+                className="h-16 w-auto"
+              />
             </div>
             
             {/* Frase de boas-vindas */}
@@ -1979,10 +1988,11 @@ const NutriPlan = () => {
             {/* Logo mobile (visível apenas em telas pequenas) */}
             <div className="lg:hidden text-center">
               <div className="flex items-center justify-center mb-6">
-                <div className="w-16 h-16 bg-cyan-500 rounded-2xl flex items-center justify-center mr-3 shadow-lg">
-                  <Utensils className="text-white" size={32} />
-                </div>
-                <h1 className="text-3xl font-bold text-gray-900">NutriApp</h1>
+                <img 
+                  src="/src/assets/images/logos/logo-primarycolor-v1.svg" 
+                  alt="NutriApp Logo" 
+                  className="h-12 w-auto"
+                />
               </div>
               <h2 className="text-lg font-semibold text-gray-900 mb-6">
                 Seja Bem-Vindo(a) na melhor plataforma de gerar dietas personalizadas para personal trainers
@@ -2075,7 +2085,7 @@ const NutriPlan = () => {
                   <div className="text-center mt-4">
                     <p className="text-xs text-gray-500">
                       Para teste de Personal Trainer, use: <br />
-                      <span className="font-medium">personal@nutriplan.com</span> / senha123
+                      <span className="font-medium">personal@nutriapp.com</span> / senha123
                     </p>
                   </div>
                 </form>
@@ -2359,10 +2369,11 @@ const NutriPlan = () => {
       <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0`}>
         <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200">
           <div className="flex items-center">
-            <div className={`w-8 h-8 bg-[${colors.primary[600]}] rounded-lg flex items-center justify-center mr-3`}>
-              <Utensils className="text-white" size={18} />
-            </div>
-            <h1 className={`text-xl font-bold text-[${colors.gray[900]}]`}>NutriApp</h1>
+            <img 
+              src="/src/assets/images/logos/logo-primarycolor-v1.svg" 
+              alt="NutriApp Logo" 
+              className="h-8 w-auto"
+            />
           </div>
           <button
             onClick={() => setSidebarOpen(false)}
@@ -2662,10 +2673,6 @@ const NutriPlan = () => {
                         <div className="text-center py-8">
                           <Users className="mx-auto h-12 w-12 text-gray-400 mb-4" />
                           <p className="text-gray-500 text-sm mb-4">Nenhum cliente cadastrado</p>
-                          <Button size="sm" onClick={() => setShowAddClientModal(true)}>
-                            <Plus size={16} />
-                            Adicionar Primeiro Cliente
-                          </Button>
                         </div>
 
                         <div className="grid grid-cols-3 gap-3 md:gap-4 mt-4 md:mt-6">
@@ -3045,11 +3052,7 @@ const NutriPlan = () => {
                   <Card className="p-8 text-center">
                     <Users className="mx-auto h-12 w-12 text-gray-400 mb-4" />
                     <h3 className="text-lg font-medium text-gray-900 mb-2">Nenhum cliente cadastrado</h3>
-                    <p className="text-gray-500 text-sm mb-4">Adicione seu primeiro cliente para começar a criar dietas personalizadas.</p>
-                    <Button onClick={() => setShowAddClientModal(true)}>
-                      <Plus size={16} />
-                      Adicionar Primeiro Cliente
-                    </Button>
+                    <p className="text-gray-500 text-sm mb-4">Use o botão "Adicionar Cliente" acima para começar a criar dietas personalizadas.</p>
                   </Card>
                 </div>
               </div>
@@ -4067,7 +4070,7 @@ const NutriPlan = () => {
                         <Input label="Nome da Aplicação" defaultValue="NutriApp" />
                         <Input label="Email de Suporte" type="email" defaultValue="suporte@nutriapp.com" />
                         <Input label="Telefone de Suporte" type="tel" defaultValue="(11) 3000-0000" />
-                        <Input label="URL da Aplicação" defaultValue="https://app.nutriplan.com" />
+                        <Input label="URL da Aplicação" defaultValue="https://app.nutriapp.com" />
                         <Select
                           label="Fuso Horário"
                           defaultValue="America/Sao_Paulo"
@@ -5564,6 +5567,8 @@ const NutriPlan = () => {
               </label>
               <input
                 type="text"
+                value={newClientData.name}
+                onChange={(e) => setNewClientData({...newClientData, name: e.target.value})}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Digite o nome do cliente"
               />
@@ -5574,6 +5579,8 @@ const NutriPlan = () => {
               </label>
               <input
                 type="number"
+                value={newClientData.age}
+                onChange={(e) => setNewClientData({...newClientData, age: e.target.value})}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Idade"
                 min="1"
@@ -5587,7 +5594,11 @@ const NutriPlan = () => {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Sexo *
               </label>
-              <select className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              <select 
+                value={newClientData.gender}
+                onChange={(e) => setNewClientData({...newClientData, gender: e.target.value})}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
                 <option value="">Selecione o sexo</option>
                 <option value="masculino">Masculino</option>
                 <option value="feminino">Feminino</option>
@@ -5599,6 +5610,8 @@ const NutriPlan = () => {
               </label>
               <input
                 type="number"
+                value={newClientData.weight}
+                onChange={(e) => setNewClientData({...newClientData, weight: e.target.value})}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Peso em kg"
                 min="1"
@@ -5614,6 +5627,8 @@ const NutriPlan = () => {
               </label>
               <input
                 type="number"
+                value={newClientData.height}
+                onChange={(e) => setNewClientData({...newClientData, height: e.target.value})}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Altura em cm"
                 min="1"
@@ -5624,7 +5639,11 @@ const NutriPlan = () => {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Nível de Atividade *
               </label>
-              <select className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              <select 
+                value={newClientData.activityLevel}
+                onChange={(e) => setNewClientData({...newClientData, activityLevel: e.target.value})}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
                 <option value="">Selecione o nível</option>
                 <option value="sedentario">Sedentário</option>
                 <option value="leve">Levemente ativo</option>
@@ -5639,7 +5658,11 @@ const NutriPlan = () => {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Objetivo *
             </label>
-            <select className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            <select 
+              value={newClientData.goal}
+              onChange={(e) => setNewClientData({...newClientData, goal: e.target.value})}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
               <option value="">Selecione o objetivo</option>
               <option value="perda">Perda de peso</option>
               <option value="manutencao">Manutenção</option>
@@ -5653,6 +5676,8 @@ const NutriPlan = () => {
               Observações
             </label>
             <textarea
+              value={newClientData.observations}
+              onChange={(e) => setNewClientData({...newClientData, observations: e.target.value})}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               rows="3"
               placeholder="Informações adicionais sobre o cliente (opcional)"
@@ -5669,7 +5694,38 @@ const NutriPlan = () => {
             </Button>
             <Button 
               onClick={() => {
-                // Aqui seria implementada a lógica para salvar o cliente
+                // Validação dos campos obrigatórios
+                if (!newClientData.name || !newClientData.age || !newClientData.gender || 
+                    !newClientData.weight || !newClientData.height || !newClientData.activityLevel || 
+                    !newClientData.goal) {
+                  showPushNotification('Por favor, preencha todos os campos obrigatórios!', 'error');
+                  return;
+                }
+                
+                // Criar novo cliente
+                const clientId = Date.now().toString();
+                const newClient = {
+                  id: clientId,
+                  ...newClientData,
+                  createdAt: new Date().toISOString(),
+                  status: 'active'
+                };
+                
+                // Adicionar à lista de clientes (simulação)
+                mockClients.push(newClient);
+                
+                // Limpar formulário
+                setNewClientData({
+                  name: '',
+                  age: '',
+                  gender: '',
+                  weight: '',
+                  height: '',
+                  activityLevel: '',
+                  goal: '',
+                  observations: ''
+                });
+                
                 showPushNotification('Cliente adicionado com sucesso!', 'success');
                 setShowAddClientModal(false);
               }}
@@ -5796,6 +5852,13 @@ const NutriPlan = () => {
           </div>
         )}
       </Modal>
+                  </tbody>
+                </table>
+              </div>
+            </Card>
+          </div>
+        </main>
+      </div>
     </div>
   );
 };

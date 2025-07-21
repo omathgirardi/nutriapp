@@ -226,6 +226,16 @@ var NutriPlan = () => {
   const [showRegisterModal, setShowRegisterModal] = useState(false);
   const [showVerificationModal, setShowVerificationModal] = useState(false);
   const [showAddClientModal, setShowAddClientModal] = useState(false);
+  const [newClientData, setNewClientData] = useState({
+    name: '',
+    age: '',
+    gender: '',
+    weight: '',
+    height: '',
+    activityLevel: '',
+    goal: '',
+    observations: ''
+  });
   const [showDietModal, setShowDietModal] = useState(false);
   const [showTemplateModal, setShowTemplateModal] = useState(false);
   const [selectedClient, setSelectedClient] = useState(null);
@@ -1370,7 +1380,7 @@ NutriApp - Sistema Profissional de Nutri\xE7\xE3o
     return true;
   };
   if (!currentUser) {
-    return /* @__PURE__ */ React.createElement("div", { className: "min-h-screen bg-gray-50 flex" }, /* @__PURE__ */ React.createElement("div", { className: "hidden lg:flex lg:w-1/2 flex-col justify-center items-center p-12 bg-gradient-to-br from-cyan-50 to-blue-50" }, /* @__PURE__ */ React.createElement("div", { className: "max-w-md text-center" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center justify-center mb-8" }, /* @__PURE__ */ React.createElement("div", { className: "w-20 h-20 bg-cyan-500 rounded-2xl flex items-center justify-center mr-4 shadow-lg" }, /* @__PURE__ */ React.createElement(Utensils, { className: "text-white", size: 40 })), /* @__PURE__ */ React.createElement("div", { className: "text-left" }, /* @__PURE__ */ React.createElement("h1", { className: "text-4xl font-bold text-gray-900" }, "NutriApp"))), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h2", { className: "text-2xl font-semibold text-gray-900 mb-6 leading-relaxed" }, "Seja Bem-Vindo(a) na melhor plataforma de gerar dietas personalizadas para personal trainers")))), /* @__PURE__ */ React.createElement("div", { className: "flex-1 flex items-center justify-center p-8 lg:w-1/2" }, /* @__PURE__ */ React.createElement("div", { className: "w-full max-w-md space-y-8" }, /* @__PURE__ */ React.createElement("div", { className: "lg:hidden text-center" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center justify-center mb-6" }, /* @__PURE__ */ React.createElement("div", { className: "w-16 h-16 bg-cyan-500 rounded-2xl flex items-center justify-center mr-3 shadow-lg" }, /* @__PURE__ */ React.createElement(Utensils, { className: "text-white", size: 32 })), /* @__PURE__ */ React.createElement("h1", { className: "text-3xl font-bold text-gray-900" }, "NutriApp")), /* @__PURE__ */ React.createElement("h2", { className: "text-lg font-semibold text-gray-900 mb-6" }, "Seja Bem-Vindo(a) na melhor plataforma de gerar dietas personalizadas para personal trainers")), /* @__PURE__ */ React.createElement(Card, { className: "bg-white rounded-xl shadow-sm border border-[#EAECF0] p-8 shadow-lg" }, /* @__PURE__ */ React.createElement("div", { className: "mb-8" }, /* @__PURE__ */ React.createElement("div", { className: "flex bg-gray-100 rounded-lg p-1 mb-6" }, /* @__PURE__ */ React.createElement(
+    return /* @__PURE__ */ React.createElement("div", { className: "min-h-screen bg-gray-50 flex" }, /* @__PURE__ */ React.createElement("div", { className: "hidden lg:flex lg:w-1/2 flex-col justify-center items-center p-12 bg-gradient-to-br from-cyan-50 to-blue-50" }, /* @__PURE__ */ React.createElement("div", { className: "max-w-md text-center" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center justify-center mb-8" }, /* @__PURE__ */ React.createElement("img", { src: "/src/assets/images/logos/logo-primarycolor-v1.svg", alt: "NutriApp Logo", className: "h-16 w-auto" })), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h2", { className: "text-2xl font-semibold text-gray-900 mb-6 leading-relaxed" }, "Seja Bem-Vindo(a) na melhor plataforma de gerar dietas personalizadas para personal trainers")))), /* @__PURE__ */ React.createElement("div", { className: "flex-1 flex items-center justify-center p-8 lg:w-1/2" }, /* @__PURE__ */ React.createElement("div", { className: "w-full max-w-md space-y-8" }, /* @__PURE__ */ React.createElement("div", { className: "lg:hidden text-center" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center justify-center mb-6" }, /* @__PURE__ */ React.createElement("img", { src: "/src/assets/images/logos/logo-primarycolor-v1.svg", alt: "NutriApp Logo", className: "h-12 w-auto" })), /* @__PURE__ */ React.createElement("h2", { className: "text-lg font-semibold text-gray-900 mb-6" }, "Seja Bem-Vindo(a) na melhor plataforma de gerar dietas personalizadas para personal trainers")), /* @__PURE__ */ React.createElement(Card, { className: "bg-white rounded-xl shadow-sm border border-[#EAECF0] p-8 shadow-lg" }, /* @__PURE__ */ React.createElement("div", { className: "mb-8" }, /* @__PURE__ */ React.createElement("div", { className: "flex bg-gray-100 rounded-lg p-1 mb-6" }, /* @__PURE__ */ React.createElement(
       "button",
       {
         onClick: () => {
@@ -1410,7 +1420,7 @@ NutriApp - Sistema Profissional de Nutri\xE7\xE3o
         className: "w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent",
         required: true
       }
-    ), /* @__PURE__ */ React.createElement(Info, { className: "absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400", size: 16 }))), loginError && /* @__PURE__ */ React.createElement("div", { className: "bg-red-50 border border-red-200 rounded-lg p-3 mb-4" }, /* @__PURE__ */ React.createElement("p", { className: "text-sm text-red-600" }, loginError)), /* @__PURE__ */ React.createElement(Button, { type: "submit", className: "w-full bg-blue-600 hover:bg-blue-700 py-3" }, "Entrar"), /* @__PURE__ */ React.createElement("div", { className: "text-center mt-4" }, /* @__PURE__ */ React.createElement("p", { className: "text-xs text-gray-500" }, "Para teste de Personal Trainer, use: ", /* @__PURE__ */ React.createElement("br", null), /* @__PURE__ */ React.createElement("span", { className: "font-medium" }, "personal@nutriplan.com"), " / senha123"))), showRegisterModal && /* @__PURE__ */ React.createElement("form", { onSubmit: handleRegister, className: "space-y-6" }, /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-2 gap-4" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("label", { className: "block text-sm font-medium text-gray-700 mb-2" }, "Nome Completo *"), /* @__PURE__ */ React.createElement("div", { className: "relative" }, /* @__PURE__ */ React.createElement(User, { className: "absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400", size: 20 }), /* @__PURE__ */ React.createElement(
+    ), /* @__PURE__ */ React.createElement(Info, { className: "absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400", size: 16 }))), loginError && /* @__PURE__ */ React.createElement("div", { className: "bg-red-50 border border-red-200 rounded-lg p-3 mb-4" }, /* @__PURE__ */ React.createElement("p", { className: "text-sm text-red-600" }, loginError)), /* @__PURE__ */ React.createElement(Button, { type: "submit", className: "w-full bg-blue-600 hover:bg-blue-700 py-3" }, "Entrar"), /* @__PURE__ */ React.createElement("div", { className: "text-center mt-4" }, /* @__PURE__ */ React.createElement("p", { className: "text-xs text-gray-500" }, "Para teste de Personal Trainer, use: ", /* @__PURE__ */ React.createElement("br", null), /* @__PURE__ */ React.createElement("span", { className: "font-medium" }, "personal@nutriapp.com"), " / senha123"))), showRegisterModal && /* @__PURE__ */ React.createElement("form", { onSubmit: handleRegister, className: "space-y-6" }, /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-2 gap-4" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("label", { className: "block text-sm font-medium text-gray-700 mb-2" }, "Nome Completo *"), /* @__PURE__ */ React.createElement("div", { className: "relative" }, /* @__PURE__ */ React.createElement(User, { className: "absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400", size: 20 }), /* @__PURE__ */ React.createElement(
       "input",
       {
         type: "text",
@@ -1532,7 +1542,7 @@ NutriApp - Sistema Profissional de Nutri\xE7\xE3o
     },
     /* @__PURE__ */ React.createElement(item.icon, { size: 20 }),
     /* @__PURE__ */ React.createElement("span", { className: "text-xs font-medium truncate px-1" }, item.label)
-  )))), /* @__PURE__ */ React.createElement("div", { className: `fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0` }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center justify-between h-16 px-6 border-b border-gray-200" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center" }, /* @__PURE__ */ React.createElement("div", { className: `w-8 h-8 bg-[${colors.primary[600]}] rounded-lg flex items-center justify-center mr-3` }, /* @__PURE__ */ React.createElement(Utensils, { className: "text-white", size: 18 })), /* @__PURE__ */ React.createElement("h1", { className: `text-xl font-bold text-[${colors.gray[900]}]` }, "NutriApp")), /* @__PURE__ */ React.createElement(
+  )))), /* @__PURE__ */ React.createElement("div", { className: `fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0` }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center justify-between h-16 px-6 border-b border-gray-200" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center" }, /* @__PURE__ */ React.createElement("img", { src: "/src/assets/images/logos/logo-primarycolor-v1.svg", alt: "NutriApp Logo", className: "h-8 w-auto" })), /* @__PURE__ */ React.createElement(
     "button",
     {
       onClick: () => setSidebarOpen(false),
@@ -2275,7 +2285,7 @@ Esta a\xE7\xE3o n\xE3o pode ser desfeita.
   ].map((activity, index) => /* @__PURE__ */ React.createElement("div", { key: index, className: "flex items-center space-x-4 p-3 bg-gray-50 rounded-lg" }, /* @__PURE__ */ React.createElement("div", { className: `w-8 h-8 rounded-full flex items-center justify-center ${activity.type === "add" ? "bg-green-100" : activity.type === "update" ? "bg-blue-100" : activity.type === "sync" ? "bg-purple-100" : activity.type === "fix" ? "bg-orange-100" : "bg-gray-100"}` }, activity.type === "add" ? /* @__PURE__ */ React.createElement(Plus, { size: 16, className: "text-green-600" }) : activity.type === "update" ? /* @__PURE__ */ React.createElement(Edit, { size: 16, className: "text-blue-600" }) : activity.type === "sync" ? /* @__PURE__ */ React.createElement(Database, { size: 16, className: "text-purple-600" }) : activity.type === "fix" ? /* @__PURE__ */ React.createElement(CheckCircle, { size: 16, className: "text-orange-600" }) : /* @__PURE__ */ React.createElement(Archive, { size: 16, className: "text-gray-600" })), /* @__PURE__ */ React.createElement("div", { className: "flex-1" }, /* @__PURE__ */ React.createElement("p", { className: "font-medium text-gray-900" }, activity.action), /* @__PURE__ */ React.createElement("p", { className: "text-sm text-gray-600" }, activity.item)), /* @__PURE__ */ React.createElement("span", { className: "text-xs text-gray-500" }, activity.time)))))), activeSection === "settings" && /* @__PURE__ */ React.createElement("div", { className: "space-y-6" }, /* @__PURE__ */ React.createElement("h2", { className: "text-xl font-semibold text-gray-900" }, "Configura\xE7\xF5es do Sistema"), /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-1 lg:grid-cols-2 gap-6" }, /* @__PURE__ */ React.createElement(Card, { className: "p-6" }, /* @__PURE__ */ React.createElement("h3", { className: "text-lg font-semibold text-gray-900 mb-4" }, "Configura\xE7\xF5es Gerais"), /* @__PURE__ */ React.createElement("form", { className: "space-y-4", onSubmit: (e) => {
     e.preventDefault();
     handleSaveSettings();
-  } }, /* @__PURE__ */ React.createElement(Input, { label: "Nome da Aplica\xE7\xE3o", defaultValue: "NutriApp" }), /* @__PURE__ */ React.createElement(Input, { label: "Email de Suporte", type: "email", defaultValue: "suporte@nutriapp.com" }), /* @__PURE__ */ React.createElement(Input, { label: "Telefone de Suporte", type: "tel", defaultValue: "(11) 3000-0000" }), /* @__PURE__ */ React.createElement(Input, { label: "URL da Aplica\xE7\xE3o", defaultValue: "https://app.nutriplan.com" }), /* @__PURE__ */ React.createElement(
+  } }, /* @__PURE__ */ React.createElement(Input, { label: "Nome da Aplica\xE7\xE3o", defaultValue: "NutriApp" }), /* @__PURE__ */ React.createElement(Input, { label: "Email de Suporte", type: "email", defaultValue: "suporte@nutriapp.com" }), /* @__PURE__ */ React.createElement(Input, { label: "Telefone de Suporte", type: "tel", defaultValue: "(11) 3000-0000" }), /* @__PURE__ */ React.createElement(Input, { label: "URL da Aplica\xE7\xE3o", defaultValue: "https://app.nutriapp.com" }), /* @__PURE__ */ React.createElement(
     Select,
     {
       label: "Fuso Hor\xE1rio",
@@ -3081,22 +3091,28 @@ Esta a\xE7\xE3o n\xE3o pode ser desfeita.
     "input",
     {
       type: "text",
+      value: newClientData.name,
+      onChange: (e) => setNewClientData({...newClientData, name: e.target.value}),
       className: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent",
-      placeholder: "Digite o nome completo"
+      placeholder: "Digite o nome do cliente"
     }
   )), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("label", { className: "block text-sm font-medium text-gray-700 mb-2" }, "Idade *"), /* @__PURE__ */ React.createElement(
     "input",
     {
       type: "number",
+      value: newClientData.age,
+      onChange: (e) => setNewClientData({...newClientData, age: e.target.value}),
       className: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent",
       placeholder: "Idade",
       min: "1",
       max: "120"
     }
-  ))), /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-4" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("label", { className: "block text-sm font-medium text-gray-700 mb-2" }, "Sexo *"), /* @__PURE__ */ React.createElement("select", { className: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" }, /* @__PURE__ */ React.createElement("option", { value: "" }, "Selecione o sexo"), /* @__PURE__ */ React.createElement("option", { value: "masculino" }, "Masculino"), /* @__PURE__ */ React.createElement("option", { value: "feminino" }, "Feminino"))), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("label", { className: "block text-sm font-medium text-gray-700 mb-2" }, "Peso (kg) *"), /* @__PURE__ */ React.createElement(
+  ))), /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-4" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("label", { className: "block text-sm font-medium text-gray-700 mb-2" }, "Sexo *"), /* @__PURE__ */ React.createElement("select", { value: newClientData.gender, onChange: (e) => setNewClientData({...newClientData, gender: e.target.value}), className: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" }, /* @__PURE__ */ React.createElement("option", { value: "" }, "Selecione o sexo"), /* @__PURE__ */ React.createElement("option", { value: "masculino" }, "Masculino"), /* @__PURE__ */ React.createElement("option", { value: "feminino" }, "Feminino"))), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("label", { className: "block text-sm font-medium text-gray-700 mb-2" }, "Peso (kg) *"), /* @__PURE__ */ React.createElement(
     "input",
     {
       type: "number",
+      value: newClientData.weight,
+      onChange: (e) => setNewClientData({...newClientData, weight: e.target.value}),
       className: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent",
       placeholder: "Peso em kg",
       min: "1",
@@ -3106,14 +3122,18 @@ Esta a\xE7\xE3o n\xE3o pode ser desfeita.
     "input",
     {
       type: "number",
+      value: newClientData.height,
+      onChange: (e) => setNewClientData({...newClientData, height: e.target.value}),
       className: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent",
       placeholder: "Altura em cm",
       min: "1",
       max: "300"
     }
-  )), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("label", { className: "block text-sm font-medium text-gray-700 mb-2" }, "Nível de Atividade *"), /* @__PURE__ */ React.createElement("select", { className: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" }, /* @__PURE__ */ React.createElement("option", { value: "" }, "Selecione o nível"), /* @__PURE__ */ React.createElement("option", { value: "sedentario" }, "Sedentário"), /* @__PURE__ */ React.createElement("option", { value: "leve" }, "Levemente ativo"), /* @__PURE__ */ React.createElement("option", { value: "moderado" }, "Moderadamente ativo"), /* @__PURE__ */ React.createElement("option", { value: "intenso" }, "Muito ativo"), /* @__PURE__ */ React.createElement("option", { value: "extremo" }, "Extremamente ativo")))), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("label", { className: "block text-sm font-medium text-gray-700 mb-2" }, "Objetivo *"), /* @__PURE__ */ React.createElement("select", { className: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" }, /* @__PURE__ */ React.createElement("option", { value: "" }, "Selecione o objetivo"), /* @__PURE__ */ React.createElement("option", { value: "perda" }, "Perda de peso"), /* @__PURE__ */ React.createElement("option", { value: "manutencao" }, "Manutenção"), /* @__PURE__ */ React.createElement("option", { value: "ganho" }, "Ganho de peso"), /* @__PURE__ */ React.createElement("option", { value: "musculo" }, "Ganho de massa muscular"))), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("label", { className: "block text-sm font-medium text-gray-700 mb-2" }, "Observações"), /* @__PURE__ */ React.createElement(
+  )), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("label", { className: "block text-sm font-medium text-gray-700 mb-2" }, "Nível de Atividade *"), /* @__PURE__ */ React.createElement("select", { value: newClientData.activityLevel, onChange: (e) => setNewClientData({...newClientData, activityLevel: e.target.value}), className: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" }, /* @__PURE__ */ React.createElement("option", { value: "" }, "Selecione o nível"), /* @__PURE__ */ React.createElement("option", { value: "sedentario" }, "Sedentário"), /* @__PURE__ */ React.createElement("option", { value: "leve" }, "Levemente ativo"), /* @__PURE__ */ React.createElement("option", { value: "moderado" }, "Moderadamente ativo"), /* @__PURE__ */ React.createElement("option", { value: "intenso" }, "Muito ativo"), /* @__PURE__ */ React.createElement("option", { value: "extremo" }, "Extremamente ativo")))), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("label", { className: "block text-sm font-medium text-gray-700 mb-2" }, "Objetivo *"), /* @__PURE__ */ React.createElement("select", { value: newClientData.goal, onChange: (e) => setNewClientData({...newClientData, goal: e.target.value}), className: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" }, /* @__PURE__ */ React.createElement("option", { value: "" }, "Selecione o objetivo"), /* @__PURE__ */ React.createElement("option", { value: "perda" }, "Perda de peso"), /* @__PURE__ */ React.createElement("option", { value: "manutencao" }, "Manutenção"), /* @__PURE__ */ React.createElement("option", { value: "ganho" }, "Ganho de peso"), /* @__PURE__ */ React.createElement("option", { value: "musculo" }, "Ganho de massa muscular"))), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("label", { className: "block text-sm font-medium text-gray-700 mb-2" }, "Observações"), /* @__PURE__ */ React.createElement(
     "textarea",
     {
+      value: newClientData.observations,
+      onChange: (e) => setNewClientData({...newClientData, observations: e.target.value}),
       className: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent",
       rows: "3",
       placeholder: "Informações adicionais sobre o cliente (opcional)"
@@ -3130,7 +3150,39 @@ Esta a\xE7\xE3o n\xE3o pode ser desfeita.
     Button,
     {
       onClick: () => {
-        showPushNotification("\u2705 Cliente adicionado com sucesso!", "success");
+        // Validação dos campos obrigatórios
+        if (!newClientData.name || !newClientData.age || !newClientData.gender || 
+            !newClientData.weight || !newClientData.height || !newClientData.activityLevel || 
+            !newClientData.goal) {
+          showPushNotification('Por favor, preencha todos os campos obrigatórios!', 'error');
+          return;
+        }
+        
+        // Criar novo cliente
+        const clientId = Date.now().toString();
+        const newClient = {
+          id: clientId,
+          ...newClientData,
+          createdAt: new Date().toISOString(),
+          status: 'active'
+        };
+        
+        // Adicionar à lista de clientes (simulação)
+        mockClients.push(newClient);
+        
+        // Limpar formulário
+        setNewClientData({
+          name: '',
+          age: '',
+          gender: '',
+          weight: '',
+          height: '',
+          activityLevel: '',
+          goal: '',
+          observations: ''
+        });
+        
+        showPushNotification('\u2705 Cliente adicionado com sucesso!', 'success');
         setShowAddClientModal(false);
       },
       className: "w-full sm:flex-1 bg-blue-600 hover:bg-blue-700"
