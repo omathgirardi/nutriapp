@@ -619,7 +619,7 @@ const NutriPlan = () => {
   const [selectedTrainer, setSelectedTrainer] = useState(null);
   const [isTestingConnection, setIsTestingConnection] = useState(false);
   const [isBackingUp, setIsBackingUp] = useState(false);
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+
   const [showCreateTemplateModal, setShowCreateTemplateModal] = useState(false);
   const [showSelectFoodModal, setShowSelectFoodModal] = useState(false);
   const [showPortionModal, setShowPortionModal] = useState(false);
@@ -662,7 +662,7 @@ const NutriPlan = () => {
       setTimeout(() => {
         if (confirm('💬 Telegram não encontrado?\n\nDeseja copiar a mensagem para enviar manualmente?')) {
           navigator.clipboard.writeText(message.replace(/\*/g, '')).then(() => {
-            showPushNotification('✅ Mensagem copiada! Cole no Telegram do seu cliente.', 'success');
+            showPushNotification('Mensagem copiada! Cole no Telegram do seu cliente.', 'success');
           }).catch(() => {
             showPushNotification('❌ Erro ao copiar. Copie manualmente a mensagem exibida.', 'error');
             console.log('Mensagem para Telegram:', message);
@@ -1669,16 +1669,16 @@ const NutriPlan = () => {
     setSelectedPlan(null);
     setShowAddTrainerModal(false);
     setNewTrainer({ name: '', email: '', phone: '', credits: 200 });
-    setShowSuccessMessage(true);
-    setTimeout(() => setShowSuccessMessage(false), 3000);
+    showPushNotification("Ação realizada com sucesso!", "success");
+    // Removido setTimeout, 3000);
   };
 
   const handleManageCredits = (e) => {
     e.preventDefault();
     setShowManageCreditsModal(false);
     setCreditAmount('');
-    setShowSuccessMessage(true);
-    setTimeout(() => setShowSuccessMessage(false), 3000);
+    showPushNotification("Ação realizada com sucesso!", "success");
+    // Removido setTimeout, 3000);
   };
 
   // Template handlers
@@ -1696,8 +1696,8 @@ const NutriPlan = () => {
         { name: 'Jantar', foods: [], substitutions: [] }
       ]
     });
-    setShowSuccessMessage(true);
-    setTimeout(() => setShowSuccessMessage(false), 3000);
+    showPushNotification("Ação realizada com sucesso!", "success");
+    // Removido setTimeout, 3000);
   };
 
   const handleAddFood = (mealIndex) => {
@@ -1764,7 +1764,7 @@ const NutriPlan = () => {
       setShowSelectFoodModal(true);
     }
     
-    showPushNotification(`✅ ${selectedFood.name} (${amount}g) adicionado!`, 'success');
+    showPushNotification(`${selectedFood.name} (${amount}g) adicionado!`, 'success');
   };
 
   const handleAddSubstitution = (mealIndex) => {
@@ -1860,8 +1860,8 @@ const NutriPlan = () => {
         });
         
         setIsUploadingPhoto(false);
-        setShowSuccessMessage(true);
-        setTimeout(() => setShowSuccessMessage(false), 3000);
+        showPushNotification("Ação realizada com sucesso!", "success");
+        // Removido setTimeout, 3000);
       };
       
       img.src = e.target.result;
@@ -1877,8 +1877,8 @@ const NutriPlan = () => {
       photo: null
     });
     setShowPhotoModal(false);
-    setShowSuccessMessage(true);
-    setTimeout(() => setShowSuccessMessage(false), 3000);
+    showPushNotification("Ação realizada com sucesso!", "success");
+    // Removido setTimeout, 3000);
   };
 
   // Payment processing function (mock for now)
@@ -1897,8 +1897,8 @@ const NutriPlan = () => {
       setIsProcessingPayment(false);
       
       // Show success message
-      setShowSuccessMessage(true);
-      setTimeout(() => setShowSuccessMessage(false), 5000);
+      showPushNotification("Ação realizada com sucesso!", "success");
+      // Removido setTimeout, 5000);
       
       // Redirect to dashboard
       setTimeout(() => {
@@ -2527,6 +2527,15 @@ const NutriPlan = () => {
                         </div>
                       </div>
                     </Card>
+                  </div>
+                </>
+              ) : (
+                <>
+                  {/* Personal Trainer Dashboard */}
+                </>
+              )}
+            </div>
+          )}
 
                     {/* Atividades Recentes ocupando 1 coluna */}
                     <Card className="p-4 md:p-6">
@@ -3201,6 +3210,12 @@ const NutriPlan = () => {
                           </Button>
                         </td>
                       </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </Card>
+            </div>
+          )}
                       {/* {mockDiets.map((diet) => (
                         <tr key={diet.id}>
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
@@ -4363,23 +4378,7 @@ const NutriPlan = () => {
         )}
       </AnimatePresence>
 
-      {/* Success Message (legacy) */}
-      {showSuccessMessage && (
-        <div className="fixed top-4 right-4 z-[9999]">
-          <motion.div
-            initial={{ opacity: 0, y: -50, scale: 0.9 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -50, scale: 0.9 }}
-            className="bg-green-500 text-white px-6 py-4 rounded-lg shadow-lg flex items-center max-w-sm"
-          >
-            <CheckCircle size={20} className="mr-3 flex-shrink-0" />
-            <div>
-              <div className="font-semibold">Pagamento Aprovado! 🎉</div>
-              <div className="text-sm opacity-90">Seus créditos foram adicionados à sua conta</div>
-            </div>
-          </motion.div>
-        </div>
-      )}
+
 
       {/* Enhanced Info Modal */}
       <Modal isOpen={showInfoModal} onClose={() => setShowInfoModal(false)} title="">
@@ -5287,7 +5286,7 @@ const NutriPlan = () => {
                   const updatedMeals = [...newTemplate.meals, newMeal];
                   setNewTemplate({...newTemplate, meals: updatedMeals});
                   
-                  showPushNotification(`✅ Refeição "${currentManualMeal.name}" adicionada ao template!`, 'success');
+                  showPushNotification(`Refeição "${currentManualMeal.name}" adicionada ao template!`, 'success');
                 } else {
                   // Adding to manual diet
                   const totalCalories = currentManualMeal.foods.reduce((sum, f) => sum + f.calories, 0);
@@ -5299,7 +5298,7 @@ const NutriPlan = () => {
                   const updatedMeals = [...manualDiet.meals, mealWithCalories];
                   setManualDiet({...manualDiet, meals: updatedMeals});
                   
-                  showPushNotification(`✅ Refeição "${currentManualMeal.name}" adicionada à dieta!`, 'success');
+                  showPushNotification(`Refeição "${currentManualMeal.name}" adicionada à dieta!`, 'success');
                 }
                 
                 setCurrentManualMeal({ name: '', calories: '', foods: [] });
@@ -5852,11 +5851,6 @@ const NutriPlan = () => {
           </div>
         )}
       </Modal>
-                  </tbody>
-                </table>
-              </div>
-            </Card>
-          </div>
         </main>
       </div>
     </div>

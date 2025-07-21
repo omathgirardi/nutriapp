@@ -44,7 +44,7 @@ import {
   Home,
   Archive
 } from "https://esm.sh/lucide-react?deps=react@18.2.0,react-dom@18.2.0";
-var { useStoredState } = hatch;
+const { useStoredState } = window.hatch;
 var colors = {
   primary: {
     25: "#F5FAFF",
@@ -246,7 +246,7 @@ var NutriPlan = () => {
   const [selectedTrainer, setSelectedTrainer] = useState(null);
   const [isTestingConnection, setIsTestingConnection] = useState(false);
   const [isBackingUp, setIsBackingUp] = useState(false);
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+
   const [showCreateTemplateModal, setShowCreateTemplateModal] = useState(false);
   const [showSelectFoodModal, setShowSelectFoodModal] = useState(false);
   const [showPortionModal, setShowPortionModal] = useState(false);
@@ -267,30 +267,30 @@ var NutriPlan = () => {
     try {
       const date = new Date(diet.createdAt);
       const formattedDate = date.toLocaleDateString("pt-BR");
-      const message = `\u{1F957} *PLANO ALIMENTAR PERSONALIZADO*
+      const message = `🥗 *PLANO ALIMENTAR PERSONALIZADO*
 
-\u{1F464} *Cliente:* ${diet.clientName}
-\u{1F4CA} *Calorias:* ${diet.calories} kcal/dia
-\u{1F4C5} *Data:* ${formattedDate}
+👤 *Cliente:* ${diet.clientName}
+📊 *Calorias:* ${diet.calories} kcal/dia
+📅 *Data:* ${formattedDate}
 
-\u{1F37D}\uFE0F *Suas Refei\xE7\xF5es:*
-${diet.meals.map((meal) => `\u2022 ${meal.name}: ${meal.calories} kcal`).join("\n")}
+🍽️ *Suas Refeições:*
+${diet.meals.map((meal) => `• ${meal.name}: ${meal.calories} kcal`).join("\n")}
 
-\u{1F4A1} *Orienta\xE7\xF5es:*
-\u2022 Siga as por\xE7\xF5es indicadas no PDF
-\u2022 Mantenha os hor\xE1rios das refei\xE7\xF5es
-\u2022 Hidrate-se adequadamente (2-3L \xE1gua/dia)
-\u2022 Em caso de d\xFAvidas, entre em contato
+💡 *Orientações:*
+• Siga as porções indicadas no PDF
+• Mantenha os horários das refeições
+• Hidrate-se adequadamente (2-3L água/dia)
+• Em caso de dúvidas, entre em contato
 
-\u{1F468}\u200D\u{1F4BC} *Personal Trainer:* ${currentUser.name}
-\u{1F3E2} *NutriApp - Sistema Profissional*
+👨‍💼 *Personal Trainer:* ${currentUser.name}
+🏢 *NutriApp - Sistema Profissional*
 
-\u{1F4CE} PDF detalhado ser\xE1 enviado separadamente`;
+📎 PDF detalhado será enviado separadamente`;
       const encodedMessage = encodeURIComponent(message);
       const telegramUrl = `https://t.me/share/url?url=${encodeURIComponent("https://nutriapp.com")}&text=${encodedMessage}`;
       window.open(telegramUrl, "_blank");
       setTimeout(() => {
-        if (confirm("\u{1F4AC} Telegram n\xE3o encontrado?\n\nDeseja copiar a mensagem para enviar manualmente?")) {
+        if (confirm("💬 Telegram não encontrado?\n\nDeseja copiar a mensagem para enviar manualmente?")) {
           navigator.clipboard.writeText(message.replace(/\*/g, "")).then(() => {
             showPushNotification("\u2705 Mensagem copiada! Cole no Telegram do seu cliente.", "success");
           }).catch(() => {
@@ -358,6 +358,12 @@ ${diet.meals.map((meal) => `\u2022 ${meal.name}: ${meal.calories} kcal`).join("\
   });
   const [creditAmount, setCreditAmount] = useState("");
   const [creditOperation, setCreditOperation] = useState("add");
+  const [profileData, setProfileData] = useState({
+    name: currentUser?.name || '',
+    email: currentUser?.email || '',
+    phone: currentUser?.phone || '',
+    cref: currentUser?.cref || ''
+  });
   const [newTemplate, setNewTemplate] = useState({
     name: "",
     description: "",
@@ -725,13 +731,13 @@ ${diet.meals.map((meal) => `\u2022 ${meal.name}: ${meal.calories} kcal`).join("\
           phoneNumber = client.phone.replace(/\D/g, "");
         }
       }
-      const message = `\u{1F957} Ol\xE1 ${diet.clientName}!
+      const message = `🥗 Olá ${diet.clientName}!
 
 Segue sua dieta personalizada:
-\u{1F4CA} ${diet.calories} kcal/dia
-\u{1F4C5} ${new Date(diet.createdAt).toLocaleDateString("pt-BR")}
+📊 ${diet.calories} kcal/dia
+📅 ${new Date(diet.createdAt).toLocaleDateString("pt-BR")}
 
-\u{1F4AA} Vou enviar o PDF completo com todas as refei\xE7\xF5es!
+💪 Vou enviar o PDF completo com todas as refeições!
 
 Bons treinos!
 ${currentUser.name}`;
@@ -753,7 +759,7 @@ ${currentUser.name}`;
         }
       }
       if (!clientEmail) {
-        clientEmail = prompt(`\u{1F4E7} Digite o email de ${diet.clientName}:`, `${diet.clientName.toLowerCase().replace(/\s+/g, ".")}@email.com`);
+        clientEmail = prompt(`📧 Digite o email de ${diet.clientName}:`, `${diet.clientName.toLowerCase().replace(/\s+/g, ".")}@email.com`);
         if (!clientEmail || clientEmail.trim() === "") {
           showPushNotification("\u274C Email \xE9 obrigat\xF3rio para enviar por email!", "warning");
           return;
@@ -773,22 +779,22 @@ Espero que voc\xEA esteja bem!
 
 Segue seu plano alimentar personalizado desenvolvido especialmente para voc\xEA.
 
-\u{1F4CA} Resumo da sua dieta:
+📊 Resumo da sua dieta:
 \u2022 Calorias di\xE1rias: ${diet.calories} kcal
 \u2022 Data: ${formattedDate}
 \u2022 Personal: ${currentUser.name}
 
-\u{1F37D}\uFE0F Refei\xE7\xF5es principais:
+🍽\uFE0F Refei\xE7\xF5es principais:
 ${diet.meals.map((meal) => `\u2022 ${meal.name}: ${meal.calories} kcal`).join("\n")}
 
-\u{1F4A1} ORIENTA\xC7\xD5ES:
+💡 ORIENTA\xC7\xD5ES:
 \u2022 Siga as por\xE7\xF5es indicadas
 \u2022 Mantenha os hor\xE1rios das refei\xE7\xF5es
 \u2022 Hidrate-se adequadamente (2-3L \xE1gua/dia)
 \u2022 Pratique atividade f\xEDsica regularmente
 \u2022 Em caso de d\xFAvidas, entre em contato comigo
 
-\u{1F4CE} Para o PDF completo com detalhes, solicite pelo WhatsApp ou use o sistema.
+📎 Para o PDF completo com detalhes, solicite pelo WhatsApp ou use o sistema.
 
 Estou \xE0 disposi\xE7\xE3o para qualquer esclarecimento!
 
@@ -1128,6 +1134,7 @@ NutriApp - Sistema Profissional de Nutri\xE7\xE3o
     setCurrentUser(null);
     setUserRole(null);
     setActiveSection("dashboard");
+    setShowLoginModal(true);
   };
   const showPushNotification = (message, type = "success") => {
     setNotificationMessage(message.trim());
@@ -1143,13 +1150,13 @@ NutriApp - Sistema Profissional de Nutri\xE7\xE3o
     setIsTestingConnection(true);
     await new Promise((resolve) => setTimeout(resolve, 2e3));
     setIsTestingConnection(false);
-    showPushNotification("\u{1F7E2} Conex\xE3o testada com sucesso! Sistema funcionando perfeitamente.", "success");
+    showPushNotification("🟢 Conex\xE3o testada com sucesso! Sistema funcionando perfeitamente.", "success");
   };
   const handleManualBackup = async () => {
     setIsBackingUp(true);
     await new Promise((resolve) => setTimeout(resolve, 3e3));
     setIsBackingUp(false);
-    showPushNotification("\u{1F4BE} Backup realizado com sucesso! Dados seguros e protegidos.", "success");
+    showPushNotification("💾 Backup realizado com sucesso! Dados seguros e protegidos.", "success");
   };
   const handleSaveSettings = () => {
     showPushNotification("\u2699\uFE0F Configura\xE7\xF5es salvas com sucesso! Altera\xE7\xF5es aplicadas.", "success");
@@ -1158,15 +1165,15 @@ NutriApp - Sistema Profissional de Nutri\xE7\xE3o
     e.preventDefault();
     setShowAddTrainerModal(false);
     setNewTrainer({ name: "", email: "", phone: "", credits: 200 });
-    setShowSuccessMessage(true);
-    setTimeout(() => setShowSuccessMessage(false), 3e3);
+    showPushNotification("Ação realizada com sucesso!", "success");
+    // Removido setTimeout, 3e3);
   };
   const handleManageCredits = (e) => {
     e.preventDefault();
     setShowManageCreditsModal(false);
     setCreditAmount("");
-    setShowSuccessMessage(true);
-    setTimeout(() => setShowSuccessMessage(false), 3e3);
+    showPushNotification("Ação realizada com sucesso!", "success");
+    // Removido setTimeout, 3e3);
   };
   const handleCreateTemplate = (e) => {
     e.preventDefault();
@@ -1182,8 +1189,8 @@ NutriApp - Sistema Profissional de Nutri\xE7\xE3o
         { name: "Jantar", foods: [], substitutions: [] }
       ]
     });
-    setShowSuccessMessage(true);
-    setTimeout(() => setShowSuccessMessage(false), 3e3);
+    showPushNotification("Ação realizada com sucesso!", "success");
+    // Removido setTimeout, 3e3);
   };
   const handleAddFood = (mealIndex) => {
     setCurrentMealIndex(mealIndex);
@@ -1306,8 +1313,8 @@ NutriApp - Sistema Profissional de Nutri\xE7\xE3o
           photo: compressedDataUrl
         });
         setIsUploadingPhoto(false);
-        setShowSuccessMessage(true);
-        setTimeout(() => setShowSuccessMessage(false), 3e3);
+        showPushNotification("Ação realizada com sucesso!", "success");
+        // Removido setTimeout, 3e3);
       };
       img.src = e.target.result;
     };
@@ -1320,8 +1327,8 @@ NutriApp - Sistema Profissional de Nutri\xE7\xE3o
       photo: null
     });
     setShowPhotoModal(false);
-    setShowSuccessMessage(true);
-    setTimeout(() => setShowSuccessMessage(false), 3e3);
+    showPushNotification("Ação realizada com sucesso!", "success");
+    // Removido setTimeout, 3e3);
   };
   const handlePayment = async () => {
     if (!selectedPlan) return;
@@ -1331,8 +1338,8 @@ NutriApp - Sistema Profissional de Nutri\xE7\xE3o
       setShowPaymentModal(false);
       setSelectedPlan(null);
       setIsProcessingPayment(false);
-      setShowSuccessMessage(true);
-      setTimeout(() => setShowSuccessMessage(false), 5e3);
+      showPushNotification("Ação realizada com sucesso!", "success");
+      // Removido setTimeout, 5e3);
       setTimeout(() => {
         setActiveSection("dashboard");
       }, 2e3);
@@ -1410,7 +1417,7 @@ NutriApp - Sistema Profissional de Nutri\xE7\xE3o
         className: "w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent",
         required: true
       }
-    ))), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("label", { className: "block text-sm font-medium text-gray-700 mb-2" }, "Senha *"), /* @__PURE__ */ React.createElement("div", { className: "relative" }, /* @__PURE__ */ React.createElement("div", { className: "absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" }, "\u{1F512}"), /* @__PURE__ */ React.createElement(
+    ))), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("label", { className: "block text-sm font-medium text-gray-700 mb-2" }, "Senha *"), /* @__PURE__ */ React.createElement("div", { className: "relative" }, /* @__PURE__ */ React.createElement("div", { className: "absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" }, "🔒"), /* @__PURE__ */ React.createElement(
       "input",
       {
         type: "password",
@@ -1430,7 +1437,7 @@ NutriApp - Sistema Profissional de Nutri\xE7\xE3o
         className: "w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent",
         required: true
       }
-    ))), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("label", { className: "block text-sm font-medium text-gray-700 mb-2" }, "CREF"), /* @__PURE__ */ React.createElement("div", { className: "relative" }, /* @__PURE__ */ React.createElement("div", { className: "absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" }, "\u{1F3F7}\uFE0F"), /* @__PURE__ */ React.createElement(
+    ))), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("label", { className: "block text-sm font-medium text-gray-700 mb-2" }, "CREF"), /* @__PURE__ */ React.createElement("div", { className: "relative" }, /* @__PURE__ */ React.createElement("div", { className: "absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" }, "🏷\uFE0F"), /* @__PURE__ */ React.createElement(
       "input",
       {
         type: "text",
@@ -1447,7 +1454,7 @@ NutriApp - Sistema Profissional de Nutri\xE7\xE3o
         className: "w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent",
         required: true
       }
-    ))), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("label", { className: "block text-sm font-medium text-gray-700 mb-2" }, "WhatsApp"), /* @__PURE__ */ React.createElement("div", { className: "relative" }, /* @__PURE__ */ React.createElement("div", { className: "absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" }, "\u{1F4F1}"), /* @__PURE__ */ React.createElement(
+    ))), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("label", { className: "block text-sm font-medium text-gray-700 mb-2" }, "WhatsApp"), /* @__PURE__ */ React.createElement("div", { className: "relative" }, /* @__PURE__ */ React.createElement("div", { className: "absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" }, "📱"), /* @__PURE__ */ React.createElement(
       "input",
       {
         type: "tel",
@@ -1457,7 +1464,7 @@ NutriApp - Sistema Profissional de Nutri\xE7\xE3o
         className: "w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent",
         required: true
       }
-    ))), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("label", { className: "block text-sm font-medium text-gray-700 mb-2" }, "Senha *"), /* @__PURE__ */ React.createElement("div", { className: "relative" }, /* @__PURE__ */ React.createElement("div", { className: "absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" }, "\u{1F512}"), /* @__PURE__ */ React.createElement(
+    ))), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("label", { className: "block text-sm font-medium text-gray-700 mb-2" }, "Senha *"), /* @__PURE__ */ React.createElement("div", { className: "relative" }, /* @__PURE__ */ React.createElement("div", { className: "absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" }, "🔒"), /* @__PURE__ */ React.createElement(
       "input",
       {
         type: "password",
@@ -1467,7 +1474,7 @@ NutriApp - Sistema Profissional de Nutri\xE7\xE3o
         className: "w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent",
         required: true
       }
-    ), /* @__PURE__ */ React.createElement(Info, { className: "absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400", size: 16 }))), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("label", { className: "block text-sm font-medium text-gray-700 mb-2" }, "Confirmar Senha *"), /* @__PURE__ */ React.createElement("div", { className: "relative" }, /* @__PURE__ */ React.createElement("div", { className: "absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" }, "\u{1F512}"), /* @__PURE__ */ React.createElement(
+    ), /* @__PURE__ */ React.createElement(Info, { className: "absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400", size: 16 }))), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("label", { className: "block text-sm font-medium text-gray-700 mb-2" }, "Confirmar Senha *"), /* @__PURE__ */ React.createElement("div", { className: "relative" }, /* @__PURE__ */ React.createElement("div", { className: "absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" }, "🔒"), /* @__PURE__ */ React.createElement(
       "input",
       {
         type: "password",
@@ -1478,7 +1485,7 @@ NutriApp - Sistema Profissional de Nutri\xE7\xE3o
         required: true
       }
     ))), /* @__PURE__ */ React.createElement("div", { className: "bg-blue-50 rounded-lg p-4 border border-blue-200" }, /* @__PURE__ */ React.createElement("h4", { className: "text-sm font-medium text-blue-800 mb-2" }, "Sistema de Confirma\xE7\xE3o"), /* @__PURE__ */ React.createElement("p", { className: "text-xs text-blue-700" }, "Ap\xF3s o cadastro, voc\xEA receber\xE1 uma mensagem via WhatsApp/Email para ativar sua conta.")), registerError && /* @__PURE__ */ React.createElement("div", { className: "bg-red-50 border border-red-200 rounded-lg p-3 mb-4" }, /* @__PURE__ */ React.createElement("p", { className: "text-sm text-red-600" }, registerError)), /* @__PURE__ */ React.createElement(Button, { type: "submit", className: "w-full bg-blue-600 hover:bg-blue-700 py-3" }, "Cadastrar"))))), showVerificationModal && /* @__PURE__ */ React.createElement(Modal, { isOpen: showVerificationModal, onClose: () => {
-    }, title: "Confirmar C\xF3digo" }, /* @__PURE__ */ React.createElement("div", { className: "text-center space-y-8 p-2" }, /* @__PURE__ */ React.createElement("div", { className: "w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center mx-auto shadow-sm border border-blue-100" }, /* @__PURE__ */ React.createElement("div", { className: "text-4xl" }, "\u{1F4F1}")), /* @__PURE__ */ React.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React.createElement("h3", { className: "text-xl font-semibold text-gray-900" }, "Confirme seu cadastro"), /* @__PURE__ */ React.createElement("p", { className: "text-gray-600" }, "Enviamos um c\xF3digo de 6 d\xEDgitos para:"), /* @__PURE__ */ React.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React.createElement("p", { className: "font-medium text-blue-600 text-lg" }, registerData.email), /* @__PURE__ */ React.createElement("p", { className: "font-medium text-green-600 text-lg" }, registerData.phone))), /* @__PURE__ */ React.createElement("form", { onSubmit: handleVerification, className: "space-y-8" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("label", { className: "block text-sm font-medium text-gray-700 mb-4" }, "Digite o c\xF3digo de verifica\xE7\xE3o:"), /* @__PURE__ */ React.createElement("div", { className: "flex justify-center space-x-3 mb-4" }, [0, 1, 2, 3, 4, 5].map((index) => /* @__PURE__ */ React.createElement(
+    }, title: "Confirmar C\xF3digo" }, /* @__PURE__ */ React.createElement("div", { className: "text-center space-y-8 p-2" }, /* @__PURE__ */ React.createElement("div", { className: "w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center mx-auto shadow-sm border border-blue-100" }, /* @__PURE__ */ React.createElement("div", { className: "text-4xl" }, "📱")), /* @__PURE__ */ React.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React.createElement("h3", { className: "text-xl font-semibold text-gray-900" }, "Confirme seu cadastro"), /* @__PURE__ */ React.createElement("p", { className: "text-gray-600" }, "Enviamos um c\xF3digo de 6 d\xEDgitos para:"), /* @__PURE__ */ React.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React.createElement("p", { className: "font-medium text-blue-600 text-lg" }, registerData.email), /* @__PURE__ */ React.createElement("p", { className: "font-medium text-green-600 text-lg" }, registerData.phone))), /* @__PURE__ */ React.createElement("form", { onSubmit: handleVerification, className: "space-y-8" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("label", { className: "block text-sm font-medium text-gray-700 mb-4" }, "Digite o c\xF3digo de verifica\xE7\xE3o:"), /* @__PURE__ */ React.createElement("div", { className: "flex justify-center space-x-3 mb-4" }, [0, 1, 2, 3, 4, 5].map((index) => /* @__PURE__ */ React.createElement(
       "input",
       {
         key: index,
@@ -1735,7 +1742,7 @@ NutriApp - Sistema Profissional de Nutri\xE7\xE3o
     Button,
     {
       onClick: () => {
-        console.log("\u{1F680} BOT\xC3O CLICADO!");
+        console.log("🚀 BOT\xC3O CLICADO!");
         if (dietType === "manual") {
           setShowManualDietModal(true);
           return;
@@ -1749,7 +1756,7 @@ NutriApp - Sistema Profissional de Nutri\xE7\xE3o
       className: "w-full bg-blue-600 hover:bg-blue-700 py-4 text-lg font-semibold text-white rounded-lg",
       disabled: false
     },
-    /* @__PURE__ */ React.createElement("div", { className: "flex items-center justify-center" }, isGenerating ? /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { className: "flex items-center" }, /* @__PURE__ */ React.createElement("div", { className: "w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin mr-3" }), /* @__PURE__ */ React.createElement("span", null, "Gerando Dieta..."))) : /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { className: "flex items-center space-x-3" }, /* @__PURE__ */ React.createElement("div", { className: "p-2 bg-white/20 rounded-full" }, dietType === "ai" && /* @__PURE__ */ React.createElement(Zap, { size: 20, className: "text-white" }), dietType === "template" && /* @__PURE__ */ React.createElement(FileText, { size: 20, className: "text-white" }), dietType === "manual" && /* @__PURE__ */ React.createElement(Edit, { size: 20, className: "text-white" })), /* @__PURE__ */ React.createElement("div", { className: "text-left" }, /* @__PURE__ */ React.createElement("div", { className: "text-lg font-bold" }, "\u{1F680} Gerar Dieta")))))
+    /* @__PURE__ */ React.createElement("div", { className: "flex items-center justify-center" }, isGenerating ? /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { className: "flex items-center" }, /* @__PURE__ */ React.createElement("div", { className: "w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin mr-3" }), /* @__PURE__ */ React.createElement("span", null, "Gerando Dieta..."))) : /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { className: "flex items-center space-x-3" }, /* @__PURE__ */ React.createElement("div", { className: "p-2 bg-white/20 rounded-full" }, dietType === "ai" && /* @__PURE__ */ React.createElement(Zap, { size: 20, className: "text-white" }), dietType === "template" && /* @__PURE__ */ React.createElement(FileText, { size: 20, className: "text-white" }), dietType === "manual" && /* @__PURE__ */ React.createElement(Edit, { size: 20, className: "text-white" })), /* @__PURE__ */ React.createElement("div", { className: "text-left" }, /* @__PURE__ */ React.createElement("div", { className: "text-lg font-bold" }, "🚀 Gerar Dieta")))))
   ))))), activeSection === "clients" && /* @__PURE__ */ React.createElement("div", { className: "space-y-4 md:space-y-6 pb-20 lg:pb-6" }, /* @__PURE__ */ React.createElement("div", { className: "flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3" }, /* @__PURE__ */ React.createElement("h2", { className: "text-xl font-semibold text-gray-900" }, "Clientes"), /* @__PURE__ */ React.createElement(Button, { onClick: () => setShowAddClientModal(true), className: "w-full sm:w-auto" }, /* @__PURE__ */ React.createElement(Plus, { size: 16 }), "Adicionar Cliente")), /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6" }, mockClients.map((client) => /* @__PURE__ */ React.createElement(Card, { key: client.id, className: "p-4 md:p-6" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center space-x-3 md:space-x-4 mb-3 md:mb-4" }, /* @__PURE__ */ React.createElement("div", { className: "w-10 h-10 md:w-12 md:h-12 bg-blue-100 rounded-full overflow-hidden flex items-center justify-center flex-shrink-0" }, /* @__PURE__ */ React.createElement(User, { className: "text-blue-600", size: 20 })), /* @__PURE__ */ React.createElement("div", { className: "min-w-0 flex-1" }, /* @__PURE__ */ React.createElement("h3", { className: "font-semibold text-gray-900 text-sm md:text-base truncate" }, client.name), /* @__PURE__ */ React.createElement("p", { className: "text-xs md:text-sm text-gray-600" }, client.age, " anos"))), /* @__PURE__ */ React.createElement("div", { className: "space-y-1 md:space-y-2 text-xs md:text-sm text-gray-600 mb-3 md:mb-4" }, /* @__PURE__ */ React.createElement("p", null, /* @__PURE__ */ React.createElement("strong", null, "Peso:"), " ", client.weight, "kg"), /* @__PURE__ */ React.createElement("p", null, /* @__PURE__ */ React.createElement("strong", null, "Altura:"), " ", client.height, "cm"), /* @__PURE__ */ React.createElement("p", null, /* @__PURE__ */ React.createElement("strong", null, "Objetivo:"), " ", client.goal), /* @__PURE__ */ React.createElement("p", null, /* @__PURE__ */ React.createElement("strong", null, "Frequ\xEAncia:"), " ", client.trainingFrequency)), /* @__PURE__ */ React.createElement("div", { className: "flex justify-center" }, /* @__PURE__ */ React.createElement(
     Button,
     {
@@ -1949,15 +1956,67 @@ NutriApp - Sistema Profissional de Nutri\xE7\xE3o
       disabled: isUploadingPhoto
     },
     isUploadingPhoto ? /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { className: "animate-spin rounded-full h-4 w-4 border-2 border-gray-400 border-t-transparent mr-2" }), "Carregando...") : /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement(Edit, { size: 16 }), profilePhoto || currentUser.photo ? "Alterar Foto" : "Adicionar Foto")
-  )))), /* @__PURE__ */ React.createElement(Card, { className: "p-4 md:p-6 lg:col-span-2" }, /* @__PURE__ */ React.createElement("h3", { className: "text-base md:text-lg font-semibold text-gray-900 mb-4" }, "Informa\xE7\xF5es Pessoais"), /* @__PURE__ */ React.createElement("form", { className: "space-y-4" }, /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-1 sm:grid-cols-2 gap-4" }, /* @__PURE__ */ React.createElement(Input, { label: "Nome completo", defaultValue: currentUser.name }), /* @__PURE__ */ React.createElement(Input, { label: "Email", type: "email", defaultValue: currentUser.email }), /* @__PURE__ */ React.createElement(Input, { label: "Telefone", type: "tel", defaultValue: "(11) 99999-9999" }), /* @__PURE__ */ React.createElement(Input, { label: "CREF", defaultValue: "123456-G/SP" })), /* @__PURE__ */ React.createElement(
+  )))), /* @__PURE__ */ React.createElement(Card, { className: "p-4 md:p-6 lg:col-span-2" }, /* @__PURE__ */ React.createElement("h3", { className: "text-base md:text-lg font-semibold text-gray-900 mb-4" }, "Informa\xE7\xF5es Pessoais"), /* @__PURE__ */ React.createElement("form", { className: "space-y-4", onSubmit: (e) => {
+    e.preventDefault();
+    
+    // Validar campos obrigatórios
+    if (!profileData.name.trim()) {
+      showPushNotification("❌ Nome é obrigatório!", "error");
+      return;
+    }
+    
+    if (!profileData.email.trim()) {
+      showPushNotification("❌ Email é obrigatório!", "error");
+      return;
+    }
+    
+    // Validar formato do email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(profileData.email)) {
+      showPushNotification("❌ Email inválido!", "error");
+      return;
+    }
+    
+    // Atualizar dados do usuário
+    const updatedUser = {
+      ...currentUser,
+      name: profileData.name.trim(),
+      email: profileData.email.trim(),
+      phone: profileData.phone.trim(),
+      cref: profileData.cref.trim()
+    };
+    
+    setCurrentUser(updatedUser);
+    showPushNotification("🎉 Perfil atualizado com sucesso! Informações salvas.", "success");
+  } }, /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-1 sm:grid-cols-2 gap-4" }, /* @__PURE__ */ React.createElement(Input, { 
+    label: "Nome completo", 
+    value: profileData.name,
+    onChange: (e) => setProfileData({ ...profileData, name: e.target.value }),
+    required: true
+  }), /* @__PURE__ */ React.createElement(Input, { 
+    label: "Email", 
+    type: "email", 
+    value: profileData.email,
+    onChange: (e) => setProfileData({ ...profileData, email: e.target.value }),
+    required: true
+  }), /* @__PURE__ */ React.createElement(Input, { 
+    label: "Telefone", 
+    type: "tel", 
+    value: profileData.phone,
+    onChange: (e) => setProfileData({ ...profileData, phone: e.target.value }),
+    placeholder: "(11) 99999-9999"
+  }), /* @__PURE__ */ React.createElement(Input, { 
+    label: "CREF", 
+    value: profileData.cref,
+    onChange: (e) => setProfileData({ ...profileData, cref: e.target.value }),
+    placeholder: "123456-G/SP"
+  })), /* @__PURE__ */ React.createElement(
     Button,
     {
-      className: "w-full sm:w-auto",
-      onClick: () => {
-        showPushNotification("\u{1F464} Perfil atualizado com sucesso! Informa\xE7\xF5es salvas.", "success");
-      }
+      type: "submit",
+      className: "w-full sm:w-auto"
     },
-    "Salvar Altera\xE7\xF5es"
+    "Salvar Alterações"
   )))), /* @__PURE__ */ React.createElement(Card, { className: "p-4 md:p-6" }, /* @__PURE__ */ React.createElement("h3", { className: "text-base md:text-lg font-semibold text-gray-900 mb-4" }, "Estat\xEDsticas"), /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4" }, /* @__PURE__ */ React.createElement("div", { className: "text-center p-3 bg-blue-50 rounded-lg" }, /* @__PURE__ */ React.createElement("p", { className: "text-xl md:text-2xl font-bold text-blue-600" }, "0"), /* @__PURE__ */ React.createElement("p", { className: "text-xs md:text-sm text-gray-600" }, "Clientes Ativos")), /* @__PURE__ */ React.createElement("div", { className: "text-center p-3 bg-green-50 rounded-lg" }, /* @__PURE__ */ React.createElement("p", { className: "text-xl md:text-2xl font-bold text-green-600" }, "0"), /* @__PURE__ */ React.createElement("p", { className: "text-xs md:text-sm text-gray-600" }, "Dietas Geradas")), /* @__PURE__ */ React.createElement("div", { className: "text-center p-3 bg-orange-50 rounded-lg" }, /* @__PURE__ */ React.createElement("p", { className: "text-xl md:text-2xl font-bold text-orange-600" }, "0"), /* @__PURE__ */ React.createElement("p", { className: "text-xs md:text-sm text-gray-600" }, "Cr\xE9ditos Restantes")), /* @__PURE__ */ React.createElement("div", { className: "text-center p-3 bg-purple-50 rounded-lg" }, /* @__PURE__ */ React.createElement("p", { className: "text-xl md:text-2xl font-bold text-purple-600" }, "0%"), /* @__PURE__ */ React.createElement("p", { className: "text-xs md:text-sm text-gray-600" }, "Taxa de Sucesso"))))), userRole === "admin" && /* @__PURE__ */ React.createElement(React.Fragment, null, activeSection === "trainers" && /* @__PURE__ */ React.createElement("div", { className: "space-y-6" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React.createElement("h2", { className: "text-xl font-semibold text-gray-900" }, "Personal Trainers"), /* @__PURE__ */ React.createElement(Button, { onClick: () => setShowAddTrainerModal(true) }, /* @__PURE__ */ React.createElement(Plus, { size: 16 }), "Adicionar Trainer")), /* @__PURE__ */ React.createElement(Card, { className: "overflow-hidden" }, /* @__PURE__ */ React.createElement("div", { className: "overflow-x-auto" }, /* @__PURE__ */ React.createElement("table", { className: "w-full" }, /* @__PURE__ */ React.createElement("thead", { className: "bg-gray-50" }, /* @__PURE__ */ React.createElement("tr", null, /* @__PURE__ */ React.createElement("th", { className: "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" }, "Trainer"), /* @__PURE__ */ React.createElement("th", { className: "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" }, "Email"), /* @__PURE__ */ React.createElement("th", { className: "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" }, "Cr\xE9ditos"), /* @__PURE__ */ React.createElement("th", { className: "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" }, "Status"), /* @__PURE__ */ React.createElement("th", { className: "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" }, "A\xE7\xF5es"))), /* @__PURE__ */ React.createElement("tbody", { className: "bg-white divide-y divide-gray-200" }, mockUsers.map((user) => /* @__PURE__ */ React.createElement("tr", { key: user.id }, /* @__PURE__ */ React.createElement("td", { className: "px-6 py-4 whitespace-nowrap" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center" }, /* @__PURE__ */ React.createElement("div", { className: "w-10 h-10 bg-blue-100 rounded-full overflow-hidden flex items-center justify-center mr-3" }, user.id === "P0001" && (profilePhoto || currentUser.photo) ? /* @__PURE__ */ React.createElement(
     "img",
     {
@@ -2009,7 +2068,7 @@ NutriApp - Sistema Profissional de Nutri\xE7\xE3o
           a.download = "templates.csv";
           a.click();
           URL.revokeObjectURL(url);
-          showPushNotification("\u{1F4C4} Templates exportados com sucesso! Arquivo CSV baixado.", "success");
+          showPushNotification("📄 Templates exportados com sucesso! Arquivo CSV baixado.", "success");
         } catch (error) {
           showPushNotification("\u274C Erro ao exportar templates. Tente novamente.", "error");
         }
@@ -2021,7 +2080,7 @@ NutriApp - Sistema Profissional de Nutri\xE7\xE3o
     Button,
     {
       onClick: () => {
-        console.log("\u{1F680} BOT\xC3O CRIAR TEMPLATE CLICADO!");
+        console.log("🚀 BOT\xC3O CRIAR TEMPLATE CLICADO!");
         setShowCreateTemplateModal(true);
       },
       className: "bg-blue-600 hover:bg-blue-700 text-white"
@@ -2035,23 +2094,23 @@ NutriApp - Sistema Profissional de Nutri\xE7\xE3o
       variant: "outline",
       onClick: () => {
         showInfoPopup(
-          `\u{1F4CB} ${template.name}`,
-          `\u{1F4DD} Descri\xE7\xE3o:
+          `📋 ${template.name}`,
+          `📝 Descri\xE7\xE3o:
 ${template.description}
 
-\u{1F37D}\uFE0F Estrutura:
+🍽\uFE0F Estrutura:
 \u2022 ${template.meals} refei\xE7\xF5es planejadas
 \u2022 Adequado para diversos perfis
 \u2022 Baseado em evid\xEAncias nutricionais
 
-\u{1F4CA} Estat\xEDsticas:
+📊 Estat\xEDsticas:
 \u2022 127 usos este m\xEAs
 \u2022 Avalia\xE7\xE3o: 4.9/5.0
 \u2022 Criado por: Equipe NutriApp
 
 \u2705 Status: Ativo e dispon\xEDvel
 
-\u{1F4A1} Este template pode ser usado como base para gerar dietas personalizadas automaticamente.`,
+💡 Este template pode ser usado como base para gerar dietas personalizadas automaticamente.`,
           "info"
         );
       },
@@ -2091,7 +2150,7 @@ ${template.description}
           ]
         });
         setShowCreateTemplateModal(true);
-        showPushNotification(`\u{1F4DD} Editando template "${template.name}"`, "info");
+        showPushNotification(`📝 Editando template "${template.name}"`, "info");
       },
       className: "text-xs"
     },
@@ -2104,13 +2163,13 @@ ${template.description}
       variant: "outline",
       onClick: () => {
         showInfoPopup(
-          "\u{1F4CB} Duplicar Template",
+          "📋 Duplicar Template",
           `Tem certeza que deseja duplicar o template "${template.name}"?
 
 Isto ir\xE1 criar uma c\xF3pia edit\xE1vel que voc\xEA pode personalizar conforme necess\xE1rio.
 
 \u2705 A c\xF3pia ser\xE1 criada com o nome "${template.name} (C\xF3pia)"
-\u{1F4A1} Voc\xEA poder\xE1 modificar todos os aspectos do template`,
+💡 Voc\xEA poder\xE1 modificar todos os aspectos do template`,
           "info"
         );
         setTimeout(() => {
@@ -2126,7 +2185,7 @@ Isto ir\xE1 criar uma c\xF3pia edit\xE1vel que voc\xEA pode personalizar conform
             ]
           });
           setShowCreateTemplateModal(true);
-          showPushNotification(`\u{1F4CB} Template "${template.name}" duplicado com sucesso!`, "success");
+          showPushNotification(`📋 Template "${template.name}" duplicado com sucesso!`, "success");
         }, 2e3);
       },
       className: "text-xs"
@@ -2140,17 +2199,17 @@ Isto ir\xE1 criar uma c\xF3pia edit\xE1vel que voc\xEA pode personalizar conform
       variant: "outline",
       onClick: () => {
         showInfoPopup(
-          "\u{1F5D1}\uFE0F Excluir Template",
+          "🗑\uFE0F Excluir Template",
           `\u26A0\uFE0F Tem certeza que deseja excluir o template "${template.name}"?
 
 Esta a\xE7\xE3o n\xE3o pode ser desfeita.
 
-\u{1F4CA} Estat\xEDsticas do template:
+📊 Estat\xEDsticas do template:
 \u2022 127 usos registrados
 \u2022 Avalia\xE7\xE3o: 4.9/5.0
 \u2022 Criado h\xE1 3 meses
 
-\u{1F4A1} Considere desativar ao inv\xE9s de excluir se houver depend\xEAncias.`,
+💡 Considere desativar ao inv\xE9s de excluir se houver depend\xEAncias.`,
           "warning"
         );
       },
@@ -2172,7 +2231,7 @@ Esta a\xE7\xE3o n\xE3o pode ser desfeita.
           a.download = "alimentos-database.csv";
           a.click();
           URL.revokeObjectURL(url);
-          showPushNotification("\u{1F4CA} Base de dados exportada! Arquivo CSV com todos os alimentos baixado.", "success");
+          showPushNotification("📊 Base de dados exportada! Arquivo CSV com todos os alimentos baixado.", "success");
         } catch (error) {
           showPushNotification("\u274C Erro ao exportar dados. Tente novamente.", "error");
         }
@@ -2181,22 +2240,22 @@ Esta a\xE7\xE3o n\xE3o pode ser desfeita.
     /* @__PURE__ */ React.createElement(Download, { size: 16 }),
     "Exportar Dados"
   ), /* @__PURE__ */ React.createElement(Button, { onClick: () => {
-    showInfoPopup("\u{1F504} Sincroniza\xE7\xE3o Iniciada", "\u2705 Base TACO atualizada\n\u2705 Novos alimentos: 47\n\u2705 Corre\xE7\xF5es nutricionais: 12\n\nTempo estimado: 2-3 minutos\nVoc\xEA ser\xE1 notificado quando conclu\xEDdo.", "info");
+    showInfoPopup("🔄 Sincroniza\xE7\xE3o Iniciada", "\u2705 Base TACO atualizada\n\u2705 Novos alimentos: 47\n\u2705 Corre\xE7\xF5es nutricionais: 12\n\nTempo estimado: 2-3 minutos\nVoc\xEA ser\xE1 notificado quando conclu\xEDdo.", "info");
   } }, /* @__PURE__ */ React.createElement(Database, { size: 16 }), "Sincronizar TACO"))), /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" }, /* @__PURE__ */ React.createElement(Card, { className: "p-6 text-center hover:shadow-lg transition-shadow cursor-pointer", onClick: () => {
-    showInfoPopup("\u{1F4CA} Alimentos Cadastrados", "Total: 2,847 alimentos\n\n\u{1F4C8} Crescimento mensal: +47 alimentos\n\u{1F504} \xDAltima atualiza\xE7\xE3o: Hoje\n\u{1F4CB} Categorias: 23\n\u2705 Validados TACO: 2,635\n\u{1F195} Adicionados manual: 212", "info");
+    showInfoPopup("📊 Alimentos Cadastrados", "Total: 2,847 alimentos\n\n\u{1F4C8} Crescimento mensal: +47 alimentos\n🔄 \xDAltima atualiza\xE7\xE3o: Hoje\n📋 Categorias: 23\n\u2705 Validados TACO: 2,635\n\u{1F195} Adicionados manual: 212", "info");
   } }, /* @__PURE__ */ React.createElement("div", { className: "w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4" }, /* @__PURE__ */ React.createElement(Database, { className: "text-blue-600", size: 24 })), /* @__PURE__ */ React.createElement("h3", { className: "text-lg font-semibold text-gray-900" }, "2,847"), /* @__PURE__ */ React.createElement("p", { className: "text-sm text-gray-600" }, "Alimentos Cadastrados"), /* @__PURE__ */ React.createElement("div", { className: "mt-2" }, /* @__PURE__ */ React.createElement("span", { className: "text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full" }, "+47 este m\xEAs"))), /* @__PURE__ */ React.createElement(Card, { className: "p-6 text-center hover:shadow-lg transition-shadow cursor-pointer", onClick: () => {
-    showInfoPopup("\u{1F465} Clientes Totais", "Total: 1,247 clientes\n\n\u{1F4CA} Distribui\xE7\xE3o:\n\u2022 Ativos: 987 (79%)\n\u2022 Pausados: 184 (15%)\n\u2022 Inativos: 76 (6%)\n\n\u{1F3AF} Objetivos mais comuns:\n\u2022 Perda de peso: 45%\n\u2022 Ganho de massa: 32%\n\u2022 Manuten\xE7\xE3o: 23%", "info");
+    showInfoPopup("👥 Clientes Totais", "Total: 1,247 clientes\n\n📊 Distribui\xE7\xE3o:\n\u2022 Ativos: 987 (79%)\n\u2022 Pausados: 184 (15%)\n\u2022 Inativos: 76 (6%)\n\n🎯 Objetivos mais comuns:\n\u2022 Perda de peso: 45%\n\u2022 Ganho de massa: 32%\n\u2022 Manuten\xE7\xE3o: 23%", "info");
   } }, /* @__PURE__ */ React.createElement("div", { className: "w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4" }, /* @__PURE__ */ React.createElement(Users, { className: "text-green-600", size: 24 })), /* @__PURE__ */ React.createElement("h3", { className: "text-lg font-semibold text-gray-900" }, "1,247"), /* @__PURE__ */ React.createElement("p", { className: "text-sm text-gray-600" }, "Clientes Totais"), /* @__PURE__ */ React.createElement("div", { className: "mt-2" }, /* @__PURE__ */ React.createElement("span", { className: "text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full" }, "987 ativos"))), /* @__PURE__ */ React.createElement(Card, { className: "p-6 text-center hover:shadow-lg transition-shadow cursor-pointer", onClick: () => {
-    showInfoPopup("\u{1F4CB} Dietas Geradas", "Total: 8,432 dietas\n\n\u{1F4C8} Este m\xEAs: 547 dietas\n\u26A1 M\xE9dia di\xE1ria: 18 dietas\n\u{1F3AF} Tipos mais gerados:\n\u2022 IA Personalizada: 67%\n\u2022 Templates: 28%\n\u2022 Manual: 5%\n\n\u{1F3C6} Personal mais ativo:\nJo\xE3o Silva - 127 dietas", "info");
+    showInfoPopup("📋 Dietas Geradas", "Total: 8,432 dietas\n\n\u{1F4C8} Este m\xEAs: 547 dietas\n\u26A1 M\xE9dia di\xE1ria: 18 dietas\n🎯 Tipos mais gerados:\n\u2022 IA Personalizada: 67%\n\u2022 Templates: 28%\n\u2022 Manual: 5%\n\n\u{1F3C6} Personal mais ativo:\nJo\xE3o Silva - 127 dietas", "info");
   } }, /* @__PURE__ */ React.createElement("div", { className: "w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4" }, /* @__PURE__ */ React.createElement(FileText, { className: "text-orange-600", size: 24 })), /* @__PURE__ */ React.createElement("h3", { className: "text-lg font-semibold text-gray-900" }, "8,432"), /* @__PURE__ */ React.createElement("p", { className: "text-sm text-gray-600" }, "Dietas Geradas"), /* @__PURE__ */ React.createElement("div", { className: "mt-2" }, /* @__PURE__ */ React.createElement("span", { className: "text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-full" }, "547 este m\xEAs"))), /* @__PURE__ */ React.createElement(Card, { className: "p-6 text-center hover:shadow-lg transition-shadow cursor-pointer", onClick: () => {
-    showInfoPopup("\u{1F4CA} Taxa de Sucesso", "Taxa atual: 94.2%\n\n\u2705 M\xE9tricas:\n\u2022 Clientes satisfeitos: 94.2%\n\u2022 Dietas seguidas: 87.3%\n\u2022 Objetivos alcan\xE7ados: 91.8%\n\u2022 Renova\xE7\xF5es: 89.4%\n\n\u{1F4C8} Tend\xEAncia: +2.1% vs m\xEAs anterior\n\u{1F3AF} Meta: 95% at\xE9 fim do ano", "success");
+    showInfoPopup("📊 Taxa de Sucesso", "Taxa atual: 94.2%\n\n\u2705 M\xE9tricas:\n\u2022 Clientes satisfeitos: 94.2%\n\u2022 Dietas seguidas: 87.3%\n\u2022 Objetivos alcan\xE7ados: 91.8%\n\u2022 Renova\xE7\xF5es: 89.4%\n\n\u{1F4C8} Tend\xEAncia: +2.1% vs m\xEAs anterior\n🎯 Meta: 95% at\xE9 fim do ano", "success");
   } }, /* @__PURE__ */ React.createElement("div", { className: "w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4" }, /* @__PURE__ */ React.createElement(BarChart3, { className: "text-purple-600", size: 24 })), /* @__PURE__ */ React.createElement("h3", { className: "text-lg font-semibold text-gray-900" }, "94.2%"), /* @__PURE__ */ React.createElement("p", { className: "text-sm text-gray-600" }, "Taxa de Sucesso"), /* @__PURE__ */ React.createElement("div", { className: "mt-2" }, /* @__PURE__ */ React.createElement("span", { className: "text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full" }, "+2.1% mensal")))), /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-1 lg:grid-cols-2 gap-6" }, /* @__PURE__ */ React.createElement(Card, { className: "p-6" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center justify-between mb-4" }, /* @__PURE__ */ React.createElement("h3", { className: "text-lg font-semibold text-gray-900" }, "Alimentos Mais Utilizados"), /* @__PURE__ */ React.createElement(
     Button,
     {
       size: "sm",
       variant: "outline",
       onClick: () => {
-        const fullReport = `\u{1F4CA} RELAT\xD3RIO COMPLETO - ALIMENTOS MAIS UTILIZADOS
+        const fullReport = `📊 RELAT\xD3RIO COMPLETO - ALIMENTOS MAIS UTILIZADOS
 
 ` + foodDatabase.map(
           (food, index) => `${index + 1}. ${food.name}
@@ -2206,7 +2265,7 @@ Esta a\xE7\xE3o n\xE3o pode ser desfeita.
 `
         ).join("\n");
         showInfoPopup(
-          "\u{1F4CA} Relat\xF3rio Completo - Alimentos",
+          "📊 Relat\xF3rio Completo - Alimentos",
           fullReport,
           "info"
         );
@@ -2220,9 +2279,9 @@ Esta a\xE7\xE3o n\xE3o pode ser desfeita.
       key: index,
       className: "flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer",
       onClick: () => {
-        const foodDetails = `\u{1F37D}\uFE0F ${food.name}
+        const foodDetails = `🍽\uFE0F ${food.name}
 
-\u{1F4CA} Informa\xE7\xF5es Nutricionais (por ${food.baseAmount}${food.unit}):
+📊 Informa\xE7\xF5es Nutricionais (por ${food.baseAmount}${food.unit}):
 \u2022 Calorias: ${food.calories} kcal
 \u2022 Prote\xEDnas: ${food.protein}g
 \u2022 Carboidratos: ${food.carbs}g
@@ -2234,8 +2293,8 @@ Esta a\xE7\xE3o n\xE3o pode ser desfeita.
 \u2022 Categoria: ${index < 2 ? "Carboidratos" : index < 4 ? "Prote\xEDnas" : "Diversos"}
 
 \u2705 Status: Ativo
-\u{1F504} \xDAltima atualiza\xE7\xE3o: ${(/* @__PURE__ */ new Date()).toLocaleDateString("pt-BR")}`;
-        showInfoPopup("\u{1F4CA} Detalhes do Alimento", foodDetails, "info");
+🔄 \xDAltima atualiza\xE7\xE3o: ${(/* @__PURE__ */ new Date()).toLocaleDateString("pt-BR")}`;
+        showInfoPopup("📊 Detalhes do Alimento", foodDetails, "info");
       }
     },
     /* @__PURE__ */ React.createElement("div", { className: "flex-1" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center space-x-3" }, /* @__PURE__ */ React.createElement("div", { className: "w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center" }, /* @__PURE__ */ React.createElement("span", { className: "text-xs font-bold text-blue-600" }, "#", index + 1)), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { className: "font-medium text-gray-900" }, food.name), /* @__PURE__ */ React.createElement("p", { className: "text-sm text-gray-600" }, food.calories, " kcal por ", food.baseAmount, food.unit)))),
@@ -2255,15 +2314,15 @@ Esta a\xE7\xE3o n\xE3o pode ser desfeita.
       onClick: () => {
         showInfoPopup(
           `\u{1F4C2} Categoria: ${category.name}`,
-          `\u{1F4CA} Estat\xEDsticas detalhadas:
+          `📊 Estat\xEDsticas detalhadas:
 \u2022 Total de alimentos: ${category.count}
 \u2022 Mais usado: ${foodDatabase[index % foodDatabase.length].name}
 \u2022 M\xE9dia cal\xF3rica: ${Math.floor(Math.random() * 200 + 100)} kcal
 \u2022 Adicionados este m\xEAs: ${Math.floor(Math.random() * 20 + 5)}
 
-\u{1F3AF} Esta categoria representa ${Math.floor(category.count / 2847 * 100)}% da base de dados.
+🎯 Esta categoria representa ${Math.floor(category.count / 2847 * 100)}% da base de dados.
 
-\u{1F4A1} Categoria bem estruturada e atualizada!`,
+💡 Categoria bem estruturada e atualizada!`,
           "info"
         );
       }
@@ -2342,8 +2401,8 @@ Esta a\xE7\xE3o n\xE3o pode ser desfeita.
     "Limpar Cache"
   ))), /* @__PURE__ */ React.createElement(Card, { className: "p-6" }, /* @__PURE__ */ React.createElement("h3", { className: "text-lg font-semibold text-gray-900 mb-4" }, "Configura\xE7\xF5es de Email"), /* @__PURE__ */ React.createElement("form", { className: "space-y-4", onSubmit: (e) => {
     e.preventDefault();
-    showPushNotification("\u{1F4E7} Configura\xE7\xF5es de email salvas com sucesso!", "success");
-  } }, /* @__PURE__ */ React.createElement(Input, { label: "Servidor SMTP", defaultValue: "smtp.gmail.com" }), /* @__PURE__ */ React.createElement(Input, { label: "Porta", type: "number", defaultValue: "587" }), /* @__PURE__ */ React.createElement(Input, { label: "Usu\xE1rio", type: "email", defaultValue: "nutriapp@gmail.com" }), /* @__PURE__ */ React.createElement(Input, { label: "Senha", type: "password", defaultValue: "\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022" }), /* @__PURE__ */ React.createElement("div", { className: "flex items-center space-x-2" }, /* @__PURE__ */ React.createElement("input", { type: "checkbox", id: "ssl", className: "rounded", defaultChecked: true }), /* @__PURE__ */ React.createElement("label", { htmlFor: "ssl", className: "text-sm text-gray-700" }, "Usar SSL/TLS")), /* @__PURE__ */ React.createElement(Button, { type: "submit", variant: "outline", className: "w-full" }, /* @__PURE__ */ React.createElement("div", { className: "mr-2" }, "\u{1F4E7}"), "Salvar Configura\xE7\xF5es de Email"))), /* @__PURE__ */ React.createElement(Card, { className: "p-6" }, /* @__PURE__ */ React.createElement("h3", { className: "text-lg font-semibold text-gray-900 mb-4" }, "Configura\xE7\xF5es Avan\xE7adas"), /* @__PURE__ */ React.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center justify-between p-3 border border-gray-200 rounded-lg" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { className: "font-medium text-gray-900" }, "Modo de Depura\xE7\xE3o"), /* @__PURE__ */ React.createElement("p", { className: "text-sm text-gray-600" }, "Logs detalhados para diagn\xF3stico")), /* @__PURE__ */ React.createElement("label", { className: "relative inline-flex items-center cursor-pointer" }, /* @__PURE__ */ React.createElement(
+    showPushNotification("📧 Configura\xE7\xF5es de email salvas com sucesso!", "success");
+  } }, /* @__PURE__ */ React.createElement(Input, { label: "Servidor SMTP", defaultValue: "smtp.gmail.com" }), /* @__PURE__ */ React.createElement(Input, { label: "Porta", type: "number", defaultValue: "587" }), /* @__PURE__ */ React.createElement(Input, { label: "Usu\xE1rio", type: "email", defaultValue: "nutriapp@gmail.com" }), /* @__PURE__ */ React.createElement(Input, { label: "Senha", type: "password", defaultValue: "\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022" }), /* @__PURE__ */ React.createElement("div", { className: "flex items-center space-x-2" }, /* @__PURE__ */ React.createElement("input", { type: "checkbox", id: "ssl", className: "rounded", defaultChecked: true }), /* @__PURE__ */ React.createElement("label", { htmlFor: "ssl", className: "text-sm text-gray-700" }, "Usar SSL/TLS")), /* @__PURE__ */ React.createElement(Button, { type: "submit", variant: "outline", className: "w-full" }, /* @__PURE__ */ React.createElement("div", { className: "mr-2" }, "📧"), "Salvar Configura\xE7\xF5es de Email"))), /* @__PURE__ */ React.createElement(Card, { className: "p-6" }, /* @__PURE__ */ React.createElement("h3", { className: "text-lg font-semibold text-gray-900 mb-4" }, "Configura\xE7\xF5es Avan\xE7adas"), /* @__PURE__ */ React.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center justify-between p-3 border border-gray-200 rounded-lg" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { className: "font-medium text-gray-900" }, "Modo de Depura\xE7\xE3o"), /* @__PURE__ */ React.createElement("p", { className: "text-sm text-gray-600" }, "Logs detalhados para diagn\xF3stico")), /* @__PURE__ */ React.createElement("label", { className: "relative inline-flex items-center cursor-pointer" }, /* @__PURE__ */ React.createElement(
     "input",
     {
       type: "checkbox",
@@ -2351,7 +2410,7 @@ Esta a\xE7\xE3o n\xE3o pode ser desfeita.
       onChange: (e) => {
         const isEnabled = e.target.checked;
         showPushNotification(
-          isEnabled ? "\u{1F41B} Modo de depura\xE7\xE3o ativado! Logs detalhados habilitados." : "\u2705 Modo de depura\xE7\xE3o desativado! Sistema voltou ao normal.",
+          isEnabled ? "�� Modo de depura\xE7\xE3o ativado! Logs detalhados habilitados." : "\u2705 Modo de depura\xE7\xE3o desativado! Sistema voltou ao normal.",
           isEnabled ? "warning" : "success"
         );
       }
@@ -2365,7 +2424,7 @@ Esta a\xE7\xE3o n\xE3o pode ser desfeita.
       onChange: (e) => {
         const isEnabled = e.target.checked;
         showPushNotification(
-          isEnabled ? "\u{1F4CA} An\xE1lise de performance ativada! Monitoramento em tempo real." : "\u23F8\uFE0F An\xE1lise de performance pausada! Recursos economizados.",
+          isEnabled ? "📊 An\xE1lise de performance ativada! Monitoramento em tempo real." : "\u23F8\uFE0F An\xE1lise de performance pausada! Recursos economizados.",
           isEnabled ? "info" : "warning"
         );
       }
@@ -2379,7 +2438,7 @@ Esta a\xE7\xE3o n\xE3o pode ser desfeita.
       onChange: (e) => {
         const isEnabled = e.target.checked;
         showPushNotification(
-          isEnabled ? "\u{1F514} Notifica\xE7\xF5es push ativadas! Voc\xEA receber\xE1 alertas em tempo real." : "\u{1F515} Notifica\xE7\xF5es push desativadas! Modo silencioso ativado.",
+          isEnabled ? "🔔 Notifica\xE7\xF5es push ativadas! Voc\xEA receber\xE1 alertas em tempo real." : "🔕 Notifica\xE7\xF5es push desativadas! Modo silencioso ativado.",
           isEnabled ? "success" : "info"
         );
       }
@@ -2390,8 +2449,8 @@ Esta a\xE7\xE3o n\xE3o pode ser desfeita.
       variant: "outline",
       onClick: () => {
         showInfoPopup(
-          "\u{1F4CA} Status do Sistema",
-          "\u{1F5A5}\uFE0F Status: Online\n\u26A1 Performance: 98.7%\n\u{1F4BE} Uso de mem\xF3ria: 234MB\n\u{1F504} Uptime: 14 dias, 7 horas\n\u{1F4C8} Requests/min: 127\n\u{1F4CA} CPU: 23% utiliza\xE7\xE3o\n\u{1F310} Lat\xEAncia: 45ms\n\n\u{1F3AF} Tudo funcionando perfeitamente!\nSistema otimizado e est\xE1vel.",
+          "📊 Status do Sistema",
+          "\u{1F5A5}\uFE0F Status: Online\n\u26A1 Performance: 98.7%\n💾 Uso de mem\xF3ria: 234MB\n🔄 Uptime: 14 dias, 7 horas\n\u{1F4C8} Requests/min: 127\n📊 CPU: 23% utiliza\xE7\xE3o\n\u{1F310} Lat\xEAncia: 45ms\n\n🎯 Tudo funcionando perfeitamente!\nSistema otimizado e est\xE1vel.",
           "success"
         );
       },
@@ -2399,7 +2458,7 @@ Esta a\xE7\xE3o n\xE3o pode ser desfeita.
     },
     /* @__PURE__ */ React.createElement(BarChart3, { size: 16 }),
     "Visualizar Status do Sistema"
-  )))), /* @__PURE__ */ React.createElement(Card, { className: "p-6" }, /* @__PURE__ */ React.createElement("h3", { className: "text-lg font-semibold text-gray-900 mb-4" }, "Status do Sistema"), /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-1 md:grid-cols-4 gap-4" }, /* @__PURE__ */ React.createElement("div", { className: "text-center p-4 border border-green-200 bg-green-50 rounded-lg" }, /* @__PURE__ */ React.createElement("div", { className: "w-8 h-8 bg-green-500 rounded-full mx-auto mb-2 flex items-center justify-center" }, /* @__PURE__ */ React.createElement(CheckCircle, { className: "text-white", size: 16 })), /* @__PURE__ */ React.createElement("p", { className: "font-semibold text-green-800" }, "API"), /* @__PURE__ */ React.createElement("p", { className: "text-sm text-green-600" }, "Online")), /* @__PURE__ */ React.createElement("div", { className: "text-center p-4 border border-green-200 bg-green-50 rounded-lg" }, /* @__PURE__ */ React.createElement("div", { className: "w-8 h-8 bg-green-500 rounded-full mx-auto mb-2 flex items-center justify-center" }, /* @__PURE__ */ React.createElement(Database, { className: "text-white", size: 16 })), /* @__PURE__ */ React.createElement("p", { className: "font-semibold text-green-800" }, "Base de Dados"), /* @__PURE__ */ React.createElement("p", { className: "text-sm text-green-600" }, "Conectado")), /* @__PURE__ */ React.createElement("div", { className: "text-center p-4 border border-green-200 bg-green-50 rounded-lg" }, /* @__PURE__ */ React.createElement("div", { className: "w-8 h-8 bg-green-500 rounded-full mx-auto mb-2 flex items-center justify-center" }, /* @__PURE__ */ React.createElement("div", { className: "text-white text-xs" }, "\u{1F4E7}")), /* @__PURE__ */ React.createElement("p", { className: "font-semibold text-green-800" }, "Email"), /* @__PURE__ */ React.createElement("p", { className: "text-sm text-green-600" }, "Funcionando")), /* @__PURE__ */ React.createElement("div", { className: "text-center p-4 border border-green-200 bg-green-50 rounded-lg" }, /* @__PURE__ */ React.createElement("div", { className: "w-8 h-8 bg-green-500 rounded-full mx-auto mb-2 flex items-center justify-center" }, /* @__PURE__ */ React.createElement(CreditCard, { className: "text-white", size: 16 })), /* @__PURE__ */ React.createElement("p", { className: "font-semibold text-green-800" }, "Pagamentos"), /* @__PURE__ */ React.createElement("p", { className: "text-sm text-green-600" }, "Ativo")))))))), /* @__PURE__ */ React.createElement(AnimatePresence, null, showNotification && /* @__PURE__ */ React.createElement(
+  )))), /* @__PURE__ */ React.createElement(Card, { className: "p-6" }, /* @__PURE__ */ React.createElement("h3", { className: "text-lg font-semibold text-gray-900 mb-4" }, "Status do Sistema"), /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-1 md:grid-cols-4 gap-4" }, /* @__PURE__ */ React.createElement("div", { className: "text-center p-4 border border-green-200 bg-green-50 rounded-lg" }, /* @__PURE__ */ React.createElement("div", { className: "w-8 h-8 bg-green-500 rounded-full mx-auto mb-2 flex items-center justify-center" }, /* @__PURE__ */ React.createElement(CheckCircle, { className: "text-white", size: 16 })), /* @__PURE__ */ React.createElement("p", { className: "font-semibold text-green-800" }, "API"), /* @__PURE__ */ React.createElement("p", { className: "text-sm text-green-600" }, "Online")), /* @__PURE__ */ React.createElement("div", { className: "text-center p-4 border border-green-200 bg-green-50 rounded-lg" }, /* @__PURE__ */ React.createElement("div", { className: "w-8 h-8 bg-green-500 rounded-full mx-auto mb-2 flex items-center justify-center" }, /* @__PURE__ */ React.createElement(Database, { className: "text-white", size: 16 })), /* @__PURE__ */ React.createElement("p", { className: "font-semibold text-green-800" }, "Base de Dados"), /* @__PURE__ */ React.createElement("p", { className: "text-sm text-green-600" }, "Conectado")), /* @__PURE__ */ React.createElement("div", { className: "text-center p-4 border border-green-200 bg-green-50 rounded-lg" }, /* @__PURE__ */ React.createElement("div", { className: "w-8 h-8 bg-green-500 rounded-full mx-auto mb-2 flex items-center justify-center" }, /* @__PURE__ */ React.createElement("div", { className: "text-white text-xs" }, "📧")), /* @__PURE__ */ React.createElement("p", { className: "font-semibold text-green-800" }, "Email"), /* @__PURE__ */ React.createElement("p", { className: "text-sm text-green-600" }, "Funcionando")), /* @__PURE__ */ React.createElement("div", { className: "text-center p-4 border border-green-200 bg-green-50 rounded-lg" }, /* @__PURE__ */ React.createElement("div", { className: "w-8 h-8 bg-green-500 rounded-full mx-auto mb-2 flex items-center justify-center" }, /* @__PURE__ */ React.createElement(CreditCard, { className: "text-white", size: 16 })), /* @__PURE__ */ React.createElement("p", { className: "font-semibold text-green-800" }, "Pagamentos"), /* @__PURE__ */ React.createElement("p", { className: "text-sm text-green-600" }, "Ativo")))))))), /* @__PURE__ */ React.createElement(AnimatePresence, null, showNotification && /* @__PURE__ */ React.createElement(
     motion.div,
     {
       initial: { opacity: 0, x: 300, scale: 0.8 },
@@ -2415,22 +2474,12 @@ Esta a\xE7\xE3o n\xE3o pode ser desfeita.
       },
       /* @__PURE__ */ React.createElement(X, { size: 16 })
     ))
-  )), showSuccessMessage && /* @__PURE__ */ React.createElement("div", { className: "fixed top-4 right-4 z-[9999]" }, /* @__PURE__ */ React.createElement(
-    motion.div,
-    {
-      initial: { opacity: 0, y: -50, scale: 0.9 },
-      animate: { opacity: 1, y: 0, scale: 1 },
-      exit: { opacity: 0, y: -50, scale: 0.9 },
-      className: "bg-green-500 text-white px-6 py-4 rounded-lg shadow-lg flex items-center max-w-sm"
-    },
-    /* @__PURE__ */ React.createElement(CheckCircle, { size: 20, className: "mr-3 flex-shrink-0" }),
-    /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { className: "font-semibold" }, "Pagamento Aprovado! \u{1F389}"), /* @__PURE__ */ React.createElement("div", { className: "text-sm opacity-90" }, "Seus cr\xE9ditos foram adicionados \xE0 sua conta"))
   )), /* @__PURE__ */ React.createElement(Modal, { isOpen: showInfoModal, onClose: () => setShowInfoModal(false), title: "" }, /* @__PURE__ */ React.createElement("div", { className: "text-center space-y-6" }, /* @__PURE__ */ React.createElement("div", { className: `w-16 h-16 rounded-full flex items-center justify-center mx-auto text-2xl ${infoModalData.type === "success" ? "bg-green-100" : infoModalData.type === "warning" ? "bg-yellow-100" : infoModalData.type === "error" ? "bg-red-100" : "bg-blue-100"}` }, infoModalData.type === "success" ? "\u2705" : infoModalData.type === "warning" ? "\u26A0\uFE0F" : infoModalData.type === "error" ? "\u274C" : "\u2139\uFE0F"), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h3", { className: "text-xl font-bold text-gray-900 mb-4" }, infoModalData.title), /* @__PURE__ */ React.createElement("div", { className: "text-gray-600 text-sm leading-snug whitespace-pre-line" }, infoModalData.content)), /* @__PURE__ */ React.createElement("div", { className: "flex gap-3 justify-center" }, infoModalData.type === "warning" && /* @__PURE__ */ React.createElement(
     Button,
     {
       onClick: () => {
         if (infoModalData.title.includes("Limpar Cache")) {
-          showPushNotification("\u{1F504} Cache limpo com sucesso! Sistema otimizado.", "success");
+          showPushNotification("🔄 Cache limpo com sucesso! Sistema otimizado.", "success");
         }
         setShowInfoModal(false);
       },
@@ -2678,7 +2727,7 @@ Esta a\xE7\xE3o n\xE3o pode ser desfeita.
             animate: { scale: 1, opacity: 1 },
             transition: { duration: 0.3 }
           },
-          generationProgress < 20 ? "\u{1F9E0}" : generationProgress < 40 ? "\u26A1" : generationProgress < 60 ? "\u{1F3AF}" : generationProgress < 80 ? "\u{1F37D}\uFE0F" : generationProgress === 100 ? "\u2728" : "\u{1F4CA}"
+          generationProgress < 20 ? "🧠" : generationProgress < 40 ? "\u26A1" : generationProgress < 60 ? "🎯" : generationProgress < 80 ? "🍽\uFE0F" : generationProgress === 100 ? "\u2728" : "📊"
         )
       )))), /* @__PURE__ */ React.createElement(
         motion.div,
@@ -2716,10 +2765,10 @@ Esta a\xE7\xE3o n\xE3o pode ser desfeita.
           transition: { duration: 0.8, ease: "easeOut" }
         }
       ), [
-        { label: "TMB", progress: 20, icon: "\u{1F9E0}" },
+        { label: "TMB", progress: 20, icon: "🧠" },
         { label: "GETD", progress: 40, icon: "\u26A1" },
-        { label: "Macros", progress: 60, icon: "\u{1F3AF}" },
-        { label: "Refei\xE7\xF5es", progress: 80, icon: "\u{1F37D}\uFE0F" },
+        { label: "Macros", progress: 60, icon: "🎯" },
+        { label: "Refei\xE7\xF5es", progress: 80, icon: "🍽\uFE0F" },
         { label: "Finalizar", progress: 100, icon: "\u2728" }
       ].map(({ label, progress, icon }, index) => /* @__PURE__ */ React.createElement(
         motion.div,
@@ -2775,7 +2824,7 @@ Esta a\xE7\xE3o n\xE3o pode ser desfeita.
             animate: { rotate: [0, 10, -10, 0] },
             transition: { duration: 2, repeat: Infinity, ease: "easeInOut" }
           },
-          /* @__PURE__ */ React.createElement("span", { className: "text-blue-600 text-sm" }, "\u{1F4A1}")
+          /* @__PURE__ */ React.createElement("span", { className: "text-blue-600 text-sm" }, "💡")
         ),
         /* @__PURE__ */ React.createElement("div", { className: "text-sm text-blue-800 leading-relaxed font-medium" }, /* @__PURE__ */ React.createElement(
           motion.span,
@@ -2824,7 +2873,7 @@ Esta a\xE7\xE3o n\xE3o pode ser desfeita.
         ))
       ))
     )
-  )), /* @__PURE__ */ React.createElement(Modal, { isOpen: showDietModal, onClose: () => setShowDietModal(false), title: "" }, generatedDiet && /* @__PURE__ */ React.createElement("div", { className: "space-y-8" }, /* @__PURE__ */ React.createElement("div", { className: "text-center border-b border-gray-100 pb-6" }, /* @__PURE__ */ React.createElement("div", { className: "w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4" }, /* @__PURE__ */ React.createElement(User, { className: "text-white", size: 24 })), /* @__PURE__ */ React.createElement("h2", { className: "text-2xl font-bold text-gray-900 mb-2" }, generatedDiet.clientName), /* @__PURE__ */ React.createElement("p", { className: "text-gray-500 text-sm mb-4" }, new Date(generatedDiet.createdAt).toLocaleDateString("pt-BR")), /* @__PURE__ */ React.createElement("div", { className: "inline-flex items-center bg-blue-500 text-white px-6 py-2 rounded-full font-semibold" }, formatNumber(generatedDiet.calories), " kcal/dia"), generatedDiet.macros && generatedDiet.macros.proteinPerKg && /* @__PURE__ */ React.createElement("p", { className: "text-xs text-gray-400 mt-3" }, "\u{1F4AA} Prote\xEDna: ", formatNumber(generatedDiet.macros.proteinPerKg), "g/kg de peso corporal")), generatedDiet.bmr && generatedDiet.tdee && /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { className: "flex items-center mb-6" }, /* @__PURE__ */ React.createElement("div", { className: "w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center mr-3" }, /* @__PURE__ */ React.createElement("span", { className: "text-blue-600 text-xs" }, "\u{1F4CA}")), /* @__PURE__ */ React.createElement("h3", { className: "text-lg font-semibold text-gray-900" }, "Informa\xE7\xF5es Metab\xF3licas")), /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-4 gap-4" }, /* @__PURE__ */ React.createElement("div", { className: "text-center p-4 bg-gray-50 rounded-lg" }, /* @__PURE__ */ React.createElement("div", { className: "text-2xl font-bold text-gray-900 mb-1" }, formatNumber(generatedDiet.bmr)), /* @__PURE__ */ React.createElement("div", { className: "text-xs text-gray-500 uppercase tracking-wide" }, "TMB (kcal)")), /* @__PURE__ */ React.createElement("div", { className: "text-center p-4 bg-gray-50 rounded-lg" }, /* @__PURE__ */ React.createElement("div", { className: "text-2xl font-bold text-gray-900 mb-1" }, formatNumber(generatedDiet.tdee)), /* @__PURE__ */ React.createElement("div", { className: "text-xs text-gray-500 uppercase tracking-wide" }, "GETD (kcal)")), /* @__PURE__ */ React.createElement("div", { className: "text-center p-4 bg-gray-50 rounded-lg" }, /* @__PURE__ */ React.createElement("div", { className: "text-2xl font-bold text-gray-900 mb-1" }, generatedDiet.tdee > generatedDiet.calories ? "-" : "+", formatNumber(Math.abs(generatedDiet.tdee - generatedDiet.calories))), /* @__PURE__ */ React.createElement("div", { className: "text-xs text-gray-500 uppercase tracking-wide" }, "Ajuste (kcal)")), /* @__PURE__ */ React.createElement("div", { className: "text-center p-4 bg-gray-50 rounded-lg" }, /* @__PURE__ */ React.createElement("div", { className: "text-2xl font-bold text-gray-900 mb-1" }, formatNumber(Math.round((generatedDiet.calories - generatedDiet.tdee) / generatedDiet.tdee * 100)), "%"), /* @__PURE__ */ React.createElement("div", { className: "text-xs text-gray-500 uppercase tracking-wide" }, "Varia\xE7\xE3o")))), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { className: "flex items-center justify-between mb-6" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center" }, /* @__PURE__ */ React.createElement("div", { className: "w-6 h-6 bg-orange-100 rounded-lg flex items-center justify-center mr-3" }, /* @__PURE__ */ React.createElement("span", { className: "text-orange-600 text-xs" }, "\u{1F37D}\uFE0F")), /* @__PURE__ */ React.createElement("h3", { className: "text-lg font-semibold text-gray-900" }, "Refei\xE7\xF5es Planejadas")), /* @__PURE__ */ React.createElement("span", { className: "text-sm text-gray-400" }, generatedDiet.meals.length, " refei\xE7\xF5es")), /* @__PURE__ */ React.createElement("div", { className: "space-y-6" }, generatedDiet.meals.map((meal, index) => /* @__PURE__ */ React.createElement("div", { key: index, className: "border-l-4 border-orange-500 pl-6 pb-6 last:pb-0" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center justify-between mb-4" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center gap-3" }, /* @__PURE__ */ React.createElement("div", { className: "w-8 h-8 bg-orange-500 text-white rounded-lg flex items-center justify-center text-sm font-bold" }, index + 1), /* @__PURE__ */ React.createElement("h4", { className: "text-lg font-semibold text-gray-900" }, meal.name)), /* @__PURE__ */ React.createElement("span", { className: "text-lg font-bold text-blue-600" }, formatNumber(meal.calories), " kcal")), meal.protein && /* @__PURE__ */ React.createElement("div", { className: "flex gap-4 mb-4 text-sm" }, /* @__PURE__ */ React.createElement("span", { className: "text-red-600 font-medium" }, "P: ", formatNumber(meal.protein), "g"), /* @__PURE__ */ React.createElement("span", { className: "text-yellow-600 font-medium" }, "C: ", formatNumber(meal.carbs), "g"), /* @__PURE__ */ React.createElement("span", { className: "text-purple-600 font-medium" }, "G: ", formatNumber(meal.fat), "g")), /* @__PURE__ */ React.createElement("div", { className: "space-y-3" }, meal.foods.map((food, foodIndex) => /* @__PURE__ */ React.createElement("div", { key: foodIndex, className: "flex items-center justify-between py-2 border-b border-gray-100 last:border-0" }, /* @__PURE__ */ React.createElement("div", { className: "flex-1" }, /* @__PURE__ */ React.createElement("div", { className: "font-medium text-gray-900" }, food.name), /* @__PURE__ */ React.createElement("div", { className: "text-sm text-gray-500" }, food.quantity), food.protein !== void 0 && /* @__PURE__ */ React.createElement("div", { className: "flex gap-3 mt-1 text-xs text-gray-400" }, /* @__PURE__ */ React.createElement("span", null, "P: ", formatNumber(food.protein), "g"), /* @__PURE__ */ React.createElement("span", null, "C: ", formatNumber(food.carbs), "g"), /* @__PURE__ */ React.createElement("span", null, "G: ", formatNumber(food.fat), "g"))), /* @__PURE__ */ React.createElement("div", { className: "text-right" }, /* @__PURE__ */ React.createElement("div", { className: "font-semibold text-gray-900" }, formatNumber(food.calories), " kcal"))))))))), /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-4 gap-3" }, /* @__PURE__ */ React.createElement(
+  )), /* @__PURE__ */ React.createElement(Modal, { isOpen: showDietModal, onClose: () => setShowDietModal(false), title: "" }, generatedDiet && /* @__PURE__ */ React.createElement("div", { className: "space-y-8" }, /* @__PURE__ */ React.createElement("div", { className: "text-center border-b border-gray-100 pb-6" }, /* @__PURE__ */ React.createElement("div", { className: "w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4" }, /* @__PURE__ */ React.createElement(User, { className: "text-white", size: 24 })), /* @__PURE__ */ React.createElement("h2", { className: "text-2xl font-bold text-gray-900 mb-2" }, generatedDiet.clientName), /* @__PURE__ */ React.createElement("p", { className: "text-gray-500 text-sm mb-4" }, new Date(generatedDiet.createdAt).toLocaleDateString("pt-BR")), /* @__PURE__ */ React.createElement("div", { className: "inline-flex items-center bg-blue-500 text-white px-6 py-2 rounded-full font-semibold" }, formatNumber(generatedDiet.calories), " kcal/dia"), generatedDiet.macros && generatedDiet.macros.proteinPerKg && /* @__PURE__ */ React.createElement("p", { className: "text-xs text-gray-400 mt-3" }, "💪 Prote\xEDna: ", formatNumber(generatedDiet.macros.proteinPerKg), "g/kg de peso corporal")), generatedDiet.bmr && generatedDiet.tdee && /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { className: "flex items-center mb-6" }, /* @__PURE__ */ React.createElement("div", { className: "w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center mr-3" }, /* @__PURE__ */ React.createElement("span", { className: "text-blue-600 text-xs" }, "📊")), /* @__PURE__ */ React.createElement("h3", { className: "text-lg font-semibold text-gray-900" }, "Informa\xE7\xF5es Metab\xF3licas")), /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-4 gap-4" }, /* @__PURE__ */ React.createElement("div", { className: "text-center p-4 bg-gray-50 rounded-lg" }, /* @__PURE__ */ React.createElement("div", { className: "text-2xl font-bold text-gray-900 mb-1" }, formatNumber(generatedDiet.bmr)), /* @__PURE__ */ React.createElement("div", { className: "text-xs text-gray-500 uppercase tracking-wide" }, "TMB (kcal)")), /* @__PURE__ */ React.createElement("div", { className: "text-center p-4 bg-gray-50 rounded-lg" }, /* @__PURE__ */ React.createElement("div", { className: "text-2xl font-bold text-gray-900 mb-1" }, formatNumber(generatedDiet.tdee)), /* @__PURE__ */ React.createElement("div", { className: "text-xs text-gray-500 uppercase tracking-wide" }, "GETD (kcal)")), /* @__PURE__ */ React.createElement("div", { className: "text-center p-4 bg-gray-50 rounded-lg" }, /* @__PURE__ */ React.createElement("div", { className: "text-2xl font-bold text-gray-900 mb-1" }, generatedDiet.tdee > generatedDiet.calories ? "-" : "+", formatNumber(Math.abs(generatedDiet.tdee - generatedDiet.calories))), /* @__PURE__ */ React.createElement("div", { className: "text-xs text-gray-500 uppercase tracking-wide" }, "Ajuste (kcal)")), /* @__PURE__ */ React.createElement("div", { className: "text-center p-4 bg-gray-50 rounded-lg" }, /* @__PURE__ */ React.createElement("div", { className: "text-2xl font-bold text-gray-900 mb-1" }, formatNumber(Math.round((generatedDiet.calories - generatedDiet.tdee) / generatedDiet.tdee * 100)), "%"), /* @__PURE__ */ React.createElement("div", { className: "text-xs text-gray-500 uppercase tracking-wide" }, "Varia\xE7\xE3o")))), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { className: "flex items-center justify-between mb-6" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center" }, /* @__PURE__ */ React.createElement("div", { className: "w-6 h-6 bg-orange-100 rounded-lg flex items-center justify-center mr-3" }, /* @__PURE__ */ React.createElement("span", { className: "text-orange-600 text-xs" }, "🍽\uFE0F")), /* @__PURE__ */ React.createElement("h3", { className: "text-lg font-semibold text-gray-900" }, "Refei\xE7\xF5es Planejadas")), /* @__PURE__ */ React.createElement("span", { className: "text-sm text-gray-400" }, generatedDiet.meals.length, " refei\xE7\xF5es")), /* @__PURE__ */ React.createElement("div", { className: "space-y-6" }, generatedDiet.meals.map((meal, index) => /* @__PURE__ */ React.createElement("div", { key: index, className: "border-l-4 border-orange-500 pl-6 pb-6 last:pb-0" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center justify-between mb-4" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center gap-3" }, /* @__PURE__ */ React.createElement("div", { className: "w-8 h-8 bg-orange-500 text-white rounded-lg flex items-center justify-center text-sm font-bold" }, index + 1), /* @__PURE__ */ React.createElement("h4", { className: "text-lg font-semibold text-gray-900" }, meal.name)), /* @__PURE__ */ React.createElement("span", { className: "text-lg font-bold text-blue-600" }, formatNumber(meal.calories), " kcal")), meal.protein && /* @__PURE__ */ React.createElement("div", { className: "flex gap-4 mb-4 text-sm" }, /* @__PURE__ */ React.createElement("span", { className: "text-red-600 font-medium" }, "P: ", formatNumber(meal.protein), "g"), /* @__PURE__ */ React.createElement("span", { className: "text-yellow-600 font-medium" }, "C: ", formatNumber(meal.carbs), "g"), /* @__PURE__ */ React.createElement("span", { className: "text-purple-600 font-medium" }, "G: ", formatNumber(meal.fat), "g")), /* @__PURE__ */ React.createElement("div", { className: "space-y-3" }, meal.foods.map((food, foodIndex) => /* @__PURE__ */ React.createElement("div", { key: foodIndex, className: "flex items-center justify-between py-2 border-b border-gray-100 last:border-0" }, /* @__PURE__ */ React.createElement("div", { className: "flex-1" }, /* @__PURE__ */ React.createElement("div", { className: "font-medium text-gray-900" }, food.name), /* @__PURE__ */ React.createElement("div", { className: "text-sm text-gray-500" }, food.quantity), food.protein !== void 0 && /* @__PURE__ */ React.createElement("div", { className: "flex gap-3 mt-1 text-xs text-gray-400" }, /* @__PURE__ */ React.createElement("span", null, "P: ", formatNumber(food.protein), "g"), /* @__PURE__ */ React.createElement("span", null, "C: ", formatNumber(food.carbs), "g"), /* @__PURE__ */ React.createElement("span", null, "G: ", formatNumber(food.fat), "g"))), /* @__PURE__ */ React.createElement("div", { className: "text-right" }, /* @__PURE__ */ React.createElement("div", { className: "font-semibold text-gray-900" }, formatNumber(food.calories), " kcal"))))))))), /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-4 gap-3" }, /* @__PURE__ */ React.createElement(
     Button,
     {
       variant: "outline",
@@ -2840,7 +2889,7 @@ Esta a\xE7\xE3o n\xE3o pode ser desfeita.
       onClick: () => showPushNotification('🚧 Em breve! Esta funcionalidade estará disponível em uma próxima atualização.', 'info'),
       className: "flex flex-col items-center justify-center p-4 h-20 border-gray-200 hover:bg-gray-50 transition-colors group"
     },
-    /* @__PURE__ */ React.createElement("div", { className: "text-lg mb-1 group-hover:scale-110 transition-transform" }, "\u{1F4F1}"),
+    /* @__PURE__ */ React.createElement("div", { className: "text-lg mb-1 group-hover:scale-110 transition-transform" }, "📱"),
     /* @__PURE__ */ React.createElement("span", { className: "text-xs text-gray-600 group-hover:text-green-600" }, "WhatsApp")
   ), /* @__PURE__ */ React.createElement(
     Button,
@@ -2854,7 +2903,7 @@ Esta a\xE7\xE3o n\xE3o pode ser desfeita.
     },
     /* @__PURE__ */ React.createElement(History, { size: 20, className: "text-gray-600 mb-2 group-hover:text-purple-600 transition-colors" }),
     /* @__PURE__ */ React.createElement("span", { className: "text-xs text-gray-600 group-hover:text-purple-600" }, "Hist\xF3rico")
-  )), generatedDiet.metabolicInfo && /* @__PURE__ */ React.createElement("details", { className: "border border-gray-200 rounded-lg" }, /* @__PURE__ */ React.createElement("summary", { className: "p-3 cursor-pointer text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg" }, "\u{1F4CA} Detalhes dos C\xE1lculos"), /* @__PURE__ */ React.createElement("div", { className: "p-3 border-t bg-gray-50 text-xs space-y-2" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("strong", null, "F\xF3rmula TMB:"), " Harris-Benedict", /* @__PURE__ */ React.createElement("br", null), calculatorData.gender === "male" ? "(13,75 \xD7 peso) + (5 \xD7 altura) - (6,76 \xD7 idade) + 66,5" : "(9,56 \xD7 peso) + (1,85 \xD7 altura) - (4,68 \xD7 idade) + 665"), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("strong", null, "N\xEDvel de Atividade:"), " ", calculatorData.activityLevel === "sedentary" ? "Sedent\xE1rio (1.2x)" : calculatorData.activityLevel === "light" ? "Levemente Ativo (1.375x)" : calculatorData.activityLevel === "moderate" ? "Moderadamente Ativo (1.55x)" : calculatorData.activityLevel === "intense" ? "Muito Ativo (1.725x)" : "Extremamente Ativo (1.9x)"), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("strong", null, "Ajuste para Objetivo:"), " ", generatedDiet.metabolicInfo.adjustmentPercent, "% em rela\xE7\xE3o ao GETD"), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("strong", null, "Distribui\xE7\xE3o de Macros:"), /* @__PURE__ */ React.createElement("br", null), "\u2022 Prote\xEDnas: ", generatedDiet.macros.proteinPerKg, "g/kg peso corporal", /* @__PURE__ */ React.createElement("br", null), "\u2022 Carboidratos: Energia restante ap\xF3s prote\xEDnas e gorduras", /* @__PURE__ */ React.createElement("br", null), "\u2022 Gorduras: 20-35% das calorias (m\xEDn. 0.8g/kg)"))), /* @__PURE__ */ React.createElement("div", { className: "flex gap-3 pt-6 border-t border-gray-100" }, /* @__PURE__ */ React.createElement(
+  )), generatedDiet.metabolicInfo && /* @__PURE__ */ React.createElement("details", { className: "border border-gray-200 rounded-lg" }, /* @__PURE__ */ React.createElement("summary", { className: "p-3 cursor-pointer text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg" }, "📊 Detalhes dos C\xE1lculos"), /* @__PURE__ */ React.createElement("div", { className: "p-3 border-t bg-gray-50 text-xs space-y-2" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("strong", null, "F\xF3rmula TMB:"), " Harris-Benedict", /* @__PURE__ */ React.createElement("br", null), calculatorData.gender === "male" ? "(13,75 \xD7 peso) + (5 \xD7 altura) - (6,76 \xD7 idade) + 66,5" : "(9,56 \xD7 peso) + (1,85 \xD7 altura) - (4,68 \xD7 idade) + 665"), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("strong", null, "N\xEDvel de Atividade:"), " ", calculatorData.activityLevel === "sedentary" ? "Sedent\xE1rio (1.2x)" : calculatorData.activityLevel === "light" ? "Levemente Ativo (1.375x)" : calculatorData.activityLevel === "moderate" ? "Moderadamente Ativo (1.55x)" : calculatorData.activityLevel === "intense" ? "Muito Ativo (1.725x)" : "Extremamente Ativo (1.9x)"), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("strong", null, "Ajuste para Objetivo:"), " ", generatedDiet.metabolicInfo.adjustmentPercent, "% em rela\xE7\xE3o ao GETD"), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("strong", null, "Distribui\xE7\xE3o de Macros:"), /* @__PURE__ */ React.createElement("br", null), "\u2022 Prote\xEDnas: ", generatedDiet.macros.proteinPerKg, "g/kg peso corporal", /* @__PURE__ */ React.createElement("br", null), "\u2022 Carboidratos: Energia restante ap\xF3s prote\xEDnas e gorduras", /* @__PURE__ */ React.createElement("br", null), "\u2022 Gorduras: 20-35% das calorias (m\xEDn. 0.8g/kg)"))), /* @__PURE__ */ React.createElement("div", { className: "flex gap-3 pt-6 border-t border-gray-100" }, /* @__PURE__ */ React.createElement(
     Button,
     {
       onClick: () => {
@@ -2862,7 +2911,7 @@ Esta a\xE7\xE3o n\xE3o pode ser desfeita.
       },
       className: "flex-1 bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 rounded-lg transition-colors"
     },
-    "\u{1F504} Gerar Nova Varia\xE7\xE3o"
+    "🔄 Gerar Nova Varia\xE7\xE3o"
   ), /* @__PURE__ */ React.createElement(
     Button,
     {
@@ -3030,7 +3079,7 @@ Esta a\xE7\xE3o n\xE3o pode ser desfeita.
       className: "w-full",
       disabled: isUploadingPhoto
     },
-    isUploadingPhoto ? /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { className: "animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2" }), "Processando...") : /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { className: "mr-2" }, "\u{1F4F7}"), profilePhoto || currentUser.photo ? "Escolher Nova Foto" : "Adicionar Foto")
+    isUploadingPhoto ? /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { className: "animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2" }), "Processando...") : /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { className: "mr-2" }, "📷"), profilePhoto || currentUser.photo ? "Escolher Nova Foto" : "Adicionar Foto")
   )), (profilePhoto || currentUser.photo) && /* @__PURE__ */ React.createElement(
     Button,
     {
@@ -3040,7 +3089,7 @@ Esta a\xE7\xE3o n\xE3o pode ser desfeita.
     },
     /* @__PURE__ */ React.createElement(Trash2, { size: 16 }),
     "Remover Foto"
-  )), /* @__PURE__ */ React.createElement("div", { className: "bg-blue-50 border border-blue-200 rounded-lg p-4" }, /* @__PURE__ */ React.createElement("h4", { className: "font-medium text-blue-900 mb-2" }, "\u{1F4A1} Dicas para uma boa foto:"), /* @__PURE__ */ React.createElement("ul", { className: "text-sm text-blue-800 space-y-1" }, /* @__PURE__ */ React.createElement("li", null, "\u2022 Use uma foto com boa ilumina\xE7\xE3o"), /* @__PURE__ */ React.createElement("li", null, "\u2022 Prefira fotos com o rosto bem vis\xEDvel"), /* @__PURE__ */ React.createElement("li", null, "\u2022 Formatos aceitos: JPG, PNG, GIF"), /* @__PURE__ */ React.createElement("li", null, "\u2022 Tamanho m\xE1ximo: 5MB"), /* @__PURE__ */ React.createElement("li", null, "\u2022 A foto ser\xE1 redimensionada automaticamente"))), /* @__PURE__ */ React.createElement("div", { className: "flex justify-end" }, /* @__PURE__ */ React.createElement(
+  )), /* @__PURE__ */ React.createElement("div", { className: "bg-blue-50 border border-blue-200 rounded-lg p-4" }, /* @__PURE__ */ React.createElement("h4", { className: "font-medium text-blue-900 mb-2" }, "💡 Dicas para uma boa foto:"), /* @__PURE__ */ React.createElement("ul", { className: "text-sm text-blue-800 space-y-1" }, /* @__PURE__ */ React.createElement("li", null, "\u2022 Use uma foto com boa ilumina\xE7\xE3o"), /* @__PURE__ */ React.createElement("li", null, "\u2022 Prefira fotos com o rosto bem vis\xEDvel"), /* @__PURE__ */ React.createElement("li", null, "\u2022 Formatos aceitos: JPG, PNG, GIF"), /* @__PURE__ */ React.createElement("li", null, "\u2022 Tamanho m\xE1ximo: 5MB"), /* @__PURE__ */ React.createElement("li", null, "\u2022 A foto ser\xE1 redimensionada automaticamente"))), /* @__PURE__ */ React.createElement("div", { className: "flex justify-end" }, /* @__PURE__ */ React.createElement(
     Button,
     {
       variant: "outline",
@@ -3080,7 +3129,7 @@ Esta a\xE7\xE3o n\xE3o pode ser desfeita.
     },
     /* @__PURE__ */ React.createElement(Trash2, { size: 16 }),
     "Remover Foto"
-  )), /* @__PURE__ */ React.createElement("div", { className: "bg-blue-50 border border-blue-200 rounded-lg p-4" }, /* @__PURE__ */ React.createElement("h4", { className: "font-medium text-blue-900 mb-2" }, "\u{1F4A1} Dicas para uma boa foto:"), /* @__PURE__ */ React.createElement("ul", { className: "text-sm text-blue-800 space-y-1" }, /* @__PURE__ */ React.createElement("li", null, "\u2022 Use uma foto com boa ilumina\xE7\xE3o"), /* @__PURE__ */ React.createElement("li", null, "\u2022 Prefira fotos com o rosto bem vis\xEDvel"), /* @__PURE__ */ React.createElement("li", null, "\u2022 Formatos aceitos: JPG, PNG, GIF"), /* @__PURE__ */ React.createElement("li", null, "\u2022 Tamanho m\xE1ximo: 5MB"), /* @__PURE__ */ React.createElement("li", null, "\u2022 A foto ser\xE1 redimensionada automaticamente"))), /* @__PURE__ */ React.createElement("div", { className: "flex justify-end" }, /* @__PURE__ */ React.createElement(
+  )), /* @__PURE__ */ React.createElement("div", { className: "bg-blue-50 border border-blue-200 rounded-lg p-4" }, /* @__PURE__ */ React.createElement("h4", { className: "font-medium text-blue-900 mb-2" }, "💡 Dicas para uma boa foto:"), /* @__PURE__ */ React.createElement("ul", { className: "text-sm text-blue-800 space-y-1" }, /* @__PURE__ */ React.createElement("li", null, "\u2022 Use uma foto com boa ilumina\xE7\xE3o"), /* @__PURE__ */ React.createElement("li", null, "\u2022 Prefira fotos com o rosto bem vis\xEDvel"), /* @__PURE__ */ React.createElement("li", null, "\u2022 Formatos aceitos: JPG, PNG, GIF"), /* @__PURE__ */ React.createElement("li", null, "\u2022 Tamanho m\xE1ximo: 5MB"), /* @__PURE__ */ React.createElement("li", null, "\u2022 A foto ser\xE1 redimensionada automaticamente"))), /* @__PURE__ */ React.createElement("div", { className: "flex justify-end" }, /* @__PURE__ */ React.createElement(
     Button,
     {
       variant: "outline",

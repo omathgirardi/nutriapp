@@ -7,6 +7,43 @@
     <link rel="icon" type="image/svg+xml" href="./public/favicon.svg" />
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+      /* Custom animations */
+      @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        25% { transform: translateY(-15px) rotate(45deg); }
+        50% { transform: translateY(-8px) rotate(90deg); }
+        75% { transform: translateY(-12px) rotate(135deg); }
+      }
+      
+      @keyframes glow {
+        0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.5); }
+        50% { box-shadow: 0 0 30px rgba(59, 130, 246, 0.8); }
+      }
+      
+      @keyframes pulse-glow {
+        0%, 100% { 
+          box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+          transform: scale(1);
+        }
+        50% { 
+          box-shadow: 0 0 20px rgba(59, 130, 246, 0.6);
+          transform: scale(1.05);
+        }
+      }
+      
+      .animate-float {
+        animation: float 4s ease-in-out infinite;
+      }
+      
+      .animate-glow {
+        animation: glow 2s ease-in-out infinite;
+      }
+      
+      .animate-pulse-glow {
+        animation: pulse-glow 2s ease-in-out infinite;
+      }
+    </style>
+    <style>
       html,
       body,
       #root {
@@ -151,7 +188,11 @@
           let componentCode;
           try {
               const response = await fetch('./component.js');
-              componentCode = await response.text();
+              if (response.ok) {
+                  componentCode = await response.text();
+              } else {
+                  throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+              }
           } catch (fetchError) {
               console.warn('Could not load component.js, using inline code:', fetchError);
               // Fallback to inline component code for file:// URLs
@@ -393,7 +434,7 @@ var NutriPlan = () => {
   const [selectedTrainer, setSelectedTrainer] = useState(null);
   const [isTestingConnection, setIsTestingConnection] = useState(false);
   const [isBackingUp, setIsBackingUp] = useState(false);
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+
   const [showCreateTemplateModal, setShowCreateTemplateModal] = useState(false);
   const [showSelectFoodModal, setShowSelectFoodModal] = useState(false);
   const [showPortionModal, setShowPortionModal] = useState(false);
@@ -439,7 +480,7 @@ var NutriPlan = () => {
       setTimeout(() => {
         if (confirm("\\u{1F4AC} Telegram n\\xE3o encontrado?\\n\\nDeseja copiar a mensagem para enviar manualmente?")) {
           navigator.clipboard.writeText(message.replace(/\\*/g, "")).then(() => {
-            showPushNotification('✅ Mensagem copiada! Cole no Telegram do seu cliente.', 'success');
+            showPushNotification('Mensagem copiada! Cole no Telegram do seu cliente.', 'success');
           }).catch(() => {
             showPushNotification('❌ Erro ao copiar. Copie manualmente a mensagem exibida.', 'error');
             console.log("Mensagem para Telegram:", message);
@@ -1305,15 +1346,15 @@ NutriApp - Sistema Profissional de Nutri\\xE7\\xE3o
     e.preventDefault();
     setShowAddTrainerModal(false);
     setNewTrainer({ name: "", email: "", phone: "", credits: 200 });
-    setShowSuccessMessage(true);
-    setTimeout(() => setShowSuccessMessage(false), 3e3);
+    showPushNotification("Ação realizada com sucesso!", "success");
+    // Removido setTimeout, 3e3);
   };
   const handleManageCredits = (e) => {
     e.preventDefault();
     setShowManageCreditsModal(false);
     setCreditAmount("");
-    setShowSuccessMessage(true);
-    setTimeout(() => setShowSuccessMessage(false), 3e3);
+    showPushNotification("Ação realizada com sucesso!", "success");
+    // Removido setTimeout, 3e3);
   };
   const handleCreateTemplate = (e) => {
     e.preventDefault();
@@ -1329,8 +1370,8 @@ NutriApp - Sistema Profissional de Nutri\\xE7\\xE3o
         { name: "Jantar", foods: [], substitutions: [] }
       ]
     });
-    setShowSuccessMessage(true);
-    setTimeout(() => setShowSuccessMessage(false), 3e3);
+    showPushNotification("Ação realizada com sucesso!", "success");
+    // Removido setTimeout, 3e3);
   };
   const handleAddFood = (mealIndex) => {
     setCurrentMealIndex(mealIndex);
@@ -1453,8 +1494,7 @@ NutriApp - Sistema Profissional de Nutri\\xE7\\xE3o
           photo: compressedDataUrl
         });
         setIsUploadingPhoto(false);
-        setShowSuccessMessage(true);
-        setTimeout(() => setShowSuccessMessage(false), 3e3);
+        showPushNotification('📸 Foto de perfil atualizada com sucesso!', 'success');
       };
       img.src = e.target.result;
     };
@@ -1467,8 +1507,7 @@ NutriApp - Sistema Profissional de Nutri\\xE7\\xE3o
       photo: null
     });
     setShowPhotoModal(false);
-    setShowSuccessMessage(true);
-    setTimeout(() => setShowSuccessMessage(false), 3e3);
+    showPushNotification('🗑️ Foto de perfil removida com sucesso!', 'success');
   };
   const handlePayment = async () => {
     if (!selectedPlan) return;
@@ -1478,8 +1517,8 @@ NutriApp - Sistema Profissional de Nutri\\xE7\\xE3o
       setShowPaymentModal(false);
       setSelectedPlan(null);
       setIsProcessingPayment(false);
-      setShowSuccessMessage(true);
-      setTimeout(() => setShowSuccessMessage(false), 5e3);
+      showPushNotification("Ação realizada com sucesso!", "success");
+      // Removido setTimeout, 5e3);
       setTimeout(() => {
         setActiveSection("dashboard");
       }, 2e3);
@@ -2593,16 +2632,6 @@ Esta a\\xE7\\xE3o n\\xE3o pode ser desfeita.
       },
       /* @__PURE__ */ React.createElement(X, { size: 16 })
     ))
-  )), showSuccessMessage && /* @__PURE__ */ React.createElement("div", { className: "fixed top-4 right-4 z-[9999]" }, /* @__PURE__ */ React.createElement(
-    motion.div,
-    {
-      initial: { opacity: 0, y: -50, scale: 0.9 },
-      animate: { opacity: 1, y: 0, scale: 1 },
-      exit: { opacity: 0, y: -50, scale: 0.9 },
-      className: "bg-green-500 text-white px-6 py-4 rounded-lg shadow-lg flex items-center max-w-sm"
-    },
-    /* @__PURE__ */ React.createElement(CheckCircle, { size: 20, className: "mr-3 flex-shrink-0" }),
-    /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { className: "font-semibold" }, "Pagamento Aprovado! \\u{1F389}"), /* @__PURE__ */ React.createElement("div", { className: "text-sm opacity-90" }, "Seus cr\\xE9ditos foram adicionados \\xE0 sua conta"))
   )), /* @__PURE__ */ React.createElement(Modal, { isOpen: showInfoModal, onClose: () => setShowInfoModal(false), title: "" }, /* @__PURE__ */ React.createElement("div", { className: "text-center space-y-6" }, /* @__PURE__ */ React.createElement("div", { className: \`w-16 h-16 rounded-full flex items-center justify-center mx-auto text-2xl \${infoModalData.type === "success" ? "bg-green-100" : infoModalData.type === "warning" ? "bg-yellow-100" : infoModalData.type === "error" ? "bg-red-100" : "bg-blue-100"}\` }, infoModalData.type === "success" ? "\\u2705" : infoModalData.type === "warning" ? "\\u26A0\\uFE0F" : infoModalData.type === "error" ? "\\u274C" : "\\u2139\\uFE0F"), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h3", { className: "text-xl font-bold text-gray-900 mb-4" }, infoModalData.title), /* @__PURE__ */ React.createElement("div", { className: "text-gray-600 text-sm leading-snug whitespace-pre-line" }, infoModalData.content)), /* @__PURE__ */ React.createElement("div", { className: "flex gap-3 justify-center" }, infoModalData.type === "warning" && /* @__PURE__ */ React.createElement(
     Button,
     {
