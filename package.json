@@ -8,11 +8,7 @@
     "dev": "serve . -l 3000",
     "start": "serve . -l 3000",
     "build": "echo 'No build process needed for this project'",
-    "preview": "serve . -l 4173",
-    "firebase:setup": "node firebase-setup.js",
-    "firebase:setup-auto": "./setup-firebase.sh",
-    "firebase:install": "npm install firebase",
-    "firebase:test": "node firebase-test.js"
+    "preview": "serve . -l 4173"
   },
   "keywords": [
     "nutrição",
@@ -27,7 +23,6 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.52.0",
     "axios": "^1.6.2",
-    "firebase": "^10.7.1",
     "framer-motion": "^10.0.0",
     "lucide-react": "^0.263.1",
     "react": "^18.2.0",

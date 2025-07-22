@@ -6,7 +6,7 @@ export const useNutriService = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [services, setServices] = useState({
-    firebase: { initialized: false },
+    supabase: { initialized: false },
     evolution: { initialized: false, connected: false }
   });
 
@@ -19,8 +19,8 @@ export const useNutriService = () => {
       const result = await nutriService.initialize();
       setServices(result);
       
-      if (result.firebase.error || result.evolution.error) {
-        setError(result.firebase.error || result.evolution.error);
+      if (result.supabase.error || result.evolution.error) {
+        setError(result.supabase.error || result.evolution.error);
       }
     } catch (err) {
       setError(err.message);
@@ -57,7 +57,7 @@ export const useClients = () => {
     setError(null);
     
     try {
-      console.log('🔍 Buscando clientes no Firebase...');
+      console.log('🔍 Buscando clientes no Supabase...');
       const result = await nutriService.clients.getAll();
       console.log('📊 Resultado da busca:', result);
       

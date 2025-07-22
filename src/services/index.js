@@ -14,7 +14,7 @@ export const nutriService = {
       const evolutionStatus = await evolutionService.getInstanceStatus();
       
       return {
-        firebase: { initialized: true },
+        supabase: { initialized: true },
         evolution: {
           initialized: true,
           connected: evolutionStatus.connected,
@@ -24,7 +24,7 @@ export const nutriService = {
     } catch (error) {
       console.error('❌ Erro ao inicializar serviços:', error);
       return {
-        firebase: { initialized: false, error: error.message },
+        supabase: { initialized: false, error: error.message },
         evolution: { initialized: false, error: error.message }
       };
     }
@@ -35,7 +35,7 @@ export const nutriService = {
     // Criar novo cliente
     async create(clientData) {
       try {
-        const result = await firebaseService.db.create('clients', clientData);
+        const result = await supabaseService.dbService.create('clients', clientData);
         
         if (result.success && clientData.phone) {
           // Verificar se o número existe no WhatsApp
@@ -66,22 +66,22 @@ export const nutriService = {
 
     // Buscar cliente por ID
     async getById(id) {
-      return await firebaseService.db.getById('clients', id);
+      return await supabaseService.dbService.getById('clients', id);
     },
 
     // Buscar todos os clientes
     async getAll() {
-      return await firebaseService.db.getAll('clients');
+      return await supabaseService.dbService.getAll('clients');
     },
 
     // Atualizar cliente
     async update(id, data) {
-      return await firebaseService.db.update('clients', id, data);
+      return await supabaseService.dbService.update('clients', id, data);
     },
 
     // Excluir cliente
     async delete(id) {
-      return await firebaseService.db.delete('clients', id);
+      return await supabaseService.dbService.delete('clients', id);
     }
   },
 
@@ -90,11 +90,11 @@ export const nutriService = {
     // Criar nova dieta
     async create(dietData) {
       try {
-        const result = await firebaseService.db.create('diets', dietData);
+        const result = await supabaseService.dbService.create('diets', dietData);
         
         if (result.success && dietData.clientId) {
           // Buscar dados do cliente
-          const clientResult = await firebaseService.db.getById('clients', dietData.clientId);
+          const clientResult = await supabaseService.dbService.getById('clients', dietData.clientId);
           
           if (clientResult.success && clientResult.data.phone) {
             // Enviar plano alimentar via WhatsApp
@@ -115,27 +115,27 @@ export const nutriService = {
 
     // Buscar dieta por ID
     async getById(id) {
-      return await firebaseService.db.getById('diets', id);
+      return await supabaseService.dbService.getById('diets', id);
     },
 
     // Buscar dietas de um cliente
     async getByClientId(clientId) {
-      return await firebaseService.db.getByFilter('diets', 'clientId', '==', clientId);
+      return await supabaseService.dbService.getByFilter('diets', 'clientId', '==', clientId);
     },
 
     // Buscar todas as dietas
     async getAll() {
-      return await firebaseService.db.getAll('diets');
+      return await supabaseService.dbService.getAll('diets');
     },
 
     // Atualizar dieta
     async update(id, data) {
-      return await firebaseService.db.update('diets', id, data);
+      return await supabaseService.dbService.update('diets', id, data);
     },
 
     // Excluir dieta
     async delete(id) {
-      return await firebaseService.db.delete('diets', id);
+      return await supabaseService.dbService.delete('diets', id);
     }
   },
 
@@ -144,11 +144,11 @@ export const nutriService = {
     // Criar nova consulta
     async create(appointmentData) {
       try {
-        const result = await firebaseService.db.create('appointments', appointmentData);
+        const result = await supabaseService.dbService.create('appointments', appointmentData);
         
         if (result.success && appointmentData.clientId) {
           // Buscar dados do cliente
-          const clientResult = await firebaseService.db.getById('clients', appointmentData.clientId);
+          const clientResult = await supabaseService.dbService.getById('clients', appointmentData.clientId);
           
           if (clientResult.success && clientResult.data.phone) {
             // Enviar confirmação da consulta
@@ -170,27 +170,27 @@ export const nutriService = {
 
     // Buscar consulta por ID
     async getById(id) {
-      return await firebaseService.db.getById('appointments', id);
+      return await supabaseService.dbService.getById('appointments', id);
     },
 
     // Buscar consultas de um cliente
     async getByClientId(clientId) {
-      return await firebaseService.db.getByFilter('appointments', 'clientId', '==', clientId);
+      return await supabaseService.dbService.getByFilter('appointments', 'clientId', '==', clientId);
     },
 
     // Buscar todas as consultas
     async getAll() {
-      return await firebaseService.db.getAll('appointments');
+      return await supabaseService.dbService.getAll('appointments');
     },
 
     // Atualizar consulta
     async update(id, data) {
-      return await firebaseService.db.update('appointments', id, data);
+      return await supabaseService.dbService.update('appointments', id, data);
     },
 
     // Excluir consulta
     async delete(id) {
-      return await firebaseService.db.delete('appointments', id);
+      return await supabaseService.dbService.delete('appointments', id);
     }
   },
 
@@ -209,7 +209,7 @@ export const nutriService = {
     // Enviar mensagem personalizada
     async sendMessage(clientId, message) {
       try {
-        const clientResult = await firebaseService.db.getById('clients', clientId);
+        const clientResult = await supabaseService.dbService.getById('clients', clientId);
         
         if (!clientResult.success) {
           return { error: 'Cliente não encontrado', success: false };
@@ -229,7 +229,7 @@ export const nutriService = {
     // Enviar dicas nutricionais
     async sendNutritionalTips(clientId, tips) {
       try {
-        const clientResult = await firebaseService.db.getById('clients', clientId);
+        const clientResult = await supabaseService.dbService.getById('clients', clientId);
         
         if (!clientResult.success) {
           return { error: 'Cliente não encontrado', success: false };
@@ -248,7 +248,8 @@ export const nutriService = {
         console.error('Erro ao enviar dicas:', error);
         return { error: error.message, success: false };
       }
-    },
+    }
+  },
 
     // Obter conversas
     async getChats() {
@@ -265,35 +266,31 @@ export const nutriService = {
   files: {
     // Upload de arquivo
     async upload(file, path) {
-      return await firebaseService.storage.uploadFile(file, path);
+      return await supabaseService.dbService.uploadFile(file, path);
     },
 
     // Excluir arquivo
     async delete(path) {
-      return await firebaseService.storage.deleteFile(path);
+      return await supabaseService.dbService.deleteFile(path);
     }
   },
 
-  // Autenticação
+  // Serviços de Autenticação
   auth: {
-    // Login
     async login(email, password) {
-      return await firebaseService.auth.login(email, password);
+      return await supabaseService.authService.login(email, password);
     },
 
-    // Criar conta
     async register(email, password, userData) {
-      return await firebaseService.auth.createUser(email, password, userData);
+      return await supabaseService.authService.createUser(email, password, userData);
     },
 
-    // Logout
     async logout() {
-      return await firebaseService.auth.logout();
+      return await supabaseService.authService.logout();
     },
 
-    // Observar mudanças de autenticação
     onAuthStateChange(callback) {
-      return firebaseService.auth.onAuthStateChange(callback);
+      return supabaseService.authService.onAuthStateChange(callback);
     }
   },
 
@@ -334,7 +331,7 @@ export const nutriService = {
 };
 
 // Exportar serviços individuais também
-export { firebaseService, evolutionService, nutriWhatsAppService, personalTrainerService };
+export { supabaseService, evolutionService, nutriWhatsAppService, personalTrainerService };
 
 // Exportar como padrão o serviço integrado
 export default nutriService;

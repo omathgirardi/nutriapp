@@ -1,5 +1,5 @@
 import { evolutionService } from './evolutionApi.js';
-import { dbService } from './firebase.js';
+import { dbService } from './supabase.js';
 
 // Serviço específico para Personal Trainers
 export const personalTrainerService = {
@@ -28,18 +28,18 @@ export const personalTrainerService = {
       // Dados completos do trainer
       const completeTrainerData = {
         ...trainerData,
-        trainerId,
-        confirmationCode,
-        tempPassword,
+        trainer_id: trainerId,
+        confirmation_code: confirmationCode,
+        temp_password: tempPassword,
         credits: trainerData.initialCredits || 10,
-        isConfirmed: false,
-        confirmationExpiry: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // 24 horas
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        is_confirmed: false,
+        confirmation_expiry: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // 24 horas
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
       };
 
-      // Salvar no Firebase
-      const result = await dbService.create('personalTrainers', completeTrainerData);
+      // Salvar no Supabase
+      const result = await dbService.create('personal_trainers', completeTrainerData);
       
       if (result.success) {
         // Enviar mensagem de boas-vindas
@@ -55,9 +55,9 @@ export const personalTrainerService = {
         
         return { 
           ...result, 
-          trainerId, 
-          confirmationCode, 
-          tempPassword 
+          trainer_id: trainerId, 
+          confirmation_code: confirmationCode, 
+          temp_password: tempPassword 
         };
       }
       
@@ -114,7 +114,7 @@ _Enviado via NutriApp_`;
   async confirmTrainer(trainerId, confirmationCode) {
     try {
       // Buscar trainer pelo ID
-      const trainersResult = await dbService.getByFilter('personalTrainers', 'trainerId', '==', trainerId);
+      const trainersResult = await dbService.getByFilter('personal_trainers', 'trainer_id', '==', trainerId);
       
       if (!trainersResult.success || trainersResult.data.length === 0) {
         return { error: 'Trainer não encontrado', success: false };
@@ -123,20 +123,20 @@ _Enviado via NutriApp_`;
       const trainer = trainersResult.data[0];
       
       // Verificar se o código está correto
-      if (trainer.confirmationCode !== confirmationCode) {
+      if (trainer.confirmation_code !== confirmationCode) {
         return { error: 'Código de confirmação inválido', success: false };
       }
       
       // Verificar se não expirou
-      if (new Date() > new Date(trainer.confirmationExpiry)) {
+      if (new Date() > new Date(trainer.confirmation_expiry)) {
         return { error: 'Código de confirmação expirado', success: false };
       }
       
       // Confirmar trainer
-      const updateResult = await dbService.update('personalTrainers', trainer.id, {
-        isConfirmed: true,
-        confirmationCode: null,
-        confirmationExpiry: null
+      const updateResult = await dbService.update('personal_trainers', trainer.id, {
+        is_confirmed: true,
+        confirmation_code: null,
+        confirmation_expiry: null
       });
       
       if (updateResult.success) {
@@ -182,7 +182,7 @@ _Enviado via NutriApp_`;
   // Adicionar créditos
   async addCredits(trainerId, credits, description = '') {
     try {
-      const trainersResult = await dbService.getByFilter('personalTrainers', 'trainerId', '==', trainerId);
+      const trainersResult = await dbService.getByFilter('personal_trainers', 'trainer_id', '==', trainerId);
       
       if (!trainersResult.success || trainersResult.data.length === 0) {
         return { error: 'Trainer não encontrado', success: false };
@@ -192,21 +192,21 @@ _Enviado via NutriApp_`;
       const newCredits = trainer.credits + credits;
       
       // Atualizar créditos
-      const updateResult = await dbService.update('personalTrainers', trainer.id, {
+      const updateResult = await dbService.update('personal_trainers', trainer.id, {
         credits: newCredits
       });
       
       if (updateResult.success) {
         // Registrar transação
-        await dbService.create('creditTransactions', {
-          trainerId,
-          trainerName: trainer.name,
+        await dbService.create('credit_transactions', {
+          trainer_id: trainerId,
+          trainer_name: trainer.name,
           type: 'credit',
           amount: credits,
           description,
-          previousBalance: trainer.credits,
-          newBalance: newCredits,
-          createdAt: new Date().toISOString()
+          previous_balance: trainer.credits,
+          new_balance: newCredits,
+          created_at: new Date().toISOString()
         });
         
         // Enviar notificação de créditos adicionados
@@ -253,7 +253,7 @@ _Enviado via NutriApp_`;
   // Usar créditos
   async useCredits(trainerId, credits, description = '') {
     try {
-      const trainersResult = await dbService.getByFilter('personalTrainers', 'trainerId', '==', trainerId);
+      const trainersResult = await dbService.getByFilter('personal_trainers', 'trainer_id', '==', trainerId);
       
       if (!trainersResult.success || trainersResult.data.length === 0) {
         return { error: 'Trainer não encontrado', success: false };
@@ -268,21 +268,21 @@ _Enviado via NutriApp_`;
       const newCredits = trainer.credits - credits;
       
       // Atualizar créditos
-      const updateResult = await dbService.update('personalTrainers', trainer.id, {
+      const updateResult = await dbService.update('personal_trainers', trainer.id, {
         credits: newCredits
       });
       
       if (updateResult.success) {
         // Registrar transação
-        await dbService.create('creditTransactions', {
-          trainerId,
-          trainerName: trainer.name,
+        await dbService.create('credit_transactions', {
+          trainer_id: trainerId,
+          trainer_name: trainer.name,
           type: 'debit',
           amount: credits,
           description,
-          previousBalance: trainer.credits,
-          newBalance: newCredits,
-          createdAt: new Date().toISOString()
+          previous_balance: trainer.credits,
+          new_balance: newCredits,
+          created_at: new Date().toISOString()
         });
         
         // Verificar se os créditos estão baixos
@@ -367,7 +367,7 @@ _Enviado via NutriApp_`;
   // Obter saldo de créditos
   async getCredits(trainerId) {
     try {
-      const trainersResult = await dbService.getByFilter('personalTrainers', 'trainerId', '==', trainerId);
+      const trainersResult = await dbService.getByFilter('personal_trainers', 'trainer_id', '==', trainerId);
       
       if (!trainersResult.success || trainersResult.data.length === 0) {
         return { error: 'Trainer não encontrado', success: false };
@@ -377,7 +377,7 @@ _Enviado via NutriApp_`;
       return { 
         success: true, 
         credits: trainer.credits,
-        trainerId: trainer.trainerId,
+        trainer_id: trainer.trainer_id,
         name: trainer.name
       };
     } catch (error) {
@@ -389,7 +389,7 @@ _Enviado via NutriApp_`;
   // Obter histórico de transações
   async getTransactionHistory(trainerId) {
     try {
-      const result = await dbService.getByFilter('creditTransactions', 'trainerId', '==', trainerId);
+      const result = await dbService.getByFilter('credit_transactions', 'trainer_id', '==', trainerId);
       return result;
     } catch (error) {
       console.error('Erro ao obter histórico:', error);
@@ -419,4 +419,4 @@ _Enviado via NutriApp_`;
   }
 };
 
-export default personalTrainerService; 
+export default personalTrainerService;
