@@ -1,10 +1,80 @@
 import React, { useState } from 'react';
 import { Search, Plus, Filter, Eye, Edit, Trash2, Calendar, User, Target, Copy, Download } from 'lucide-react';
-import Card from '../../components/shared/Card';
-import Button from '../../components/shared/Button';
-import Input from '../../components/shared/Input';
-import Modal from '../../components/shared/Modal';
-import Select from '../../components/shared/Select';
+
+// Componentes simulados (normalmente viriam de arquivos separados)
+const Card = ({ children, className = "", ...props }) => (
+  <div className={`bg-white rounded-lg shadow-md border border-gray-200 ${className}`} {...props}>
+    {children}
+  </div>
+);
+
+const Button = ({ children, variant = "primary", size = "md", className = "", ...props }) => {
+  const baseClasses = "inline-flex items-center justify-center gap-2 font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2";
+  const variants = {
+    primary: "bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500",
+    outline: "border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 focus:ring-blue-500"
+  };
+  const sizes = {
+    sm: "px-3 py-2 text-sm",
+    md: "px-4 py-2 text-sm"
+  };
+  
+  return (
+    <button 
+      className={`${baseClasses} ${variants[variant]} ${sizes[size]} ${className}`} 
+      {...props}
+    >
+      {children}
+    </button>
+  );
+};
+
+const Input = ({ label, className = "", ...props }) => (
+  <div className="space-y-1">
+    {label && <label className="block text-sm font-medium text-gray-700">{label}</label>}
+    <input 
+      className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${className}`}
+      {...props} 
+    />
+  </div>
+);
+
+const Select = ({ label, children, className = "", ...props }) => (
+  <div className="space-y-1">
+    {label && <label className="block text-sm font-medium text-gray-700">{label}</label>}
+    <select 
+      className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${className}`}
+      {...props}
+    >
+      {children}
+    </select>
+  </div>
+);
+
+const Modal = ({ isOpen, onClose, title, children }) => {
+  if (!isOpen) return null;
+  
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="p-6 border-b border-gray-200">
+          <div className="flex justify-between items-center">
+            <h2 className="text-xl font-semibold text-gray-900">{title}</h2>
+            <button 
+              onClick={onClose}
+              className="text-gray-400 hover:text-gray-600 text-2xl leading-none"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+        <div className="p-6">
+          {children}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const PersonalTrainerDiets = ({ showPushNotification }) => {
   const [diets, setDiets] = useState([

@@ -45,12 +45,168 @@ import {
   Edit2
 } from 'lucide-react';
 
-// Import shared components
-import Button from './src/components/shared/Button.jsx';
-import Modal from './src/components/shared/Modal.jsx';
-import Input from './src/components/shared/Input.jsx';
-import Select from './src/components/shared/Select.jsx';
-import AddClientModal from './src/components/shared/AddClientModal.jsx';
+// Componentes simulados (normalmente viriam de arquivos separados)
+const Button = ({ children, variant = "primary", size = "md", className = "", ...props }) => {
+  const baseClasses = "inline-flex items-center justify-center gap-2 font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2";
+  const variants = {
+    primary: "bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500",
+    outline: "border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 focus:ring-blue-500"
+  };
+  const sizes = {
+    sm: "px-3 py-2 text-sm",
+    md: "px-4 py-2 text-sm"
+  };
+  
+  return (
+    <button 
+      className={`${baseClasses} ${variants[variant]} ${sizes[size]} ${className}`} 
+      {...props}
+    >
+      {children}
+    </button>
+  );
+};
+
+const Modal = ({ isOpen, onClose, title, children, className = "" }) => {
+  if (!isOpen) return null;
+  
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="fixed inset-0 bg-black bg-opacity-50" onClick={onClose}></div>
+      <div className={`relative bg-white rounded-lg shadow-lg max-w-md w-full mx-4 ${className}`}>
+        <div className="flex items-center justify-between p-4 border-b">
+          <h3 className="text-lg font-semibold">{title}</h3>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+            <X size={20} />
+          </button>
+        </div>
+        <div className="p-4">
+          {children}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const Input = ({ label, className = "", ...props }) => (
+  <div className="space-y-1">
+    {label && <label className="block text-sm font-medium text-gray-700">{label}</label>}
+    <input 
+      className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${className}`}
+      {...props} 
+    />
+  </div>
+);
+
+const Select = ({ label, children, className = "", ...props }) => (
+  <div className="space-y-1">
+    {label && <label className="block text-sm font-medium text-gray-700">{label}</label>}
+    <select 
+      className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${className}`}
+      {...props}
+    >
+      {children}
+    </select>
+  </div>
+);
+
+const AddClientModal = ({ isOpen, onClose, onAddClient }) => {
+  const [clientData, setClientData] = useState({
+    name: '',
+    age: '',
+    gender: 'male',
+    weight: '',
+    height: '',
+    activityLevel: 'moderate',
+    goal: 'maintenance'
+  });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onAddClient(clientData);
+    setClientData({
+      name: '',
+      age: '',
+      gender: 'male',
+      weight: '',
+      height: '',
+      activityLevel: 'moderate',
+      goal: 'maintenance'
+    });
+    onClose();
+  };
+
+  return (
+    <Modal isOpen={isOpen} onClose={onClose} title="Adicionar Cliente">
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <Input
+          label="Nome"
+          value={clientData.name}
+          onChange={(e) => setClientData({...clientData, name: e.target.value})}
+          required
+        />
+        <Input
+          label="Idade"
+          type="number"
+          value={clientData.age}
+          onChange={(e) => setClientData({...clientData, age: e.target.value})}
+          required
+        />
+        <Select
+          label="Gênero"
+          value={clientData.gender}
+          onChange={(e) => setClientData({...clientData, gender: e.target.value})}
+        >
+          <option value="male">Masculino</option>
+          <option value="female">Feminino</option>
+        </Select>
+        <Input
+          label="Peso (kg)"
+          type="number"
+          value={clientData.weight}
+          onChange={(e) => setClientData({...clientData, weight: e.target.value})}
+          required
+        />
+        <Input
+          label="Altura (cm)"
+          type="number"
+          value={clientData.height}
+          onChange={(e) => setClientData({...clientData, height: e.target.value})}
+          required
+        />
+        <Select
+          label="Nível de Atividade"
+          value={clientData.activityLevel}
+          onChange={(e) => setClientData({...clientData, activityLevel: e.target.value})}
+        >
+          <option value="sedentary">Sedentário</option>
+          <option value="light">Leve</option>
+          <option value="moderate">Moderado</option>
+          <option value="active">Ativo</option>
+          <option value="very_active">Muito Ativo</option>
+        </Select>
+        <Select
+          label="Objetivo"
+          value={clientData.goal}
+          onChange={(e) => setClientData({...clientData, goal: e.target.value})}
+        >
+          <option value="weight_loss">Perda de Peso</option>
+          <option value="maintenance">Manutenção</option>
+          <option value="weight_gain">Ganho de Peso</option>
+          <option value="muscle_gain">Ganho de Massa</option>
+        </Select>
+        <div className="flex gap-2 pt-4">
+          <Button type="button" variant="outline" onClick={onClose} className="flex-1">
+            Cancelar
+          </Button>
+          <Button type="submit" className="flex-1">
+            Adicionar
+          </Button>
+        </div>
+      </form>
+    </Modal>
+  );
+};
 
 const { useStoredState } = hatch;
 
@@ -99,7 +255,7 @@ const colors = {
 
 // Mock Data
 const mockUsers = [];
-const mockClients = [
+const initialClients = [
   {
     id: '1',
     name: 'João Silva',
@@ -143,6 +299,35 @@ const NutriPlan = () => {
   const [userRole, setUserRole] = useStoredState('userRole', null);
   const [activeSection, setActiveSection] = useStoredState('activeSection', 'dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  // Limpar dados antigos e forçar reinicialização
+  useEffect(() => {
+    const storageKey = 'hatch_clients';
+    try {
+      const storedData = localStorage.getItem(storageKey);
+      if (!storedData) {
+        console.log('Nenhum dado encontrado no localStorage, inicializando com dados padrão');
+        localStorage.setItem(storageKey, JSON.stringify(initialClients));
+      } else {
+        const parsedData = JSON.parse(storedData);
+        if (!Array.isArray(parsedData) || parsedData.length < 2) {
+          console.log('Dados inválidos no localStorage, reinicializando');
+          localStorage.setItem(storageKey, JSON.stringify(initialClients));
+        }
+      }
+    } catch (error) {
+       console.error('Erro ao verificar localStorage:', error);
+       localStorage.setItem(storageKey, JSON.stringify(initialClients));
+     }
+   }, []);
+  
+  const [clients, setClients] = useStoredState('clients', initialClients);
+  
+  // Debug: verificar dados dos clientes
+  useEffect(() => {
+    console.log('🔍 Debug - Dados dos clientes:', clients);
+    console.log('🔍 Debug - Quantidade de clientes:', clients?.length || 0);
+    console.log('🔍 Debug - Dados iniciais:', initialClients);
+  }, [clients]);
   const [showLoginModal, setShowLoginModal] = useState(true);
   const [showRegisterModal, setShowRegisterModal] = useState(false);
   const [showVerificationModal, setShowVerificationModal] = useState(false);
@@ -200,6 +385,21 @@ const NutriPlan = () => {
   
   // Editing client state
   const [editingClient, setEditingClient] = useState(null);
+  
+  // New client data state
+  const [newClientData, setNewClientData] = useState({
+    name: '',
+    age: '',
+    gender: '',
+    weight: '',
+    height: '',
+    activityLevel: '',
+    goal: '',
+    trainingFrequency: '',
+    observations: '',
+    isVegan: false,
+    isIntolerant: false
+  });
 
   // Efeito para popular os campos quando editando um cliente
   useEffect(() => {
@@ -460,7 +660,7 @@ const NutriPlan = () => {
                     </div>
                     <div className="ml-4">
                       <p className="text-sm font-medium text-gray-600">Total Clientes</p>
-                      <p className="text-2xl font-bold text-gray-900">{mockClients.length}</p>
+                      <p className="text-2xl font-bold text-gray-900">{clients.length}</p>
                     </div>
                   </div>
                 </Card>
@@ -509,34 +709,47 @@ const NutriPlan = () => {
             <div className="space-y-6">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <h2 className="text-2xl font-bold text-gray-900">Clientes</h2>
-                <Button
-                  onClick={() => {
-                    setEditingClient(null);
-                    setNewClientData({
-                      name: '',
-                      age: '',
-                      gender: '',
-                      weight: '',
-                      height: '',
-                      activityLevel: '',
-                      goal: '',
-                      trainingFrequency: '',
-                      observations: '',
-                      isVegan: false,
-                      isIntolerant: false
-                    });
-                    setShowAddClientModal(true);
-                  }}
-                  className="bg-blue-600 hover:bg-blue-700"
-                >
-                  <Plus size={20} className="mr-2" />
-                  Adicionar Cliente
-                </Button>
+                <div className="flex space-x-2">
+                  <Button
+                    onClick={() => {
+                      setEditingClient(null);
+                      setNewClientData({
+                        name: '',
+                        age: '',
+                        gender: '',
+                        weight: '',
+                        height: '',
+                        activityLevel: '',
+                        goal: '',
+                        trainingFrequency: '',
+                        observations: '',
+                        isVegan: false,
+                        isIntolerant: false
+                      });
+                      setShowAddClientModal(true);
+                    }}
+                    className="bg-blue-600 hover:bg-blue-700"
+                  >
+                    <Plus size={20} className="mr-2" />
+                    Adicionar Cliente
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      localStorage.removeItem('hatch_clients');
+                      setClients(initialClients);
+                      showPushNotification('Dados resetados com sucesso!', 'info');
+                    }}
+                    variant="outline"
+                    className="bg-red-50 border-red-200 text-red-600 hover:bg-red-100"
+                  >
+                    🔄 Reset Dados
+                  </Button>
+                </div>
               </div>
               
-              {mockClients.length > 0 ? (
+              {clients.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {mockClients.map((client) => (
+                  {clients.map((client) => (
                     <Card key={client.id} className="p-6">
                       <div className="flex items-start justify-between mb-4">
                         <div className="flex items-center space-x-3">
@@ -570,6 +783,18 @@ const NutriPlan = () => {
                       </div>
                       
                       <div className="flex space-x-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            // Lógica para Ver mais (pode abrir modal de visualização)
+                            setSelectedClient(client);
+                            setShowViewClientModal(true);
+                          }}
+                          className="flex-1"
+                        >
+                          Ver mais
+                        </Button>
                         <Button
                           size="sm"
                           variant="outline"
@@ -608,7 +833,7 @@ const NutriPlan = () => {
                           className="flex-1 bg-green-600 hover:bg-green-700"
                         >
                           <Utensils size={16} className="mr-1" />
-                          Dieta
+                          Gerar nova dieta
                         </Button>
                       </div>
                     </Card>
@@ -1062,17 +1287,16 @@ const NutriPlan = () => {
           setShowAddClientModal(false);
           setEditingClient(null);
         }}
-        onSave={(clientData, editingClient) => {
+        onAddClient={(clientData) => {
           if (editingClient) {
             // Editar cliente existente
-            const clientIndex = mockClients.findIndex(c => c.id === editingClient.id);
-            if (clientIndex !== -1) {
-              mockClients[clientIndex] = {
-                ...editingClient,
-                ...clientData,
-                updatedAt: new Date().toISOString()
-              };
-            }
+            setClients(prevClients => 
+              prevClients.map(client => 
+                client.id === editingClient.id 
+                  ? { ...client, ...clientData, updatedAt: new Date().toISOString() }
+                  : client
+              )
+            );
             showPushNotification('Cliente atualizado com sucesso!', 'success');
           } else {
             // Criar novo cliente
@@ -1084,16 +1308,14 @@ const NutriPlan = () => {
               status: 'active'
             };
             
-            // Adicionar à lista de clientes (simulação)
-            mockClients.push(newClient);
+            // Adicionar à lista de clientes
+            setClients(prevClients => [...prevClients, newClient]);
             showPushNotification('Cliente adicionado com sucesso!', 'success');
           }
           
           setEditingClient(null);
           setShowAddClientModal(false);
         }}
-        editingClient={editingClient}
-        showNotification={showPushNotification}
       />
 
       {/* Client Selector Modal */}
@@ -1109,7 +1331,7 @@ const NutriPlan = () => {
           </div>
           
           <div className="max-h-96 overflow-y-auto space-y-2">
-            {mockClients.map((client) => (
+            {clients.map((client) => (
               <div
                 key={client.id}
                 className="p-3 border border-gray-200 rounded-lg hover:bg-blue-50 transition-colors cursor-pointer"

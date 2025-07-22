@@ -10,13 +10,14 @@ const AddClientModal = ({
 }) => {
   const [clientData, setClientData] = useState({
     name: '',
+    email: '',
+    phone: '',
     age: '',
     gender: '',
     weight: '',
     height: '',
-    activityLevel: '',
     goal: '',
-    trainingFrequency: '',
+    activityLevel: '',
     observations: '',
     isVegan: false,
     isIntolerant: false,
@@ -34,13 +35,14 @@ const AddClientModal = ({
     if (editingClient) {
       setClientData({
         name: editingClient.name || '',
+        email: editingClient.email || '',
+        phone: editingClient.phone || '',
         age: editingClient.age?.toString() || '',
         gender: editingClient.gender || '',
         weight: editingClient.weight?.toString() || '',
         height: editingClient.height?.toString() || '',
-        activityLevel: editingClient.activityLevel || '',
         goal: editingClient.goal || '',
-        trainingFrequency: editingClient.trainingFrequency || '',
+        activityLevel: editingClient.activityLevel || '',
         observations: editingClient.observations || '',
         isVegan: editingClient.isVegan || '',
         isIntolerant: editingClient.isIntolerant || '',
@@ -54,16 +56,17 @@ const AddClientModal = ({
       // Limpar formulário para novo cliente
       setClientData({
         name: '',
+        email: '',
+        phone: '',
         age: '',
         gender: '',
         weight: '',
         height: '',
-        activityLevel: '',
         goal: '',
-        trainingFrequency: '',
-        observations: '',
-        isVegan: '',
-        isIntolerant: '',
+        activityLevel: '',
+      observations: '',
+      isVegan: false,
+      isIntolerant: false,
         intolerances: '',
         medicalConditions: '',
         currentMedications: '',
@@ -78,13 +81,15 @@ const AddClientModal = ({
     const newErrors = {};
     
     if (!clientData.name.trim()) newErrors.name = 'Nome é obrigatório';
+    if (!clientData.email.trim()) newErrors.email = 'Email é obrigatório';
+    else if (!/\S+@\S+\.\S+/.test(clientData.email)) newErrors.email = 'Email inválido';
+    if (!clientData.phone.trim()) newErrors.phone = 'Telefone é obrigatório';
     if (!clientData.age || clientData.age < 1 || clientData.age > 120) newErrors.age = 'Idade deve estar entre 1 e 120 anos';
     if (!clientData.gender) newErrors.gender = 'Gênero é obrigatório';
     if (!clientData.weight || clientData.weight < 20 || clientData.weight > 300) newErrors.weight = 'Peso deve estar entre 20 e 300 kg';
     if (!clientData.height || clientData.height < 100 || clientData.height > 250) newErrors.height = 'Altura deve estar entre 100 e 250 cm';
-    if (!clientData.activityLevel) newErrors.activityLevel = 'Nível de atividade é obrigatório';
     if (!clientData.goal) newErrors.goal = 'Objetivo é obrigatório';
-    if (!clientData.trainingFrequency) newErrors.trainingFrequency = 'Frequência de treino é obrigatória';
+    if (!clientData.activityLevel) newErrors.activityLevel = 'Nível de atividade é obrigatório';
     
     if (clientData.isIntolerant && !clientData.intolerances.trim()) {
       newErrors.intolerances = 'Especifique as intolerâncias';
@@ -114,13 +119,14 @@ const AddClientModal = ({
   const handleClose = () => {
     setClientData({
       name: '',
+      email: '',
+      phone: '',
       age: '',
       gender: '',
       weight: '',
       height: '',
-      activityLevel: '',
       goal: '',
-      trainingFrequency: '',
+      activityLevel: '',
       observations: '',
       isVegan: false,
       isIntolerant: false,
@@ -172,6 +178,38 @@ const AddClientModal = ({
                   placeholder="Digite o nome do cliente"
                 />
                 {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Email *
+                </label>
+                <input
+                  type="email"
+                  value={clientData.email}
+                  onChange={(e) => setClientData({...clientData, email: e.target.value})}
+                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                    errors.email ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                  placeholder="email@exemplo.com"
+                />
+                {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Telefone *
+                </label>
+                <input
+                  type="tel"
+                  value={clientData.phone}
+                  onChange={(e) => setClientData({...clientData, phone: e.target.value})}
+                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                    errors.phone ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                  placeholder="(11) 99999-9999"
+                />
+                {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
               </div>
 
               <div>
@@ -248,26 +286,7 @@ const AddClientModal = ({
                 {errors.height && <p className="text-red-500 text-sm mt-1">{errors.height}</p>}
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Nível de Atividade *
-                </label>
-                <select
-                  value={clientData.activityLevel}
-                  onChange={(e) => setClientData({...clientData, activityLevel: e.target.value})}
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                    errors.activityLevel ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                >
-                  <option value="">Selecione o nível</option>
-                  <option value="sedentario">Sedentário</option>
-                  <option value="leve">Levemente ativo</option>
-                  <option value="moderado">Moderadamente ativo</option>
-                  <option value="intenso">Muito ativo</option>
-                  <option value="extremo">Extremamente ativo</option>
-                </select>
-                {errors.activityLevel && <p className="text-red-500 text-sm mt-1">{errors.activityLevel}</p>}
-              </div>
+
             </div>
           </div>
 
@@ -298,25 +317,25 @@ const AddClientModal = ({
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Frequência de Treino *
+                  Nível de Atividade *
                 </label>
                 <select
-                  value={clientData.trainingFrequency}
-                  onChange={(e) => setClientData({...clientData, trainingFrequency: e.target.value})}
+                  value={clientData.activityLevel}
+                  onChange={(e) => setClientData({...clientData, activityLevel: e.target.value})}
                   className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                    errors.trainingFrequency ? 'border-red-500' : 'border-gray-300'
+                    errors.activityLevel ? 'border-red-500' : 'border-gray-300'
                   }`}
                 >
-                  <option value="">Selecione a frequência</option>
-                  <option value="1x por semana">1x por semana</option>
-                  <option value="2x por semana">2x por semana</option>
-                  <option value="3x por semana">3x por semana</option>
-                  <option value="4x por semana">4x por semana</option>
-                  <option value="5x por semana">5x por semana</option>
-                  <option value="6x por semana">6x por semana</option>
-                  <option value="Todos os dias">Todos os dias</option>
+                  <option value="">Selecione o nível de atividade</option>
+                  <option value="sedentary">Sedentário - 1x por semana</option>
+                  <option value="light">Levemente ativo - 2x por semana</option>
+                  <option value="moderate">Moderadamente ativo - 3x por semana</option>
+                  <option value="active">Ativo - 4x por semana</option>
+                  <option value="very_active">Muito ativo - 5x por semana</option>
+                  <option value="extremely_active">Extremamente ativo - 6x por semana</option>
+                  <option value="super_active">Super ativo - 7x por semana</option>
                 </select>
-                {errors.trainingFrequency && <p className="text-red-500 text-sm mt-1">{errors.trainingFrequency}</p>}
+                {errors.activityLevel && <p className="text-red-500 text-sm mt-1">{errors.activityLevel}</p>}
               </div>
             </div>
           </div>

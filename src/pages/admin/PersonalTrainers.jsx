@@ -1,8 +1,43 @@
 import React, { useState } from 'react';
 import { Users2, Plus, Search, Filter, Edit, Trash2, Eye, Star, Award } from 'lucide-react';
-import Card from '../../components/shared/Card';
-import Button from '../../components/shared/Button';
-import Input from '../../components/shared/Input';
+
+// Componentes simulados (normalmente viriam de arquivos separados)
+const Card = ({ children, className = "", ...props }) => (
+  <div className={`bg-white rounded-lg shadow-md border border-gray-200 ${className}`} {...props}>
+    {children}
+  </div>
+);
+
+const Button = ({ children, variant = "primary", size = "md", className = "", ...props }) => {
+  const baseClasses = "inline-flex items-center justify-center gap-2 font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2";
+  const variants = {
+    primary: "bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500",
+    outline: "border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 focus:ring-blue-500"
+  };
+  const sizes = {
+    sm: "px-3 py-2 text-sm",
+    md: "px-4 py-2 text-sm"
+  };
+  
+  return (
+    <button 
+      className={`${baseClasses} ${variants[variant]} ${sizes[size]} ${className}`} 
+      {...props}
+    >
+      {children}
+    </button>
+  );
+};
+
+const Input = ({ label, className = "", ...props }) => (
+  <div className="space-y-1">
+    {label && <label className="block text-sm font-medium text-gray-700">{label}</label>}
+    <input 
+      className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${className}`}
+      {...props} 
+    />
+  </div>
+);
 
 const PersonalTrainersPage = ({ 
   setShowAddTrainerModal, 

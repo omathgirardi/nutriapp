@@ -346,6 +346,7 @@ const NutriPlan = () => {
     weight: '',
     height: '',
     gender: 'male',
+
     activityLevel: 'moderate',
     goal: 'maintenance',
     restrictions: '',

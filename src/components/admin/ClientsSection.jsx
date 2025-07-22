@@ -24,7 +24,7 @@ import {
   Download,
   Upload
 } from 'lucide-react';
-import { useClients } from '../hooks/useNutriService.js';
+import { useClients } from '../../hooks/useNutriService.js';
 import { Button, Card, Input, Select, Modal } from './index.js';
 
 const ClientsSection = () => {
@@ -55,6 +55,8 @@ const ClientsSection = () => {
   const [itemsPerPage] = useState(10);
   const [sortBy, setSortBy] = useState('name');
   const [sortOrder, setSortOrder] = useState('asc');
+  const [viewMode, setViewMode] = useState('cards'); // 'cards' ou 'table'
+  const [expandedCards, setExpandedCards] = useState(new Set());
   
   // Formulário do cliente
   const [clientForm, setClientForm] = useState({
@@ -65,6 +67,7 @@ const ClientsSection = () => {
     weight: '',
     height: '',
     gender: 'male',
+
     activityLevel: 'moderate',
     goal: 'maintenance',
     restrictions: '',
@@ -95,7 +98,6 @@ const ClientsSection = () => {
       weight: '',
       height: '',
       gender: 'male',
-      activityLevel: 'moderate',
       goal: 'maintenance',
       restrictions: '',
       isVegan: false,
@@ -181,6 +183,17 @@ const ClientsSection = () => {
     setShowDeleteModal(true);
   };
 
+  // Expandir/contrair card no mobile
+  const toggleCardExpansion = (clientId) => {
+    const newExpanded = new Set(expandedCards);
+    if (newExpanded.has(clientId)) {
+      newExpanded.delete(clientId);
+    } else {
+      newExpanded.add(clientId);
+    }
+    setExpandedCards(newExpanded);
+  };
+
   // Salvar cliente
   const handleSaveClient = async (e) => {
     e.preventDefault();
@@ -197,8 +210,7 @@ const ClientsSection = () => {
       age: 'Idade',
       weight: 'Peso',
       height: 'Altura',
-      goal: 'Objetivo',
-      activityLevel: 'Nível de atividade'
+      goal: 'Objetivo'
     };
     
     for (const [field, label] of Object.entries(requiredFields)) {
@@ -414,131 +426,153 @@ const ClientsSection = () => {
         </Card>
       ) : (
         <>
-          {/* Tabela de clientes */}
-          <Card className="overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Cliente
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Contato
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Dados Físicos
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Objetivo
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Ações
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {paginatedClients.map((client) => {
-                    const bmi = calculateBMI(client.weight, client.height);
-                    const bmiStatus = getBMIStatus(bmi);
+          {/* Cards de clientes */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {paginatedClients.map((client) => {
+              const bmi = calculateBMI(client.weight, client.height);
+              const bmiStatus = getBMIStatus(bmi);
+              const isExpanded = expandedCards.has(client.id);
+              
+              return (
+                <Card key={client.id} className="p-6 hover:shadow-lg transition-shadow">
+                  {/* Header do card */}
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center space-x-3">
+                      <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                        <User size={24} className="text-blue-600" />
+                      </div>
+                      <div className="min-w-0">
+                        <h3 className="text-lg font-semibold text-gray-900 truncate">{client.name}</h3>
+                        <p className="text-sm text-gray-500">
+                          {client.age} anos • {client.gender === 'male' ? 'Masculino' : 'Feminino'}
+                        </p>
+                      </div>
+                    </div>
+                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                      client.status === 'active'
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-gray-100 text-gray-800'
+                    }`}>
+                      {client.status === 'active' ? 'Ativo' : 'Inativo'}
+                    </span>
+                  </div>
+
+                  {/* Informações principais (sempre visíveis) */}
+                  <div className="space-y-3 mb-4">
+                    <div className="flex items-center text-sm text-gray-600">
+                      <Mail size={16} className="mr-2 text-gray-400" />
+                      <span className="truncate">{client.email}</span>
+                    </div>
+                    <div className="flex items-center text-sm text-gray-600">
+                      <Phone size={16} className="mr-2 text-gray-400" />
+                      <span>{client.phone}</span>
+                    </div>
+                  </div>
+
+                  {/* Informações expandidas (ocultas por padrão) */}
+                  <div className={`space-y-3 mb-4 ${
+                    isExpanded ? 'block' : 'hidden'
+                  }`}>
+                    <div className="flex items-center text-sm text-gray-600">
+                      <Activity size={16} className="mr-2 text-gray-400" />
+                      <span>{client.weight}kg • {client.height}cm</span>
+                      {bmi && (
+                        <span className={`ml-2 px-2 py-1 text-xs font-semibold rounded-full bg-${bmiStatus.color}-100 text-${bmiStatus.color}-800`}>
+                          IMC: {bmi}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center text-sm text-gray-600">
+                      <Target size={16} className="mr-2 text-gray-400" />
+                      <span>
+                        {client.goal === 'weight_loss' && 'Perda de peso'}
+                        {client.goal === 'weight_gain' && 'Ganho de peso'}
+                        {client.goal === 'maintenance' && 'Manutenção'}
+                        {client.goal === 'muscle_gain' && 'Ganho muscular'}
+                      </span>
+                    </div>
+                    <div className="border-t pt-3">
+                      <h4 className="text-sm font-medium text-gray-900 mb-2">Nível de Atividade</h4>
+                      <p className="text-sm text-gray-600">
+                        {client.activityLevel === 'sedentary' && 'Sedentário - 1x por semana'}
+                        {client.activityLevel === 'light' && 'Levemente ativo - 2x por semana'}
+                        {client.activityLevel === 'moderate' && 'Moderadamente ativo - 3x por semana'}
+                        {client.activityLevel === 'active' && 'Ativo - 4x por semana'}
+                        {client.activityLevel === 'very_active' && 'Muito ativo - 5x por semana'}
+                        {client.activityLevel === 'extremely_active' && 'Extremamente ativo - 6x por semana'}
+                        {client.activityLevel === 'super_active' && 'Super ativo - 7x por semana'}
+                      </p>
+                    </div>
                     
-                    return (
-                      <tr key={client.id} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center">
-                            <div className="flex-shrink-0 h-10 w-10">
-                              <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                                <User size={20} className="text-blue-600" />
-                              </div>
-                            </div>
-                            <div className="ml-4">
-                              <div className="text-sm font-medium text-gray-900">
-                                {client.name}
-                              </div>
-                              <div className="text-sm text-gray-500">
-                                {client.age} anos • {client.gender === 'male' ? 'Masculino' : 'Feminino'}
-                              </div>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">{client.email}</div>
-                          <div className="text-sm text-gray-500">{client.phone}</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">
-                            {client.weight}kg • {client.height}cm
-                          </div>
-                          {bmi && (
-                            <div className="text-sm">
-                              <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-${bmiStatus.color}-100 text-${bmiStatus.color}-800`}>
-                                IMC: {bmi}
-                              </span>
-                            </div>
+                    {client.restrictions && (
+                      <div>
+                        <h4 className="text-sm font-medium text-gray-900 mb-1">Restrições Alimentares</h4>
+                        <p className="text-sm text-gray-600 bg-yellow-50 p-2 rounded">{client.restrictions}</p>
+                      </div>
+                    )}
+                    
+                    {(client.isVegan || client.isIntolerant) && (
+                      <div>
+                        <h4 className="text-sm font-medium text-gray-900 mb-1">Características</h4>
+                        <div className="flex gap-2">
+                          {client.isVegan && (
+                            <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">Vegano</span>
                           )}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">
-                            {client.goal === 'weight_loss' && 'Perda de peso'}
-                            {client.goal === 'weight_gain' && 'Ganho de peso'}
-                            {client.goal === 'maintenance' && 'Manutenção'}
-                            {client.goal === 'muscle_gain' && 'Ganho muscular'}
-                          </div>
-                          <div className="text-sm text-gray-500">
-                            {client.activityLevel === 'sedentary' && 'Sedentário'}
-                            {client.activityLevel === 'light' && 'Leve'}
-                            {client.activityLevel === 'moderate' && 'Moderado'}
-                            {client.activityLevel === 'intense' && 'Intenso'}
-                            {client.activityLevel === 'very_intense' && 'Muito intenso'}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                            client.status === 'active'
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-gray-100 text-gray-800'
-                          }`}>
-                            {client.status === 'active' ? 'Ativo' : 'Inativo'}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                          <div className="flex items-center justify-end space-x-2">
-                            <Button
-                              onClick={() => handleViewClient(client)}
-                              variant="outline"
-                              size="sm"
-                              className="p-2"
-                            >
-                              <Eye size={16} />
-                            </Button>
-                            <Button
-                              onClick={() => handleEditClient(client)}
-                              variant="outline"
-                              size="sm"
-                              className="p-2"
-                            >
-                              <Edit size={16} />
-                            </Button>
-                            <Button
-                              onClick={() => handleDeleteClient(client)}
-                              variant="outline"
-                              size="sm"
-                              className="p-2 text-red-600 hover:text-red-700"
-                            >
-                              <Trash2 size={16} />
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </Card>
+                          {client.isIntolerant && (
+                            <span className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-full">Intolerante</span>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                    
+                    {client.notes && (
+                      <div>
+                        <h4 className="text-sm font-medium text-gray-900 mb-1">Observações</h4>
+                        <p className="text-sm text-gray-600 bg-gray-50 p-2 rounded">{client.notes}</p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Botões de ação */}
+                  <div className="flex items-center justify-between pt-3 border-t">
+                    <Button
+                      onClick={() => toggleCardExpansion(client.id)}
+                      variant="outline"
+                      size="sm"
+                    >
+                      {isExpanded ? 'Ver menos' : 'Ver mais'}
+                    </Button>
+                    <div className="flex items-center space-x-2 ml-auto">
+                      <Button
+                        onClick={() => handleEditClient(client)}
+                        variant="outline"
+                        size="sm"
+                        className="p-2"
+                      >
+                        <Edit size={16} />
+                      </Button>
+                      <Button
+                        onClick={() => handleViewClient(client)}
+                        variant="outline"
+                        size="sm"
+                        className="p-2"
+                      >
+                        <Eye size={16} />
+                      </Button>
+                      <Button
+                        onClick={() => handleDeleteClient(client)}
+                        variant="outline"
+                        size="sm"
+                        className="p-2 text-red-600 hover:text-red-700"
+                      >
+                        <Trash2 size={16} />
+                      </Button>
+                    </div>
+                  </div>
+                </Card>
+              );
+            })}
+          </div>
 
           {/* Paginação */}
           {totalPages > 1 && (
@@ -699,17 +733,20 @@ const ClientsSection = () => {
                 <option value="muscle_gain">Ganho muscular</option>
               </Select>
               <Select
-                label="Nível de atividade"
+                label="Nível de Atividade"
                 value={clientForm.activityLevel}
                 onChange={(e) => setClientForm({ ...clientForm, activityLevel: e.target.value })}
                 required
               >
-                <option value="sedentary">Sedentário</option>
-                <option value="light">Leve (1-3 dias/semana)</option>
-                <option value="moderate">Moderado (3-5 dias/semana)</option>
-                <option value="intense">Intenso (6-7 dias/semana)</option>
-                <option value="very_intense">Muito intenso (2x/dia)</option>
+                <option value="sedentary">Sedentário - 1x por semana</option>
+                <option value="light">Levemente ativo - 2x por semana</option>
+                <option value="moderate">Moderadamente ativo - 3x por semana</option>
+                <option value="active">Ativo - 4x por semana</option>
+                <option value="very_active">Muito ativo - 5x por semana</option>
+                <option value="extremely_active">Extremamente ativo - 6x por semana</option>
+                <option value="super_active">Super ativo - 7x por semana</option>
               </Select>
+
             </div>
           </div>
 
@@ -935,13 +972,16 @@ const ClientsSection = () => {
                 <div className="p-4 bg-green-50 rounded-lg">
                   <div className="text-sm text-green-600 font-medium">Nível de Atividade</div>
                   <div className="text-green-900 font-semibold">
-                    {selectedClient.activityLevel === 'sedentary' && 'Sedentário'}
-                    {selectedClient.activityLevel === 'light' && 'Leve'}
-                    {selectedClient.activityLevel === 'moderate' && 'Moderado'}
-                    {selectedClient.activityLevel === 'intense' && 'Intenso'}
-                    {selectedClient.activityLevel === 'very_intense' && 'Muito intenso'}
+                    {selectedClient.activityLevel === 'sedentary' && 'Sedentário - 1x por semana'}
+                    {selectedClient.activityLevel === 'light' && 'Levemente ativo - 2x por semana'}
+                    {selectedClient.activityLevel === 'moderate' && 'Moderadamente ativo - 3x por semana'}
+                    {selectedClient.activityLevel === 'active' && 'Ativo - 4x por semana'}
+                    {selectedClient.activityLevel === 'very_active' && 'Muito ativo - 5x por semana'}
+                    {selectedClient.activityLevel === 'extremely_active' && 'Extremamente ativo - 6x por semana'}
+                    {selectedClient.activityLevel === 'super_active' && 'Super ativo - 7x por semana'}
                   </div>
                 </div>
+
               </div>
             </div>
 

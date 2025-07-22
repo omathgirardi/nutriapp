@@ -1,6 +1,712 @@
 // <stdin>
 import React, { useState, useEffect } from "https://esm.sh/react@18.2.0";
 import { motion, AnimatePresence } from "https://esm.sh/framer-motion?deps=react@18.2.0,react-dom@18.2.0";
+// AddClientModal component inline
+const AddClientModal = ({ isOpen, onClose, onSave, editingClient = null, showNotification }) => {
+  const [clientData, setClientData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    age: '',
+    gender: '',
+    weight: '',
+    height: '',
+    activityLevel: 'moderate',
+    goal: '',
+    observations: ''
+  });
+
+  const [errors, setErrors] = useState({});
+
+  useEffect(() => {
+    if (editingClient) {
+      setClientData({
+        name: editingClient.name || '',
+        email: editingClient.email || '',
+        phone: editingClient.phone || '',
+        age: editingClient.age?.toString() || '',
+        gender: editingClient.gender || '',
+        weight: editingClient.weight?.toString() || '',
+        height: editingClient.height?.toString() || '',
+        activityLevel: editingClient.activityLevel || 'moderate',
+        goal: editingClient.goal || '',
+        observations: editingClient.observations || ''
+      });
+    } else {
+      setClientData({
+        name: '',
+        email: '',
+        phone: '',
+        age: '',
+        gender: '',
+        weight: '',
+        height: '',
+        activityLevel: 'moderate',
+        goal: '',
+        observations: ''
+      });
+    }
+    setErrors({});
+  }, [editingClient, isOpen]);
+
+  const validateForm = () => {
+    const newErrors = {};
+    if (!clientData.name.trim()) newErrors.name = 'Nome é obrigatório';
+    if (!clientData.email.trim()) newErrors.email = 'Email é obrigatório';
+    else if (!/\S+@\S+\.\S+/.test(clientData.email)) newErrors.email = 'Email inválido';
+    if (!clientData.phone.trim()) newErrors.phone = 'Telefone é obrigatório';
+    if (!clientData.age || clientData.age < 1 || clientData.age > 120) newErrors.age = 'Idade deve estar entre 1 e 120 anos';
+    if (!clientData.gender) newErrors.gender = 'Gênero é obrigatório';
+    if (!clientData.weight || clientData.weight < 20 || clientData.weight > 300) newErrors.weight = 'Peso deve estar entre 20 e 300 kg';
+    if (!clientData.height || clientData.height < 100 || clientData.height > 250) newErrors.height = 'Altura deve estar entre 100 e 250 cm';
+    if (!clientData.activityLevel) newErrors.activityLevel = 'Nível de atividade é obrigatório';
+    if (!clientData.goal) newErrors.goal = 'Objetivo é obrigatório';
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSave = () => {
+    if (!validateForm()) {
+      showNotification?.('Por favor, corrija os erros no formulário!', 'error');
+      return;
+    }
+    const clientToSave = {
+      ...clientData,
+      age: parseInt(clientData.age),
+      weight: parseFloat(clientData.weight),
+      height: parseInt(clientData.height)
+    };
+    onSave(clientToSave, editingClient);
+    onClose();
+  };
+
+  const handleClose = () => {
+    setClientData({
+      name: '',
+      email: '',
+      phone: '',
+      age: '',
+      gender: '',
+      weight: '',
+      height: '',
+      activityLevel: '',
+      goal: '',
+      observations: ''
+    });
+    setErrors({});
+    onClose();
+  };
+
+  if (!isOpen) return null;
+
+  return /* @__PURE__ */ React.createElement(
+    "div",
+    { className: "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" },
+    /* @__PURE__ */ React.createElement(
+      "div",
+      { className: "bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto" },
+      /* @__PURE__ */ React.createElement(
+        "div",
+        { className: "flex items-center justify-between p-6 border-b border-gray-200" },
+        /* @__PURE__ */ React.createElement(
+          "h2",
+          { className: "text-xl font-semibold text-gray-900" },
+          editingClient ? 'Editar Cliente' : 'Adicionar Novo Cliente'
+        ),
+        /* @__PURE__ */ React.createElement(
+          "button",
+          { onClick: handleClose, className: "text-gray-400 hover:text-gray-600 transition-colors" },
+          /* @__PURE__ */ React.createElement(X, { size: 24 })
+        )
+      ),
+      /* @__PURE__ */ React.createElement(
+        "div",
+        { className: "p-6 space-y-4" },
+        /* @__PURE__ */ React.createElement(
+          "div",
+          { className: "grid grid-cols-1 md:grid-cols-2 gap-4" },
+          /* @__PURE__ */ React.createElement(
+            "div",
+            null,
+            /* @__PURE__ */ React.createElement(
+              "label",
+              { className: "block text-sm font-medium text-gray-700 mb-2" },
+              "Nome Completo *"
+            ),
+            /* @__PURE__ */ React.createElement(
+              "input",
+              {
+                type: "text",
+                value: clientData.name,
+                onChange: (e) => setClientData({...clientData, name: e.target.value}),
+                className: `w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.name ? 'border-red-500' : 'border-gray-300'}`,
+                placeholder: "Digite o nome do cliente"
+              }
+            ),
+            errors.name && /* @__PURE__ */ React.createElement("p", { className: "text-red-500 text-sm mt-1" }, errors.name)
+          ),
+          /* @__PURE__ */ React.createElement(
+            "div",
+            null,
+            /* @__PURE__ */ React.createElement(
+              "label",
+              { className: "block text-sm font-medium text-gray-700 mb-2" },
+              "Email *"
+            ),
+            /* @__PURE__ */ React.createElement(
+              "input",
+              {
+                type: "email",
+                value: clientData.email,
+                onChange: (e) => setClientData({...clientData, email: e.target.value}),
+                className: `w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.email ? 'border-red-500' : 'border-gray-300'}`,
+                placeholder: "email@exemplo.com"
+              }
+            ),
+            errors.email && /* @__PURE__ */ React.createElement("p", { className: "text-red-500 text-sm mt-1" }, errors.email)
+          ),
+          /* @__PURE__ */ React.createElement(
+            "div",
+            null,
+            /* @__PURE__ */ React.createElement(
+              "label",
+              { className: "block text-sm font-medium text-gray-700 mb-2" },
+              "Telefone *"
+            ),
+            /* @__PURE__ */ React.createElement(
+              "input",
+              {
+                type: "tel",
+                value: clientData.phone,
+                onChange: (e) => setClientData({...clientData, phone: e.target.value}),
+                className: `w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.phone ? 'border-red-500' : 'border-gray-300'}`,
+                placeholder: "(11) 99999-9999"
+              }
+            ),
+            errors.phone && /* @__PURE__ */ React.createElement("p", { className: "text-red-500 text-sm mt-1" }, errors.phone)
+          ),
+          /* @__PURE__ */ React.createElement(
+            "div",
+            null,
+            /* @__PURE__ */ React.createElement(
+              "label",
+              { className: "block text-sm font-medium text-gray-700 mb-2" },
+              "Idade *"
+            ),
+            /* @__PURE__ */ React.createElement(
+              "input",
+              {
+                type: "number",
+                value: clientData.age,
+                onChange: (e) => setClientData({...clientData, age: e.target.value}),
+                className: `w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.age ? 'border-red-500' : 'border-gray-300'}`,
+                placeholder: "Idade em anos",
+                min: "1",
+                max: "120"
+              }
+            ),
+            errors.age && /* @__PURE__ */ React.createElement("p", { className: "text-red-500 text-sm mt-1" }, errors.age)
+          ),
+          /* @__PURE__ */ React.createElement(
+            "div",
+            null,
+            /* @__PURE__ */ React.createElement(
+              "label",
+              { className: "block text-sm font-medium text-gray-700 mb-2" },
+              "Gênero *"
+            ),
+            /* @__PURE__ */ React.createElement(
+              "select",
+              {
+                value: clientData.gender,
+                onChange: (e) => setClientData({...clientData, gender: e.target.value}),
+                className: `w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.gender ? 'border-red-500' : 'border-gray-300'}`
+              },
+              /* @__PURE__ */ React.createElement("option", { value: "" }, "Selecione o gênero"),
+              /* @__PURE__ */ React.createElement("option", { value: "masculino" }, "Masculino"),
+              /* @__PURE__ */ React.createElement("option", { value: "feminino" }, "Feminino"),
+              /* @__PURE__ */ React.createElement("option", { value: "outro" }, "Outro")
+            ),
+            errors.gender && /* @__PURE__ */ React.createElement("p", { className: "text-red-500 text-sm mt-1" }, errors.gender)
+          ),
+          /* @__PURE__ */ React.createElement(
+            "div",
+            null,
+            /* @__PURE__ */ React.createElement(
+              "label",
+              { className: "block text-sm font-medium text-gray-700 mb-2" },
+              "Peso (kg) *"
+            ),
+            /* @__PURE__ */ React.createElement(
+              "input",
+              {
+                type: "number",
+                step: "0.1",
+                value: clientData.weight,
+                onChange: (e) => setClientData({...clientData, weight: e.target.value}),
+                className: `w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.weight ? 'border-red-500' : 'border-gray-300'}`,
+                placeholder: "Peso em kg",
+                min: "20",
+                max: "300"
+              }
+            ),
+            errors.weight && /* @__PURE__ */ React.createElement("p", { className: "text-red-500 text-sm mt-1" }, errors.weight)
+          ),
+          /* @__PURE__ */ React.createElement(
+            "div",
+            null,
+            /* @__PURE__ */ React.createElement(
+              "label",
+              { className: "block text-sm font-medium text-gray-700 mb-2" },
+              "Altura (cm) *"
+            ),
+            /* @__PURE__ */ React.createElement(
+              "input",
+              {
+                type: "number",
+                value: clientData.height,
+                onChange: (e) => setClientData({...clientData, height: e.target.value}),
+                className: `w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.height ? 'border-red-500' : 'border-gray-300'}`,
+                placeholder: "Altura em cm",
+                min: "100",
+                max: "250"
+              }
+            ),
+            errors.height && /* @__PURE__ */ React.createElement("p", { className: "text-red-500 text-sm mt-1" }, errors.height)
+          ),
+
+          /* @__PURE__ */ React.createElement(
+            "div",
+            null,
+            /* @__PURE__ */ React.createElement(
+              "label",
+              { className: "block text-sm font-medium text-gray-700 mb-2" },
+              "Objetivo *"
+            ),
+            /* @__PURE__ */ React.createElement(
+              "select",
+              {
+                value: clientData.goal,
+                onChange: (e) => setClientData({...clientData, goal: e.target.value}),
+                className: `w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.goal ? 'border-red-500' : 'border-gray-300'}`
+              },
+              /* @__PURE__ */ React.createElement("option", { value: "" }, "Selecione o objetivo"),
+              /* @__PURE__ */ React.createElement("option", { value: "Perda de peso" }, "Perda de peso"),
+              /* @__PURE__ */ React.createElement("option", { value: "Ganho de massa" }, "Ganho de massa"),
+              /* @__PURE__ */ React.createElement("option", { value: "Manutenção" }, "Manutenção"),
+              /* @__PURE__ */ React.createElement("option", { value: "Recomposição" }, "Recomposição corporal"),
+              /* @__PURE__ */ React.createElement("option", { value: "Performance" }, "Melhora de performance")
+            ),
+            errors.goal && /* @__PURE__ */ React.createElement("p", { className: "text-red-500 text-sm mt-1" }, errors.goal)
+          ),
+          /* @__PURE__ */ React.createElement(
+            "div",
+            null,
+            /* @__PURE__ */ React.createElement(
+              "label",
+              { className: "block text-sm font-medium text-gray-700 mb-2" },
+              "Nível de Atividade *"
+            ),
+            /* @__PURE__ */ React.createElement(
+              "select",
+              {
+                value: clientData.activityLevel,
+                onChange: (e) => setClientData({...clientData, activityLevel: e.target.value}),
+                className: `w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.activityLevel ? 'border-red-500' : 'border-gray-300'}`
+              },
+              /* @__PURE__ */ React.createElement("option", { value: "" }, "Selecione o nível de atividade"),
+              /* @__PURE__ */ React.createElement("option", { value: "sedentary" }, "Sedentário - 1x por semana"),
+              /* @__PURE__ */ React.createElement("option", { value: "light" }, "Levemente ativo - 2x por semana"),
+              /* @__PURE__ */ React.createElement("option", { value: "moderate" }, "Moderadamente ativo - 3x por semana"),
+              /* @__PURE__ */ React.createElement("option", { value: "active" }, "Ativo - 4x por semana"),
+              /* @__PURE__ */ React.createElement("option", { value: "very_active" }, "Muito ativo - 5x por semana"),
+              /* @__PURE__ */ React.createElement("option", { value: "extremely_active" }, "Extremamente ativo - 6x por semana"),
+              /* @__PURE__ */ React.createElement("option", { value: "super_active" }, "Super ativo - 7x por semana")
+            ),
+            errors.activityLevel && /* @__PURE__ */ React.createElement("p", { className: "text-red-500 text-sm mt-1" }, errors.activityLevel)
+          )
+        ),
+        /* @__PURE__ */ React.createElement(
+          "div",
+          null,
+          /* @__PURE__ */ React.createElement(
+            "label",
+            { className: "block text-sm font-medium text-gray-700 mb-3" },
+            "Restrições Alimentares"
+          ),
+          /* @__PURE__ */ React.createElement(
+            "div",
+            { className: "grid grid-cols-1 md:grid-cols-2 gap-4" },
+            
+            // Dropdown 1: Restrições por escolha
+            /* @__PURE__ */ React.createElement(
+              "div",
+              { className: "relative" },
+              /* @__PURE__ */ React.createElement(
+                "div",
+                {
+                  className: "w-full px-3 py-2 border border-gray-300 rounded-lg bg-white cursor-pointer hover:border-blue-400 transition-colors",
+                  onClick: () => setClientData({...clientData, showChoiceDropdown: !clientData.showChoiceDropdown})
+                },
+                /* @__PURE__ */ React.createElement(
+                  "div",
+                  { className: "flex items-center justify-between" },
+                  /* @__PURE__ */ React.createElement(
+                    "span",
+                    { className: "text-gray-700 text-sm" },
+                    "🌱 Restrições por escolha"
+                  ),
+                  /* @__PURE__ */ React.createElement(
+                    "svg",
+                    {
+                      className: `w-4 h-4 text-gray-400 transition-transform ${clientData.showChoiceDropdown ? 'rotate-180' : ''}`,
+                      fill: "none",
+                      stroke: "currentColor",
+                      viewBox: "0 0 24 24"
+                    },
+                    /* @__PURE__ */ React.createElement("path", {
+                      strokeLinecap: "round",
+                      strokeLinejoin: "round",
+                      strokeWidth: 2,
+                      d: "M19 9l-7 7-7-7"
+                    })
+                  )
+                )
+              ),
+              clientData.showChoiceDropdown && /* @__PURE__ */ React.createElement(
+                "div",
+                { className: "absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg" },
+                /* @__PURE__ */ React.createElement(
+                  "div",
+                  { className: "p-3 space-y-2" },
+                  ["Nenhuma restrição", "Vegano", "Vegetariano", "Ovolactovegetariano", "Pescetariano"].map(restriction => 
+                    /* @__PURE__ */ React.createElement(
+                      "label",
+                      { key: restriction, className: "flex items-center space-x-3 cursor-pointer hover:bg-gray-50 p-2 rounded-md transition-colors" },
+                      /* @__PURE__ */ React.createElement(
+                        "input",
+                        {
+                          type: "checkbox",
+                          checked: (clientData.restrictions || []).includes(restriction),
+                          onChange: (e) => {
+                            const restrictions = clientData.restrictions || [];
+                            if (e.target.checked) {
+                              if (restriction === "Nenhuma restrição") {
+                                // Se "Nenhuma restrição" for selecionada, limpa todas as outras
+                                setClientData({...clientData, restrictions: ["Nenhuma restrição"]});
+                              } else {
+                                // Remove "Nenhuma restrição" se outra opção for selecionada
+                                const newRestrictions = restrictions.filter(r => r !== "Nenhuma restrição");
+                                setClientData({...clientData, restrictions: [...newRestrictions, restriction]});
+                              }
+                            } else {
+                              setClientData({...clientData, restrictions: restrictions.filter(r => r !== restriction)});
+                            }
+                          },
+                          className: "w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                        }
+                      ),
+                      /* @__PURE__ */ React.createElement("span", { className: "text-sm text-gray-700" }, restriction)
+                    )
+                  )
+                )
+              )
+            ),
+            
+            // Dropdown 2: Restrições por saúde
+            /* @__PURE__ */ React.createElement(
+              "div",
+              { className: "relative" },
+              /* @__PURE__ */ React.createElement(
+                "div",
+                {
+                  className: "w-full px-3 py-2 border border-gray-300 rounded-lg bg-white cursor-pointer hover:border-blue-400 transition-colors",
+                  onClick: () => setClientData({...clientData, showHealthDropdown: !clientData.showHealthDropdown})
+                },
+                /* @__PURE__ */ React.createElement(
+                  "div",
+                  { className: "flex items-center justify-between" },
+                  /* @__PURE__ */ React.createElement(
+                    "span",
+                    { className: "text-gray-700 text-sm" },
+                    "🏥 Restrições por saúde"
+                  ),
+                  /* @__PURE__ */ React.createElement(
+                    "svg",
+                    {
+                      className: `w-4 h-4 text-gray-400 transition-transform ${clientData.showHealthDropdown ? 'rotate-180' : ''}`,
+                      fill: "none",
+                      stroke: "currentColor",
+                      viewBox: "0 0 24 24"
+                    },
+                    /* @__PURE__ */ React.createElement("path", {
+                      strokeLinecap: "round",
+                      strokeLinejoin: "round",
+                      strokeWidth: 2,
+                      d: "M19 9l-7 7-7-7"
+                    })
+                  )
+                )
+              ),
+              clientData.showHealthDropdown && /* @__PURE__ */ React.createElement(
+                "div",
+                { className: "absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto" },
+                /* @__PURE__ */ React.createElement(
+                  "div",
+                  { className: "p-3 space-y-2" },
+                  ["Nenhuma restrição", "Intolerância à lactose", "Intolerância ao glúten", "Doença celíaca", "Diabetes", "Hipertensão", "Colesterol alto", "Refluxo gastroesofágico"].map(restriction => 
+                    /* @__PURE__ */ React.createElement(
+                      "label",
+                      { key: restriction, className: "flex items-center space-x-3 cursor-pointer hover:bg-gray-50 p-2 rounded-md transition-colors" },
+                      /* @__PURE__ */ React.createElement(
+                        "input",
+                        {
+                          type: "checkbox",
+                          checked: (clientData.restrictions || []).includes(restriction),
+                          onChange: (e) => {
+                            const restrictions = clientData.restrictions || [];
+                            if (e.target.checked) {
+                              if (restriction === "Nenhuma restrição") {
+                                // Se "Nenhuma restrição" for selecionada, limpa todas as outras
+                                setClientData({...clientData, restrictions: ["Nenhuma restrição"]});
+                              } else {
+                                // Remove "Nenhuma restrição" se outra opção for selecionada
+                                const newRestrictions = restrictions.filter(r => r !== "Nenhuma restrição");
+                                setClientData({...clientData, restrictions: [...newRestrictions, restriction]});
+                              }
+                            } else {
+                              setClientData({...clientData, restrictions: restrictions.filter(r => r !== restriction)});
+                            }
+                          },
+                          className: "w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                        }
+                      ),
+                      /* @__PURE__ */ React.createElement("span", { className: "text-sm text-gray-700" }, restriction)
+                    )
+                  )
+                )
+              )
+            ),
+            
+            // Dropdown 3: Alergias alimentares
+            /* @__PURE__ */ React.createElement(
+              "div",
+              { className: "relative" },
+              /* @__PURE__ */ React.createElement(
+                "div",
+                {
+                  className: "w-full px-3 py-2 border border-gray-300 rounded-lg bg-white cursor-pointer hover:border-blue-400 transition-colors",
+                  onClick: () => setClientData({...clientData, showAllergiesDropdown: !clientData.showAllergiesDropdown})
+                },
+                /* @__PURE__ */ React.createElement(
+                  "div",
+                  { className: "flex items-center justify-between" },
+                  /* @__PURE__ */ React.createElement(
+                    "span",
+                    { className: "text-gray-700 text-sm" },
+                    "⚠️ Alergias alimentares"
+                  ),
+                  /* @__PURE__ */ React.createElement(
+                    "svg",
+                    {
+                      className: `w-4 h-4 text-gray-400 transition-transform ${clientData.showAllergiesDropdown ? 'rotate-180' : ''}`,
+                      fill: "none",
+                      stroke: "currentColor",
+                      viewBox: "0 0 24 24"
+                    },
+                    /* @__PURE__ */ React.createElement("path", {
+                      strokeLinecap: "round",
+                      strokeLinejoin: "round",
+                      strokeWidth: 2,
+                      d: "M19 9l-7 7-7-7"
+                    })
+                  )
+                )
+              ),
+              clientData.showAllergiesDropdown && /* @__PURE__ */ React.createElement(
+                "div",
+                { className: "absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg" },
+                /* @__PURE__ */ React.createElement(
+                  "div",
+                  { className: "p-3 space-y-2" },
+                  ["Nenhuma restrição", "Alergia a frutos do mar", "Alergia a amendoim", "Alergia a castanhas/nozes", "Alergia a ovos", "Alergia a soja", "Alergia a leite"].map(restriction => 
+                    /* @__PURE__ */ React.createElement(
+                      "label",
+                      { key: restriction, className: "flex items-center space-x-3 cursor-pointer hover:bg-gray-50 p-2 rounded-md transition-colors" },
+                      /* @__PURE__ */ React.createElement(
+                        "input",
+                        {
+                          type: "checkbox",
+                          checked: (clientData.restrictions || []).includes(restriction),
+                          onChange: (e) => {
+                            const restrictions = clientData.restrictions || [];
+                            if (e.target.checked) {
+                              if (restriction === "Nenhuma restrição") {
+                                // Se "Nenhuma restrição" for selecionada, limpa todas as outras
+                                setClientData({...clientData, restrictions: ["Nenhuma restrição"]});
+                              } else {
+                                // Remove "Nenhuma restrição" se outra opção for selecionada
+                                const newRestrictions = restrictions.filter(r => r !== "Nenhuma restrição");
+                                setClientData({...clientData, restrictions: [...newRestrictions, restriction]});
+                              }
+                            } else {
+                              setClientData({...clientData, restrictions: restrictions.filter(r => r !== restriction)});
+                            }
+                          },
+                          className: "w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                        }
+                      ),
+                      /* @__PURE__ */ React.createElement("span", { className: "text-sm text-gray-700" }, restriction)
+                    )
+                  )
+                )
+              )
+            ),
+            
+            // Dropdown 4: Outras restrições
+            /* @__PURE__ */ React.createElement(
+              "div",
+              { className: "relative" },
+              /* @__PURE__ */ React.createElement(
+                "div",
+                {
+                  className: "w-full px-3 py-2 border border-gray-300 rounded-lg bg-white cursor-pointer hover:border-blue-400 transition-colors",
+                  onClick: () => setClientData({...clientData, showOthersDropdown: !clientData.showOthersDropdown})
+                },
+                /* @__PURE__ */ React.createElement(
+                  "div",
+                  { className: "flex items-center justify-between" },
+                  /* @__PURE__ */ React.createElement(
+                    "span",
+                    { className: "text-gray-700 text-sm" },
+                    "📋 Outras restrições"
+                  ),
+                  /* @__PURE__ */ React.createElement(
+                    "svg",
+                    {
+                      className: `w-4 h-4 text-gray-400 transition-transform ${clientData.showOthersDropdown ? 'rotate-180' : ''}`,
+                      fill: "none",
+                      stroke: "currentColor",
+                      viewBox: "0 0 24 24"
+                    },
+                    /* @__PURE__ */ React.createElement("path", {
+                      strokeLinecap: "round",
+                      strokeLinejoin: "round",
+                      strokeWidth: 2,
+                      d: "M19 9l-7 7-7-7"
+                    })
+                  )
+                )
+              ),
+              clientData.showOthersDropdown && /* @__PURE__ */ React.createElement(
+                "div",
+                { className: "absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg" },
+                /* @__PURE__ */ React.createElement(
+                  "div",
+                  { className: "p-3 space-y-2" },
+                  ["Nenhuma restrição", "Sem açúcar", "Low carb", "Cetogênica", "Sem sal/sódio", "Halal", "Kosher", "Sem conservantes"].map(restriction => 
+                    /* @__PURE__ */ React.createElement(
+                      "label",
+                      { key: restriction, className: "flex items-center space-x-3 cursor-pointer hover:bg-gray-50 p-2 rounded-md transition-colors" },
+                      /* @__PURE__ */ React.createElement(
+                        "input",
+                        {
+                          type: "checkbox",
+                          checked: (clientData.restrictions || []).includes(restriction),
+                          onChange: (e) => {
+                            const restrictions = clientData.restrictions || [];
+                            if (e.target.checked) {
+                              if (restriction === "Nenhuma restrição") {
+                                // Se "Nenhuma restrição" for selecionada, limpa todas as outras
+                                setClientData({...clientData, restrictions: ["Nenhuma restrição"]});
+                              } else {
+                                // Remove "Nenhuma restrição" se outra opção for selecionada
+                                const newRestrictions = restrictions.filter(r => r !== "Nenhuma restrição");
+                                setClientData({...clientData, restrictions: [...newRestrictions, restriction]});
+                              }
+                            } else {
+                              setClientData({...clientData, restrictions: restrictions.filter(r => r !== restriction)});
+                            }
+                          },
+                          className: "w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                        }
+                      ),
+                      /* @__PURE__ */ React.createElement("span", { className: "text-sm text-gray-700" }, restriction)
+                    )
+                  )
+                )
+              )
+            )
+          ),
+          (clientData.restrictions && clientData.restrictions.length > 0) && /* @__PURE__ */ React.createElement(
+            "div",
+            { className: "mt-2 flex flex-wrap gap-1" },
+            clientData.restrictions.map(restriction => 
+              /* @__PURE__ */ React.createElement(
+                "span",
+                { 
+                  key: restriction, 
+                  className: "inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800" 
+                },
+                restriction,
+                /* @__PURE__ */ React.createElement(
+                  "button",
+                  {
+                    onClick: () => {
+                      const restrictions = clientData.restrictions || [];
+                      setClientData({...clientData, restrictions: restrictions.filter(r => r !== restriction)});
+                    },
+                    className: "ml-1 text-blue-600 hover:text-blue-800"
+                  },
+                  "×"
+                )
+              )
+            )
+          ),
+          /* @__PURE__ */ React.createElement(
+            "div",
+            { className: "mt-3" },
+            /* @__PURE__ */ React.createElement(
+              "label",
+              { className: "block text-sm font-medium text-gray-700 mb-2" },
+              "Outras restrições específicas:"
+            ),
+            /* @__PURE__ */ React.createElement(
+              "textarea",
+              {
+                value: clientData.otherRestrictions || '',
+                onChange: (e) => setClientData({...clientData, otherRestrictions: e.target.value}),
+                className: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500",
+                rows: "2",
+                placeholder: "Descreva outras restrições específicas..."
+              }
+            )
+          )
+        ),
+        /* @__PURE__ */ React.createElement(
+          "div",
+          { className: "flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200" },
+          /* @__PURE__ */ React.createElement(
+            "button",
+            {
+              onClick: handleClose,
+              className: "w-full sm:w-auto px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
+            },
+            "Cancelar"
+          ),
+          /* @__PURE__ */ React.createElement(
+            "button",
+            {
+              onClick: handleSave,
+              className: "w-full sm:flex-1 px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2"
+            },
+            editingClient ? /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement(Edit, { size: 20 }), /* @__PURE__ */ React.createElement("span", null, "Salvar Alterações")) : /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement(Plus, { size: 20 }), /* @__PURE__ */ React.createElement("span", null, "Adicionar Cliente"))
+          )
+        )
+      )
+    )
+  );
+};
 import {
   User,
   Users,
@@ -226,6 +932,7 @@ var NutriPlan = () => {
   const [showRegisterModal, setShowRegisterModal] = useState(false);
   const [showVerificationModal, setShowVerificationModal] = useState(false);
   const [showAddClientModal, setShowAddClientModal] = useState(false);
+  const [editingClient, setEditingClient] = useState(null);
   const [newClientData, setNewClientData] = useState({
     name: '',
     age: '',
@@ -3136,109 +3843,45 @@ Esta a\xE7\xE3o n\xE3o pode ser desfeita.
       onClick: () => setShowPhotoModal(false)
     },
     "Fechar"
-  )))), /* @__PURE__ */ React.createElement(Modal, { isOpen: showAddClientModal, onClose: () => setShowAddClientModal(false), title: "Adicionar Novo Cliente" }, /* @__PURE__ */ React.createElement("div", { className: "space-y-6" }, /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-4" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("label", { className: "block text-sm font-medium text-gray-700 mb-2" }, "Nome Completo *"), /* @__PURE__ */ React.createElement(
-    "input",
-    {
-      type: "text",
-      value: newClientData.name,
-      onChange: (e) => setNewClientData({...newClientData, name: e.target.value}),
-      className: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent",
-      placeholder: "Digite o nome do cliente"
-    }
-  )), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("label", { className: "block text-sm font-medium text-gray-700 mb-2" }, "Idade *"), /* @__PURE__ */ React.createElement(
-    "input",
-    {
-      type: "number",
-      value: newClientData.age,
-      onChange: (e) => setNewClientData({...newClientData, age: e.target.value}),
-      className: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent",
-      placeholder: "Idade",
-      min: "1",
-      max: "120"
-    }
-  ))), /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-4" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("label", { className: "block text-sm font-medium text-gray-700 mb-2" }, "Sexo *"), /* @__PURE__ */ React.createElement("select", { value: newClientData.gender, onChange: (e) => setNewClientData({...newClientData, gender: e.target.value}), className: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" }, /* @__PURE__ */ React.createElement("option", { value: "" }, "Selecione o sexo"), /* @__PURE__ */ React.createElement("option", { value: "masculino" }, "Masculino"), /* @__PURE__ */ React.createElement("option", { value: "feminino" }, "Feminino"))), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("label", { className: "block text-sm font-medium text-gray-700 mb-2" }, "Peso (kg) *"), /* @__PURE__ */ React.createElement(
-    "input",
-    {
-      type: "number",
-      value: newClientData.weight,
-      onChange: (e) => setNewClientData({...newClientData, weight: e.target.value}),
-      className: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent",
-      placeholder: "Peso em kg",
-      min: "1",
-      step: "0.1"
-    }
-  ))), /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-4" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("label", { className: "block text-sm font-medium text-gray-700 mb-2" }, "Altura (cm) *"), /* @__PURE__ */ React.createElement(
-    "input",
-    {
-      type: "number",
-      value: newClientData.height,
-      onChange: (e) => setNewClientData({...newClientData, height: e.target.value}),
-      className: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent",
-      placeholder: "Altura em cm",
-      min: "1",
-      max: "300"
-    }
-  )), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("label", { className: "block text-sm font-medium text-gray-700 mb-2" }, "Nível de Atividade *"), /* @__PURE__ */ React.createElement("select", { value: newClientData.activityLevel, onChange: (e) => setNewClientData({...newClientData, activityLevel: e.target.value}), className: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" }, /* @__PURE__ */ React.createElement("option", { value: "" }, "Selecione o nível"), /* @__PURE__ */ React.createElement("option", { value: "sedentario" }, "Sedentário"), /* @__PURE__ */ React.createElement("option", { value: "leve" }, "Levemente ativo"), /* @__PURE__ */ React.createElement("option", { value: "moderado" }, "Moderadamente ativo"), /* @__PURE__ */ React.createElement("option", { value: "intenso" }, "Muito ativo"), /* @__PURE__ */ React.createElement("option", { value: "extremo" }, "Extremamente ativo")))), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("label", { className: "block text-sm font-medium text-gray-700 mb-2" }, "Objetivo *"), /* @__PURE__ */ React.createElement("select", { value: newClientData.goal, onChange: (e) => setNewClientData({...newClientData, goal: e.target.value}), className: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" }, /* @__PURE__ */ React.createElement("option", { value: "" }, "Selecione o objetivo"), /* @__PURE__ */ React.createElement("option", { value: "perda" }, "Perda de peso"), /* @__PURE__ */ React.createElement("option", { value: "manutenção" }, "Manutenção"), /* @__PURE__ */ React.createElement("option", { value: "ganho" }, "Ganho de peso"), /* @__PURE__ */ React.createElement("option", { value: "musculo" }, "Ganho de massa muscular"))), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("label", { className: "block text-sm font-medium text-gray-700 mb-2" }, "Observações"), /* @__PURE__ */ React.createElement(
-    "textarea",
-    {
-      value: newClientData.observations,
-      onChange: (e) => setNewClientData({...newClientData, observations: e.target.value}),
-      className: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent",
-      rows: "3",
-      placeholder: "Informações adicionais sobre o cliente (opcional)"
-    }
-  )), /* @__PURE__ */ React.createElement("div", { className: "flex flex-col sm:flex-row gap-3 pt-4" }, /* @__PURE__ */ React.createElement(
-    Button,
-    {
-      variant: "outline",
-      onClick: () => setShowAddClientModal(false),
-      className: "w-full sm:w-auto"
+  )))), /* @__PURE__ */ React.createElement(AddClientModal, {
+    isOpen: showAddClientModal,
+    onClose: () => {
+      setShowAddClientModal(false);
+      setEditingClient(null);
     },
-    "Cancelar"
-  ), /* @__PURE__ */ React.createElement(
-    Button,
-    {
-      onClick: () => {
-        // Validação dos campos obrigatórios
-        if (!newClientData.name || !newClientData.age || !newClientData.gender || 
-            !newClientData.weight || !newClientData.height || !newClientData.activityLevel || 
-            !newClientData.goal) {
-          showPushNotification('Por favor, preencha todos os campos obrigatórios!', 'error');
-          return;
+    onSave: (clientData, editingClient) => {
+      if (editingClient) {
+        // Editar cliente existente
+        const clientIndex = mockClients.findIndex(c => c.id === editingClient.id);
+        if (clientIndex !== -1) {
+          mockClients[clientIndex] = {
+            ...editingClient,
+            ...clientData,
+            updatedAt: new Date().toISOString()
+          };
         }
-        
+        showPushNotification('Cliente atualizado com sucesso!', 'success');
+      } else {
         // Criar novo cliente
         const clientId = Date.now().toString();
         const newClient = {
           id: clientId,
-          ...newClientData,
+          ...clientData,
           createdAt: new Date().toISOString(),
           status: 'active'
         };
         
         // Adicionar à lista de clientes (simulação)
         mockClients.push(newClient);
-        
-        // Limpar formulário
-        setNewClientData({
-          name: '',
-          age: '',
-          gender: '',
-          weight: '',
-          height: '',
-          activityLevel: '',
-          goal: '',
-          observations: ''
-        });
-        
-        showPushNotification('\u2705 Cliente adicionado com sucesso!', 'success');
-        setShowAddClientModal(false);
-      },
-      className: "w-full sm:flex-1 bg-blue-600 hover:bg-blue-700"
+        showPushNotification('Cliente adicionado com sucesso!', 'success');
+      }
+      
+      setEditingClient(null);
+      setShowAddClientModal(false);
     },
-    /* @__PURE__ */ React.createElement(Plus, { size: 20 }),
-    "Adicionar Cliente"
-  )))), /* @__PURE__ */ React.createElement(Modal, { isOpen: showPaymentModal, onClose: () => setShowPaymentModal(false), title: "Finalizar Pagamento" }, selectedPlan && /* @__PURE__ */ React.createElement("div", { className: "space-y-6" }, /* @__PURE__ */ React.createElement("div", { className: "bg-gray-50 rounded-lg p-4" }, /* @__PURE__ */ React.createElement("h4", { className: "font-semibold text-gray-900 mb-3" }, "Resumo do Pedido"), /* @__PURE__ */ React.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React.createElement("div", { className: "flex justify-between" }, /* @__PURE__ */ React.createElement("span", { className: "text-gray-600" }, "Plano ", selectedPlan.name), /* @__PURE__ */ React.createElement("span", { className: "font-medium" }, selectedPlan.credits, " cr\xE9ditos")), selectedPlan.originalPrice && /* @__PURE__ */ React.createElement("div", { className: "flex justify-between text-sm" }, /* @__PURE__ */ React.createElement("span", { className: "text-gray-500" }, "Desconto aplicado"), /* @__PURE__ */ React.createElement("span", { className: "text-green-600 font-medium" }, "-R$ ", (selectedPlan.originalPrice - selectedPlan.price).toFixed(2).replace(".", ","))), /* @__PURE__ */ React.createElement("div", { className: "border-t border-gray-200 pt-2 flex justify-between" }, /* @__PURE__ */ React.createElement("span", { className: "font-semibold text-gray-900" }, "Total"), /* @__PURE__ */ React.createElement("span", { className: "font-bold text-blue-600 text-lg" }, "R$ ", selectedPlan.price.toFixed(2).replace(".", ","))))), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h4", { className: "font-semibold text-gray-900 mb-4" }, "Forma de Pagamento"), /* @__PURE__ */ React.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React.createElement("div", { className: "border border-gray-200 rounded-lg p-4 cursor-pointer hover:border-blue-300 transition-colors" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center space-x-3" }, /* @__PURE__ */ React.createElement("div", { className: "w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center" }, /* @__PURE__ */ React.createElement("div", { className: "w-2 h-2 bg-white rounded-full" })), /* @__PURE__ */ React.createElement("div", { className: "flex-1" }, /* @__PURE__ */ React.createElement("div", { className: "font-medium text-gray-900" }, "Cart\xE3o de Cr\xE9dito/D\xE9bito"), /* @__PURE__ */ React.createElement("div", { className: "text-sm text-gray-500" }, "Processamento instant\xE2neo via Stripe")), /* @__PURE__ */ React.createElement("div", { className: "flex space-x-1" }, /* @__PURE__ */ React.createElement("div", { className: "w-8 h-5 bg-blue-600 rounded text-white text-xs flex items-center justify-center font-bold" }, "VISA"), /* @__PURE__ */ React.createElement("div", { className: "w-8 h-5 bg-red-600 rounded text-white text-xs flex items-center justify-center font-bold" }, "MC")))), /* @__PURE__ */ React.createElement("div", { className: "border border-gray-200 rounded-lg p-4 cursor-pointer hover:border-blue-300 transition-colors opacity-50" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center space-x-3" }, /* @__PURE__ */ React.createElement("div", { className: "w-6 h-6 border-2 border-gray-300 rounded-full" }), /* @__PURE__ */ React.createElement("div", { className: "flex-1" }, /* @__PURE__ */ React.createElement("div", { className: "font-medium text-gray-900" }, "PIX"), /* @__PURE__ */ React.createElement("div", { className: "text-sm text-gray-500" }, "Pagamento instant\xE2neo (em breve)")), /* @__PURE__ */ React.createElement("div", { className: "text-green-600 font-bold text-sm" }, "PIX"))))), /* @__PURE__ */ React.createElement("div", { className: "bg-green-50 border border-green-200 rounded-lg p-4" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-start space-x-3" }, /* @__PURE__ */ React.createElement(CheckCircle, { className: "text-green-600 flex-shrink-0 mt-0.5", size: 20 }), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h5", { className: "font-medium text-green-900 mb-1" }, "Pagamento 100% Seguro"), /* @__PURE__ */ React.createElement("p", { className: "text-sm text-green-700" }, "Seus dados s\xE3o protegidos com criptografia SSL e processados pela Stripe, uma das plataformas de pagamento mais seguras do mundo.")))), /* @__PURE__ */ React.createElement("div", { className: "flex flex-col sm:flex-row gap-3" }, /* @__PURE__ */ React.createElement(
+    editingClient: editingClient,
+    showNotification: showPushNotification
+  }), /* @__PURE__ */ React.createElement(Modal, { isOpen: showPaymentModal, onClose: () => setShowPaymentModal(false), title: "Finalizar Pagamento" }, selectedPlan && /* @__PURE__ */ React.createElement("div", { className: "space-y-6" }, /* @__PURE__ */ React.createElement("div", { className: "bg-gray-50 rounded-lg p-4" }, /* @__PURE__ */ React.createElement("h4", { className: "font-semibold text-gray-900 mb-3" }, "Resumo do Pedido"), /* @__PURE__ */ React.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React.createElement("div", { className: "flex justify-between" }, /* @__PURE__ */ React.createElement("span", { className: "text-gray-600" }, "Plano ", selectedPlan.name), /* @__PURE__ */ React.createElement("span", { className: "font-medium" }, selectedPlan.credits, " cr\xE9ditos")), selectedPlan.originalPrice && /* @__PURE__ */ React.createElement("div", { className: "flex justify-between text-sm" }, /* @__PURE__ */ React.createElement("span", { className: "text-gray-500" }, "Desconto aplicado"), /* @__PURE__ */ React.createElement("span", { className: "text-green-600 font-medium" }, "-R$ ", (selectedPlan.originalPrice - selectedPlan.price).toFixed(2).replace(".", ","))), /* @__PURE__ */ React.createElement("div", { className: "border-t border-gray-200 pt-2 flex justify-between" }, /* @__PURE__ */ React.createElement("span", { className: "font-semibold text-gray-900" }, "Total"), /* @__PURE__ */ React.createElement("span", { className: "font-bold text-blue-600 text-lg" }, "R$ ", selectedPlan.price.toFixed(2).replace(".", ","))))), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h4", { className: "font-semibold text-gray-900 mb-4" }, "Forma de Pagamento"), /* @__PURE__ */ React.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React.createElement("div", { className: "border border-gray-200 rounded-lg p-4 cursor-pointer hover:border-blue-300 transition-colors" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center space-x-3" }, /* @__PURE__ */ React.createElement("div", { className: "w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center" }, /* @__PURE__ */ React.createElement("div", { className: "w-2 h-2 bg-white rounded-full" })), /* @__PURE__ */ React.createElement("div", { className: "flex-1" }, /* @__PURE__ */ React.createElement("div", { className: "font-medium text-gray-900" }, "Cart\xE3o de Cr\xE9dito/D\xE9bito"), /* @__PURE__ */ React.createElement("div", { className: "text-sm text-gray-500" }, "Processamento instant\xE2neo via Stripe")), /* @__PURE__ */ React.createElement("div", { className: "flex space-x-1" }, /* @__PURE__ */ React.createElement("div", { className: "w-8 h-5 bg-blue-600 rounded text-white text-xs flex items-center justify-center font-bold" }, "VISA"), /* @__PURE__ */ React.createElement("div", { className: "w-8 h-5 bg-red-600 rounded text-white text-xs flex items-center justify-center font-bold" }, "MC")))), /* @__PURE__ */ React.createElement("div", { className: "border border-gray-200 rounded-lg p-4 cursor-pointer hover:border-blue-300 transition-colors opacity-50" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center space-x-3" }, /* @__PURE__ */ React.createElement("div", { className: "w-6 h-6 border-2 border-gray-300 rounded-full" }), /* @__PURE__ */ React.createElement("div", { className: "flex-1" }, /* @__PURE__ */ React.createElement("div", { className: "font-medium text-gray-900" }, "PIX"), /* @__PURE__ */ React.createElement("div", { className: "text-sm text-gray-500" }, "Pagamento instant\xE2neo (em breve)")), /* @__PURE__ */ React.createElement("div", { className: "text-green-600 font-bold text-sm" }, "PIX"))))), /* @__PURE__ */ React.createElement("div", { className: "bg-green-50 border border-green-200 rounded-lg p-4" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-start space-x-3" }, /* @__PURE__ */ React.createElement(CheckCircle, { className: "text-green-600 flex-shrink-0 mt-0.5", size: 20 }), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h5", { className: "font-medium text-green-900 mb-1" }, "Pagamento 100% Seguro"), /* @__PURE__ */ React.createElement("p", { className: "text-sm text-green-700" }, "Seus dados s\xE3o protegidos com criptografia SSL e processados pela Stripe, uma das plataformas de pagamento mais seguras do mundo.")))), /* @__PURE__ */ React.createElement("div", { className: "flex flex-col sm:flex-row gap-3" }, /* @__PURE__ */ React.createElement(
     Button,
     {
       variant: "outline",
