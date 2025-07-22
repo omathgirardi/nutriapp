@@ -72,7 +72,7 @@ const collectionsStructure = {
         medications: [],
         diseases: [],
         activityLevel: 'moderado', // sedentário, leve, moderado, intenso
-        goal: 'perda_peso' // perda_peso, ganho_massa, manutencao
+        goal: 'perda_peso' // perda_peso, ganho_massa, manutenção
       },
       nutritionistId: 'user_example_id',
       isActive: true,

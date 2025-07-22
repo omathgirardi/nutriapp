@@ -68,6 +68,8 @@ const ClientsSection = () => {
     activityLevel: 'moderate',
     goal: 'maintenance',
     restrictions: '',
+    isVegan: false,
+    isIntolerant: false,
     address: {
       street: '',
       city: '',
@@ -96,6 +98,8 @@ const ClientsSection = () => {
       activityLevel: 'moderate',
       goal: 'maintenance',
       restrictions: '',
+      isVegan: false,
+      isIntolerant: false,
       address: {
         street: '',
         city: '',
@@ -720,6 +724,32 @@ const ClientsSection = () => {
                 onChange={(e) => setClientForm({ ...clientForm, restrictions: e.target.value })}
                 placeholder="Ex: Lactose, glúten, vegetariano..."
               />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="isVegan"
+                    checked={clientForm.isVegan}
+                    onChange={(e) => setClientForm({ ...clientForm, isVegan: e.target.checked })}
+                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  />
+                  <label htmlFor="isVegan" className="block text-sm font-medium text-gray-700">
+                    Vegano
+                  </label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="isIntolerant"
+                    checked={clientForm.isIntolerant}
+                    onChange={(e) => setClientForm({ ...clientForm, isIntolerant: e.target.checked })}
+                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  />
+                  <label htmlFor="isIntolerant" className="block text-sm font-medium text-gray-700">
+                    Intolerante
+                  </label>
+                </div>
+              </div>
               <div>
                 <label 
                   htmlFor="client-notes"

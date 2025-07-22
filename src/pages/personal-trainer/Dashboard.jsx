@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
-import { Users, Target, TrendingUp, Calendar, Plus, Eye, Edit, Trash2 } from 'lucide-react';
+import { Users, Target, TrendingUp, Calendar, Plus, Eye, Edit, Trash2, Mail, Phone } from 'lucide-react';
 import Card from '../../components/shared/Card';
 import Button from '../../components/shared/Button';
+import Modal from '../../components/shared/Modal';
+import Input from '../../components/shared/Input';
+import Select from '../../components/shared/Select';
 
 const PersonalTrainerDashboard = ({ showPushNotification }) => {
   const [clients] = useState([
@@ -71,20 +74,64 @@ const PersonalTrainerDashboard = ({ showPushNotification }) => {
     successRate: 85
   };
 
+  const [showClientModal, setShowClientModal] = useState(false);
+  const [showAddClientModal, setShowAddClientModal] = useState(false);
+  const [selectedClient, setSelectedClient] = useState(null);
+  const [newClient, setNewClient] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    goal: '',
+    weight: '',
+    height: '',
+    age: ''
+  });
+
   const handleCreateDiet = (clientId) => {
-    showPushNotification('Redirecionando para criação de dieta...', 'info');
+    const client = clients.find(c => c.id === clientId);
+    showPushNotification(`Iniciando criação de dieta para ${client?.name}...`, 'info');
+    // Aqui você pode redirecionar para a página de criação de dieta
+    // window.location.href = `/personal-trainer/diets/create?clientId=${clientId}`;
   };
 
   const handleViewClient = (clientId) => {
-    showPushNotification('Visualizando perfil do cliente...', 'info');
+    const client = clients.find(c => c.id === clientId);
+    setSelectedClient(client);
+    setShowClientModal(true);
   };
 
   const handleEditClient = (clientId) => {
-    showPushNotification('Editando dados do cliente...', 'info');
+    const client = clients.find(c => c.id === clientId);
+    showPushNotification(`Editando dados de ${client?.name}...`, 'info');
+    // Aqui você pode abrir um modal de edição ou redirecionar
   };
 
   const handleDeleteClient = (clientId) => {
-    showPushNotification('Cliente removido com sucesso!', 'success');
+    const client = clients.find(c => c.id === clientId);
+    if (window.confirm(`Tem certeza que deseja remover ${client?.name}?`)) {
+      // Aqui você removeria o cliente da lista
+      showPushNotification(`${client?.name} foi removido com sucesso!`, 'success');
+    }
+  };
+
+  const handleAddClient = () => {
+    if (!newClient.name || !newClient.email || !newClient.phone) {
+      showPushNotification('Preencha todos os campos obrigatórios!', 'warning');
+      return;
+    }
+
+    // Simular adição do cliente
+    showPushNotification(`Cliente ${newClient.name} adicionado com sucesso!`, 'success');
+    setNewClient({
+      name: '',
+      email: '',
+      phone: '',
+      goal: '',
+      weight: '',
+      height: '',
+      age: ''
+    });
+    setShowAddClientModal(false);
   };
 
   return (
@@ -95,7 +142,10 @@ const PersonalTrainerDashboard = ({ showPushNotification }) => {
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Dashboard Personal Trainer</h1>
           <p className="text-gray-500 text-sm">Gerencie seus clientes e acompanhe o progresso</p>
         </div>
-        <Button className="mt-4 sm:mt-0">
+        <Button 
+          className="mt-4 sm:mt-0"
+          onClick={() => setShowAddClientModal(true)}
+        >
           <Plus size={16} />
           Adicionar Cliente
         </Button>
@@ -271,12 +321,229 @@ const PersonalTrainerDashboard = ({ showPushNotification }) => {
               ))}
             </div>
             
-            <Button variant="outline" className="w-full mt-4">
+            <Button 
+              variant="outline" 
+              className="w-full mt-4"
+              onClick={() => showPushNotification('Redirecionando para atividades...', 'info')}
+            >
               Ver Todas as Atividades
             </Button>
           </Card>
         </div>
       </div>
+
+      {/* Modal Visualizar Cliente */}
+      <Modal 
+        isOpen={showClientModal} 
+        onClose={() => setShowClientModal(false)}
+        title="Detalhes do Cliente"
+      >
+        {selectedClient && (
+          <div className="space-y-6">
+            <div className="flex items-center space-x-4">
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
+                <span className="text-blue-600 font-medium text-lg">
+                  {selectedClient.name.split(' ').map(n => n[0]).join('')}
+                </span>
+              </div>
+              <div>
+                <h3 className="text-xl font-semibold text-gray-900">{selectedClient.name}</h3>
+                <p className="text-gray-500">{selectedClient.goal}</p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <h4 className="font-medium text-gray-900 mb-3">Informações de Contato</h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center space-x-2">
+                    <Mail size={16} className="text-gray-400" />
+                    <span>{selectedClient.email}</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Phone size={16} className="text-gray-400" />
+                    <span>{selectedClient.phone}</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div>
+              <h4 className="font-medium text-gray-900 mb-3">Progresso</h4>
+              <div className="space-y-3">
+                <div>
+                  <div className="flex items-center justify-between text-sm mb-1">
+                    <span className="text-gray-500">Progresso Geral</span>
+                    <span className="text-gray-900 font-medium">{selectedClient.progress}%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-3">
+                    <div 
+                      className="bg-blue-600 h-3 rounded-full transition-all duration-300"
+                      style={{ width: `${selectedClient.progress}%` }}
+                    ></div>
+                  </div>
+                </div>
+                
+                {selectedClient.frequency && (
+                  <div className="text-sm">
+                    <span className="text-gray-500">Frequência de Treino:</span>
+                    <span className="ml-2 font-medium">{selectedClient.frequency}</span>
+                  </div>
+                )}
+                
+                {selectedClient.dietaryRestriction && (
+                  <div className="text-sm">
+                    <span className="text-gray-500">Restrição Alimentar:</span>
+                    <span className="ml-2 font-medium">{selectedClient.dietaryRestriction}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+            </div>
+            
+            <div>
+              <h4 className="font-medium text-gray-900 mb-3">Datas Importantes</h4>
+              <div className="space-y-2 text-sm">
+                <div>Início do acompanhamento: <span className="font-medium">
+                  {new Date(selectedClient.startDate).toLocaleDateString('pt-BR')}
+                </span></div>
+                <div>Última dieta criada: <span className="font-medium">
+                  {new Date(selectedClient.lastDiet).toLocaleDateString('pt-BR')}
+                </span></div>
+              </div>
+            </div>
+            
+            <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200">
+              <Button 
+                variant="outline" 
+                onClick={() => handleEditClient(selectedClient.id)}
+              >
+                <Edit size={16} />
+                Editar
+              </Button>
+              <Button 
+                onClick={() => handleCreateDiet(selectedClient.id)}
+              >
+                <Plus size={16} />
+                Criar Dieta
+              </Button>
+            </div>
+          </div>
+        )}
+      </Modal>
+
+      {/* Modal Adicionar Cliente */}
+      <Modal 
+        isOpen={showAddClientModal} 
+        onClose={() => setShowAddClientModal(false)}
+        title="Adicionar Novo Cliente"
+      >
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Input
+              label="Nome Completo *"
+              value={newClient.name}
+              onChange={(e) => setNewClient({...newClient, name: e.target.value})}
+              placeholder="Digite o nome completo"
+            />
+            <Input
+              label="Idade"
+              type="number"
+              value={newClient.age}
+              onChange={(e) => setNewClient({...newClient, age: e.target.value})}
+              placeholder="Digite a idade"
+            />
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Input
+              label="Email *"
+              type="email"
+              value={newClient.email}
+              onChange={(e) => setNewClient({...newClient, email: e.target.value})}
+              placeholder="Digite o email"
+            />
+            <Input
+              label="Telefone *"
+              value={newClient.phone}
+              onChange={(e) => setNewClient({...newClient, phone: e.target.value})}
+              placeholder="(11) 99999-9999"
+            />
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Input
+              label="Peso (kg)"
+              type="number"
+              step="0.1"
+              value={newClient.weight}
+              onChange={(e) => setNewClient({...newClient, weight: e.target.value})}
+              placeholder="70.5"
+            />
+            <Input
+              label="Altura (cm)"
+              type="number"
+              value={newClient.height}
+              onChange={(e) => setNewClient({...newClient, height: e.target.value})}
+              placeholder="170"
+            />
+            <Select
+              label="Objetivo"
+              value={newClient.goal}
+              onChange={(e) => setNewClient({...newClient, goal: e.target.value})}
+            >
+              <option value="">Selecione o objetivo</option>
+              <option value="Perda de peso">Perda de peso</option>
+              <option value="Ganho de massa">Ganho de massa</option>
+              <option value="Manutenção">Manutenção</option>
+            </Select>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Select
+              label="Restrição Alimentar"
+              value={newClient.dietaryRestriction || ''}
+              onChange={(e) => setNewClient({...newClient, dietaryRestriction: e.target.value})}
+            >
+              <option value="">Nenhuma restrição</option>
+              <option value="Vegano">Vegano</option>
+              <option value="Vegetariano">Vegetariano</option>
+              <option value="Intolerante à Lactose">Intolerante à Lactose</option>
+              <option value="Intolerante ao Glúten">Intolerante ao Glúten</option>
+            </Select>
+            <Input
+              label="Frequência de Treino"
+              value={newClient.frequency || ''}
+              onChange={(e) => setNewClient({...newClient, frequency: e.target.value})}
+              placeholder="Ex: 3x por semana"
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Observações
+            </label>
+            <textarea
+              value={newClient.notes || ''}
+              onChange={(e) => setNewClient({...newClient, notes: e.target.value})}
+              placeholder="Adicione observações sobre o cliente..."
+              rows={3}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+          
+          <div className="flex justify-end space-x-3 pt-4">
+            <Button 
+              variant="outline" 
+              onClick={() => setShowAddClientModal(false)}
+            >
+              Cancelar
+            </Button>
+            <Button onClick={handleAddClient}>
+              Adicionar Cliente
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };

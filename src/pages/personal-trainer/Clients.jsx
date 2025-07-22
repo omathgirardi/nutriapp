@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Plus, Filter, Eye, Edit, Trash2, Calendar, Target, Phone, Mail } from 'lucide-react';
+import { Search, Plus, Filter, Eye, Edit, Trash2, Calendar, Target, Phone, Mail, Utensils } from 'lucide-react';
 import Card from '../../components/shared/Card';
 import Button from '../../components/shared/Button';
 import Input from '../../components/shared/Input';
@@ -134,8 +134,53 @@ const PersonalTrainerClients = ({ showPushNotification }) => {
     setShowViewModal(true);
   };
 
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingClient, setEditingClient] = useState(null);
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+  const [advancedFilters, setAdvancedFilters] = useState({
+    ageRange: { min: '', max: '' },
+    weightRange: { min: '', max: '' },
+    progressRange: { min: '', max: '' },
+    startDateRange: { from: '', to: '' }
+  });
+
   const handleEditClient = (clientId) => {
-    showPushNotification('Funcionalidade de edição em desenvolvimento...', 'info');
+    const client = clients.find(c => c.id === clientId);
+    setEditingClient({...client});
+    setShowEditModal(true);
+  };
+
+  const handleUpdateClient = () => {
+    if (!editingClient.name || !editingClient.email || !editingClient.phone) {
+      showPushNotification('Preencha todos os campos obrigatórios!', 'warning');
+      return;
+    }
+
+    setClients(clients.map(c => 
+      c.id === editingClient.id ? editingClient : c
+    ));
+    setShowEditModal(false);
+    showPushNotification('Cliente atualizado com sucesso!', 'success');
+  };
+
+  const handleAdvancedFilter = () => {
+    setShowAdvancedFilters(true);
+  };
+
+  const applyAdvancedFilters = () => {
+    // Aqui você aplicaria os filtros avançados
+    showPushNotification('Filtros avançados aplicados!', 'success');
+    setShowAdvancedFilters(false);
+  };
+
+  const clearAdvancedFilters = () => {
+    setAdvancedFilters({
+      ageRange: { min: '', max: '' },
+      weightRange: { min: '', max: '' },
+      progressRange: { min: '', max: '' },
+      startDateRange: { from: '', to: '' }
+    });
+    showPushNotification('Filtros limpos!', 'info');
   };
 
   const handleDeleteClient = (clientId) => {
@@ -208,7 +253,10 @@ const PersonalTrainerClients = ({ showPushNotification }) => {
             <option value="Manutenção">Manutenção</option>
           </Select>
           
-          <Button variant="outline">
+          <Button 
+            variant="outline"
+            onClick={handleAdvancedFilter}
+          >
             <Filter size={16} />
             Filtros Avançados
           </Button>
@@ -273,6 +321,20 @@ const PersonalTrainerClients = ({ showPushNotification }) => {
                 <Target size={16} />
                 <span>{client.weight}kg • {client.height}cm</span>
               </div>
+              
+              {client.frequency && (
+                <div className="flex items-center space-x-2 text-sm text-gray-600">
+                  <Calendar size={16} />
+                  <span>Frequência: {client.frequency}</span>
+                </div>
+              )}
+              
+              {client.dietaryRestriction && (
+                <div className="flex items-center space-x-2 text-sm text-gray-600">
+                  <Utensils size={16} />
+                  <span>Restrição: {client.dietaryRestriction}</span>
+                </div>
+              )}
               
               <div className="flex items-center justify-between">
                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(client.status)}`}>
@@ -397,6 +459,26 @@ const PersonalTrainerClients = ({ showPushNotification }) => {
             </Select>
           </div>
           
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Select
+              label="Restrição Alimentar"
+              value={newClient.dietaryRestriction || ''}
+              onChange={(e) => setNewClient({...newClient, dietaryRestriction: e.target.value})}
+            >
+              <option value="">Nenhuma restrição</option>
+              <option value="Vegano">Vegano</option>
+              <option value="Vegetariano">Vegetariano</option>
+              <option value="Intolerante à Lactose">Intolerante à Lactose</option>
+              <option value="Intolerante ao Glúten">Intolerante ao Glúten</option>
+            </Select>
+            <Input
+              label="Frequência de Treino"
+              value={newClient.frequency || ''}
+              onChange={(e) => setNewClient({...newClient, frequency: e.target.value})}
+              placeholder="Ex: 3x por semana"
+            />
+          </div>
+          
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Observações
@@ -495,6 +577,20 @@ const PersonalTrainerClients = ({ showPushNotification }) => {
                     ></div>
                   </div>
                 </div>
+                
+                {selectedClient.frequency && (
+                  <div className="text-sm">
+                    <span className="text-gray-500">Frequência de Treino:</span>
+                    <span className="ml-2 font-medium">{selectedClient.frequency}</span>
+                  </div>
+                )}
+                
+                {selectedClient.dietaryRestriction && (
+                  <div className="text-sm">
+                    <span className="text-gray-500">Restrição Alimentar:</span>
+                    <span className="ml-2 font-medium">{selectedClient.dietaryRestriction}</span>
+                  </div>
+                )}
               </div>
             </div>
             
@@ -538,6 +634,253 @@ const PersonalTrainerClients = ({ showPushNotification }) => {
             </div>
           </div>
         )}
+      </Modal>
+
+      {/* Modal Editar Cliente */}
+      <Modal 
+        isOpen={showEditModal} 
+        onClose={() => setShowEditModal(false)}
+        title="Editar Cliente"
+      >
+        {editingClient && (
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Input
+                label="Nome Completo *"
+                value={editingClient.name}
+                onChange={(e) => setEditingClient({...editingClient, name: e.target.value})}
+                placeholder="Digite o nome completo"
+              />
+              <Input
+                label="Idade"
+                type="number"
+                value={editingClient.age}
+                onChange={(e) => setEditingClient({...editingClient, age: e.target.value})}
+                placeholder="Digite a idade"
+              />
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Input
+                label="Email *"
+                type="email"
+                value={editingClient.email}
+                onChange={(e) => setEditingClient({...editingClient, email: e.target.value})}
+                placeholder="Digite o email"
+              />
+              <Input
+                label="Telefone *"
+                value={editingClient.phone}
+                onChange={(e) => setEditingClient({...editingClient, phone: e.target.value})}
+                placeholder="(11) 99999-9999"
+              />
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Input
+                label="Peso (kg)"
+                type="number"
+                step="0.1"
+                value={editingClient.weight}
+                onChange={(e) => setEditingClient({...editingClient, weight: e.target.value})}
+                placeholder="70.5"
+              />
+              <Input
+                label="Altura (cm)"
+                type="number"
+                value={editingClient.height}
+                onChange={(e) => setEditingClient({...editingClient, height: e.target.value})}
+                placeholder="170"
+              />
+              <Select
+                label="Objetivo"
+                value={editingClient.goal}
+                onChange={(e) => setEditingClient({...editingClient, goal: e.target.value})}
+              >
+                <option value="">Selecione o objetivo</option>
+                <option value="Perda de peso">Perda de peso</option>
+                <option value="Ganho de massa">Ganho de massa</option>
+                <option value="Manutenção">Manutenção</option>
+              </Select>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Select
+                label="Restrição Alimentar"
+                value={editingClient.dietaryRestriction || ''}
+                onChange={(e) => setEditingClient({...editingClient, dietaryRestriction: e.target.value})}
+              >
+                <option value="">Nenhuma restrição</option>
+                <option value="Vegano">Vegano</option>
+                <option value="Vegetariano">Vegetariano</option>
+                <option value="Intolerante à Lactose">Intolerante à Lactose</option>
+                <option value="Intolerante ao Glúten">Intolerante ao Glúten</option>
+              </Select>
+              <Input
+                label="Frequência de Treino"
+                value={editingClient.frequency || ''}
+                onChange={(e) => setEditingClient({...editingClient, frequency: e.target.value})}
+                placeholder="Ex: 3x por semana"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Observações
+              </label>
+              <textarea
+                value={editingClient.notes || ''}
+                onChange={(e) => setEditingClient({...editingClient, notes: e.target.value})}
+                placeholder="Adicione observações sobre o cliente..."
+                rows={3}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+            
+            <div className="flex justify-end space-x-3 pt-4">
+              <Button 
+                variant="outline" 
+                onClick={() => setShowEditModal(false)}
+              >
+                Cancelar
+              </Button>
+              <Button onClick={handleUpdateClient}>
+                Salvar Alterações
+              </Button>
+            </div>
+          </div>
+        )}
+      </Modal>
+
+      {/* Modal Filtros Avançados */}
+      <Modal 
+        isOpen={showAdvancedFilters} 
+        onClose={() => setShowAdvancedFilters(false)}
+        title="Filtros Avançados"
+      >
+        <div className="space-y-6">
+          <div>
+            <h4 className="font-medium text-gray-900 mb-3">Faixa Etária</h4>
+            <div className="grid grid-cols-2 gap-4">
+              <Input
+                label="Idade Mínima"
+                type="number"
+                value={advancedFilters.ageRange.min}
+                onChange={(e) => setAdvancedFilters({
+                  ...advancedFilters,
+                  ageRange: { ...advancedFilters.ageRange, min: e.target.value }
+                })}
+                placeholder="18"
+              />
+              <Input
+                label="Idade Máxima"
+                type="number"
+                value={advancedFilters.ageRange.max}
+                onChange={(e) => setAdvancedFilters({
+                  ...advancedFilters,
+                  ageRange: { ...advancedFilters.ageRange, max: e.target.value }
+                })}
+                placeholder="65"
+              />
+            </div>
+          </div>
+
+          <div>
+            <h4 className="font-medium text-gray-900 mb-3">Faixa de Peso</h4>
+            <div className="grid grid-cols-2 gap-4">
+              <Input
+                label="Peso Mínimo (kg)"
+                type="number"
+                step="0.1"
+                value={advancedFilters.weightRange.min}
+                onChange={(e) => setAdvancedFilters({
+                  ...advancedFilters,
+                  weightRange: { ...advancedFilters.weightRange, min: e.target.value }
+                })}
+                placeholder="50"
+              />
+              <Input
+                label="Peso Máximo (kg)"
+                type="number"
+                step="0.1"
+                value={advancedFilters.weightRange.max}
+                onChange={(e) => setAdvancedFilters({
+                  ...advancedFilters,
+                  weightRange: { ...advancedFilters.weightRange, max: e.target.value }
+                })}
+                placeholder="100"
+              />
+            </div>
+          </div>
+
+          <div>
+            <h4 className="font-medium text-gray-900 mb-3">Faixa de Progresso</h4>
+            <div className="grid grid-cols-2 gap-4">
+              <Input
+                label="Progresso Mínimo (%)"
+                type="number"
+                value={advancedFilters.progressRange.min}
+                onChange={(e) => setAdvancedFilters({
+                  ...advancedFilters,
+                  progressRange: { ...advancedFilters.progressRange, min: e.target.value }
+                })}
+                placeholder="0"
+              />
+              <Input
+                label="Progresso Máximo (%)"
+                type="number"
+                value={advancedFilters.progressRange.max}
+                onChange={(e) => setAdvancedFilters({
+                  ...advancedFilters,
+                  progressRange: { ...advancedFilters.progressRange, max: e.target.value }
+                })}
+                placeholder="100"
+              />
+            </div>
+          </div>
+
+          <div>
+            <h4 className="font-medium text-gray-900 mb-3">Período de Início</h4>
+            <div className="grid grid-cols-2 gap-4">
+              <Input
+                label="Data Inicial"
+                type="date"
+                value={advancedFilters.startDateRange.from}
+                onChange={(e) => setAdvancedFilters({
+                  ...advancedFilters,
+                  startDateRange: { ...advancedFilters.startDateRange, from: e.target.value }
+                })}
+              />
+              <Input
+                label="Data Final"
+                type="date"
+                value={advancedFilters.startDateRange.to}
+                onChange={(e) => setAdvancedFilters({
+                  ...advancedFilters,
+                  startDateRange: { ...advancedFilters.startDateRange, to: e.target.value }
+                })}
+              />
+            </div>
+          </div>
+          
+          <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200">
+            <Button 
+              variant="outline" 
+              onClick={clearAdvancedFilters}
+            >
+              Limpar Filtros
+            </Button>
+            <Button 
+              variant="outline" 
+              onClick={() => setShowAdvancedFilters(false)}
+            >
+              Cancelar
+            </Button>
+            <Button onClick={applyAdvancedFilters}>
+              Aplicar Filtros
+            </Button>
+          </div>
+        </div>
       </Modal>
     </div>
   );

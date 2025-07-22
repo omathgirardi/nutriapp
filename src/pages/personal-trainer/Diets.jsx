@@ -147,6 +147,17 @@ const PersonalTrainerDiets = ({ showPushNotification }) => {
   const [goalFilter, setGoalFilter] = useState('all');
   const [showViewModal, setShowViewModal] = useState(false);
   const [selectedDiet, setSelectedDiet] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [editingDiet, setEditingDiet] = useState(null);
+  const [newDiet, setNewDiet] = useState({
+    title: '',
+    client: '',
+    goal: '',
+    duration: '',
+    calories: '',
+    meals: []
+  });
 
   const filteredDiets = diets.filter(diet => {
     const matchesSearch = diet.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -162,13 +173,30 @@ const PersonalTrainerDiets = ({ showPushNotification }) => {
     setShowViewModal(true);
   };
 
-  const handleEditDiet = (dietId) => {
-    showPushNotification('Redirecionando para edição da dieta...', 'info');
+  const handleEditDiet = (diet) => {
+    setEditingDiet({...diet});
+    setShowEditModal(true);
+  };
+
+  const handleUpdateDiet = () => {
+    if (!editingDiet.title || !editingDiet.client) {
+      showPushNotification('Por favor, preencha os campos obrigatórios', 'error');
+      return;
+    }
+    
+    setDiets(diets.map(diet => 
+      diet.id === editingDiet.id ? editingDiet : diet
+    ));
+    setShowEditModal(false);
+    setEditingDiet(null);
+    showPushNotification('Dieta atualizada com sucesso!', 'success');
   };
 
   const handleDeleteDiet = (dietId) => {
-    setDiets(diets.filter(d => d.id !== dietId));
-    showPushNotification('Dieta removida com sucesso!', 'success');
+    if (window.confirm('Tem certeza que deseja excluir esta dieta?')) {
+      setDiets(diets.filter(diet => diet.id !== dietId));
+      showPushNotification('Dieta excluída com sucesso!', 'success');
+    }
   };
 
   const handleCopyDiet = (diet) => {
@@ -182,11 +210,77 @@ const PersonalTrainerDiets = ({ showPushNotification }) => {
   };
 
   const handleDownloadDiet = (diet) => {
-    showPushNotification(`Baixando dieta de ${diet.client}...`, 'info');
+    const element = document.createElement('a');
+    const dietContent = `DIETA PERSONALIZADA\n\nTítulo: ${diet.title}\nCliente: ${diet.client}\nObjetivo: ${diet.goal}\nDuração: ${diet.duration}\nCalorias: ${diet.calories}\nData de Criação: ${diet.createdDate}\n\nPLANO ALIMENTAR:\n\n${diet.meals.map((meal, index) => `${index + 1}. ${meal.name} (${meal.time})\n   Alimentos: ${meal.foods.join(', ')}\n   Calorias: ${meal.calories} kcal`).join('\n\n')}\n\nObservações:\n- Beba pelo menos 2 litros de água por dia\n- Respeite os horários das refeições\n- Em caso de dúvidas, consulte seu nutricionista`;
+    const file = new Blob([dietContent], { type: 'text/plain' });
+    element.href = URL.createObjectURL(file);
+    element.download = `dieta-${diet.client.toLowerCase().replace(/\s+/g, '-')}.txt`;
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+    showPushNotification('Download realizado com sucesso!', 'success');
   };
 
   const handleCreateDiet = () => {
-    showPushNotification('Redirecionando para criação de nova dieta...', 'info');
+    setShowCreateModal(true);
+  };
+
+  const handleSaveNewDiet = () => {
+    if (!newDiet.title || !newDiet.client || !newDiet.goal) {
+      showPushNotification('Por favor, preencha os campos obrigatórios', 'error');
+      return;
+    }
+    
+    const dietToAdd = {
+      id: diets.length + 1,
+      ...newDiet,
+      status: 'Ativa',
+      createdDate: new Date().toISOString().split('T')[0],
+      lastModified: new Date().toISOString().split('T')[0]
+    };
+    
+    setDiets([...diets, dietToAdd]);
+    setNewDiet({
+      title: '',
+      client: '',
+      goal: '',
+      duration: '',
+      calories: '',
+      meals: []
+    });
+    setShowCreateModal(false);
+    showPushNotification('Dieta criada com sucesso!', 'success');
+  };
+
+  const addMealToNewDiet = () => {
+    setNewDiet({
+      ...newDiet,
+      meals: [...newDiet.meals, {
+        name: '',
+        time: '',
+        foods: [],
+        calories: 0
+      }]
+    });
+  };
+
+  const updateMealInNewDiet = (index, field, value) => {
+    const updatedMeals = [...newDiet.meals];
+    updatedMeals[index] = {
+      ...updatedMeals[index],
+      [field]: value
+    };
+    setNewDiet({
+      ...newDiet,
+      meals: updatedMeals
+    });
+  };
+
+  const removeMealFromNewDiet = (index) => {
+    setNewDiet({
+      ...newDiet,
+      meals: newDiet.meals.filter((_, i) => i !== index)
+    });
   };
 
   const getStatusColor = (status) => {
@@ -564,6 +658,196 @@ const PersonalTrainerDiets = ({ showPushNotification }) => {
             </div>
           </div>
         )}
+      </Modal>
+
+      {/* Modal Editar Dieta */}
+      <Modal 
+        isOpen={showEditModal} 
+        onClose={() => setShowEditModal(false)}
+        title="Editar Dieta"
+      >
+        {editingDiet && (
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Input
+                label="Título da Dieta *"
+                value={editingDiet.title}
+                onChange={(e) => setEditingDiet({...editingDiet, title: e.target.value})}
+                placeholder="Digite o título da dieta"
+              />
+              <Input
+                label="Cliente *"
+                value={editingDiet.client}
+                onChange={(e) => setEditingDiet({...editingDiet, client: e.target.value})}
+                placeholder="Nome do cliente"
+              />
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Select
+                label="Objetivo *"
+                value={editingDiet.goal}
+                onChange={(e) => setEditingDiet({...editingDiet, goal: e.target.value})}
+              >
+                <option value="">Selecione o objetivo</option>
+                <option value="Perda de peso">Perda de peso</option>
+                <option value="Ganho de massa">Ganho de massa</option>
+                <option value="Manutenção">Manutenção</option>
+              </Select>
+              <Input
+                label="Duração"
+                value={editingDiet.duration}
+                onChange={(e) => setEditingDiet({...editingDiet, duration: e.target.value})}
+                placeholder="Ex: 30 dias"
+              />
+              <Input
+                label="Calorias Totais"
+                type="number"
+                value={editingDiet.calories}
+                onChange={(e) => setEditingDiet({...editingDiet, calories: e.target.value})}
+                placeholder="2000"
+              />
+            </div>
+            
+            <div className="flex justify-end space-x-3 pt-4">
+              <Button 
+                variant="outline" 
+                onClick={() => setShowEditModal(false)}
+              >
+                Cancelar
+              </Button>
+              <Button onClick={handleUpdateDiet}>
+                Salvar Alterações
+              </Button>
+            </div>
+          </div>
+        )}
+      </Modal>
+
+      {/* Modal Criar Nova Dieta */}
+      <Modal 
+        isOpen={showCreateModal} 
+        onClose={() => setShowCreateModal(false)}
+        title="Criar Nova Dieta"
+      >
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Input
+              label="Título da Dieta *"
+              value={newDiet.title}
+              onChange={(e) => setNewDiet({...newDiet, title: e.target.value})}
+              placeholder="Digite o título da dieta"
+            />
+            <Input
+              label="Cliente *"
+              value={newDiet.client}
+              onChange={(e) => setNewDiet({...newDiet, client: e.target.value})}
+              placeholder="Nome do cliente"
+            />
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Select
+              label="Objetivo *"
+              value={newDiet.goal}
+              onChange={(e) => setNewDiet({...newDiet, goal: e.target.value})}
+            >
+              <option value="">Selecione o objetivo</option>
+              <option value="Perda de peso">Perda de peso</option>
+              <option value="Ganho de massa">Ganho de massa</option>
+              <option value="Manutenção">Manutenção</option>
+            </Select>
+            <Input
+              label="Duração"
+              value={newDiet.duration}
+              onChange={(e) => setNewDiet({...newDiet, duration: e.target.value})}
+              placeholder="Ex: 30 dias"
+            />
+            <Input
+              label="Calorias Totais"
+              type="number"
+              value={newDiet.calories}
+              onChange={(e) => setNewDiet({...newDiet, calories: e.target.value})}
+              placeholder="2000"
+            />
+          </div>
+
+          <div>
+            <div className="flex justify-between items-center mb-3">
+              <h4 className="font-medium text-gray-900">Refeições</h4>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={addMealToNewDiet}
+              >
+                + Adicionar Refeição
+              </Button>
+            </div>
+            
+            {newDiet.meals.map((meal, index) => (
+              <div key={index} className="border border-gray-200 rounded-lg p-4 mb-3">
+                <div className="flex justify-between items-start mb-3">
+                  <h5 className="font-medium text-gray-700">Refeição {index + 1}</h5>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => removeMealFromNewDiet(index)}
+                    className="text-red-600 hover:text-red-700"
+                  >
+                    Remover
+                  </Button>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <Input
+                    label="Nome da Refeição"
+                    value={meal.name}
+                    onChange={(e) => updateMealInNewDiet(index, 'name', e.target.value)}
+                    placeholder="Ex: Café da manhã"
+                  />
+                  <Input
+                    label="Horário"
+                    type="time"
+                    value={meal.time}
+                    onChange={(e) => updateMealInNewDiet(index, 'time', e.target.value)}
+                  />
+                  <Input
+                    label="Calorias"
+                    type="number"
+                    value={meal.calories}
+                    onChange={(e) => updateMealInNewDiet(index, 'calories', parseInt(e.target.value) || 0)}
+                    placeholder="300"
+                  />
+                </div>
+                
+                <div className="mt-3">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Alimentos
+                  </label>
+                  <textarea
+                    value={meal.foods ? meal.foods.join(', ') : ''}
+                    onChange={(e) => updateMealInNewDiet(index, 'foods', e.target.value.split(', ').filter(f => f.trim()))}
+                    placeholder="Ex: 1 fatia de pão integral, 1 ovo cozido, 1 copo de leite"
+                    rows={2}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200">
+            <Button 
+              variant="outline" 
+              onClick={() => setShowCreateModal(false)}
+            >
+              Cancelar
+            </Button>
+            <Button onClick={handleSaveNewDiet}>
+              Criar Dieta
+            </Button>
+          </div>
+        </div>
       </Modal>
     </div>
   );
