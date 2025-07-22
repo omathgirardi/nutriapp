@@ -1,5 +1,5 @@
 // Serviços principais do NutriApp
-import firebaseService from './firebase.js';
+import supabaseService from './supabase.js';
 import evolutionService, { nutriWhatsAppService } from './evolutionApi.js';
 import personalTrainerService from './personalTrainerService.js';
 
@@ -337,4 +337,4 @@ export const nutriService = {
 export { firebaseService, evolutionService, nutriWhatsAppService, personalTrainerService };
 
 // Exportar como padrão o serviço integrado
-export default nutriService; 
+export default nutriService;

@@ -16,14 +16,6 @@ export const config = {
       templates: '/templates'
     }
   },
-  firebase: {
-    apiKey: "AIzaSyCyJLIOs4LuUg3wMkxkK9UOzGDBF2tQgHE",
-    authDomain: "nutriplan-app-75faa.firebaseapp.com",
-    projectId: "nutriplan-app-75faa",
-    storageBucket: "nutriplan-app-75faa.firebasestorage.app",
-    messagingSenderId: "162618694330",
-    appId: "1:162618694330:web:56f8cfbb93290bac904083"
-  },
   evolution: {
     baseURL: "https://dev-studiogirardi-evolution-api.lt0sh0.easypanel.host",
     apiKey: "02314644FB70-4D08-A756-A53CED8621A9",
@@ -47,6 +39,10 @@ export const config = {
   storage: {
     prefix: 'nutriapp_',
     version: '1.0'
+  },
+  supabase: {
+    url: 'https://lbtjkmkhntfebldgslxg.supabase.co',
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxidGprbWtobnRmZWJsZGdzbHhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMxODg1NjMsImV4cCI6MjA2ODc2NDU2M30.bbJ3sw6noqSewixsZq2eW8RitKwgsldzAwFjOkFb_Ww'
   }
 };
 
