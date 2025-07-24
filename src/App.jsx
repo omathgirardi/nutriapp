@@ -1,6 +1,15 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
+// Context
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+
+// Auth Components
+import LoginForm from './components/auth/LoginForm';
+import RegisterForm from './components/auth/RegisterForm';
+import ProtectedRoute from './components/auth/ProtectedRoute';
+import LoadingSpinner from './components/ui/LoadingSpinner';
+
 // Admin Pages
 import AdminDashboard from './pages/admin/Dashboard';
 import AdminPersonalTrainers from './pages/admin/PersonalTrainers';
@@ -15,8 +24,10 @@ import PersonalTrainerDiets from './pages/personal-trainer/Diets';
 // Legacy Component (mantido para compatibilidade)
 import NutriPlan from './components/NutriPlan';
 
-const App = () => {
-  const [userType, setUserType] = useState('legacy'); // 'admin', 'personal-trainer', 'legacy'
+// Componente principal da aplicação
+const AppContent = () => {
+  const { user, userProfile, loading } = useAuth();
+  const [authMode, setAuthMode] = useState('login'); // 'login' ou 'register'
   const [isTestingConnection, setIsTestingConnection] = useState(false);
   const [isBackingUp, setIsBackingUp] = useState(false);
 
@@ -26,86 +37,142 @@ const App = () => {
     // Aqui você pode implementar sua lógica de notificação
   };
 
-  // Se for legacy, mantém o componente original
-  if (userType === 'legacy') {
-    return <NutriPlan />;
+  // Mostrar loading enquanto verifica autenticação
+  if (loading) {
+    return <LoadingSpinner message="Verificando autenticação..." />;
   }
+
+  // Se não estiver logado, mostrar tela de login/registro
+  if (!user || !userProfile) {
+    return (
+      <>
+        {authMode === 'login' ? (
+          <LoginForm onSwitchToRegister={() => setAuthMode('register')} />
+        ) : (
+          <RegisterForm onSwitchToLogin={() => setAuthMode('login')} />
+        )}
+      </>
+    );
+  }
+
+  // Função para determinar rota padrão baseada no papel do usuário
+  const getDefaultRoute = () => {
+    switch (userProfile.role) {
+      case 'admin':
+        return '/admin/dashboard';
+      case 'personal_trainer':
+        return '/personal-trainer/dashboard';
+      case 'client':
+        return '/legacy'; // Clientes usam o componente legacy
+      default:
+        return '/legacy';
+    }
+  };
 
   return (
     <Router>
       <div className="min-h-screen bg-gray-50">
         <Routes>
-          {/* Admin Routes */}
+          {/* Legacy Route (para clientes) */}
+          <Route 
+            path="/legacy" 
+            element={<NutriPlan />} 
+          />
+          
+          {/* Admin Routes - Protegidas */}
           <Route 
             path="/admin/dashboard" 
             element={
-              <AdminDashboard 
-                showPushNotification={showPushNotification}
-              />
+              <ProtectedRoute requiredRole="admin">
+                <AdminDashboard 
+                  showPushNotification={showPushNotification}
+                />
+              </ProtectedRoute>
             } 
           />
           <Route 
             path="/admin/personal-trainers" 
             element={
-              <AdminPersonalTrainers 
-                showPushNotification={showPushNotification}
-              />
+              <ProtectedRoute requiredRole="admin">
+                <AdminPersonalTrainers 
+                  showPushNotification={showPushNotification}
+                />
+              </ProtectedRoute>
             } 
           />
           <Route 
             path="/admin/settings" 
             element={
-              <AdminSettings 
-                isTestingConnection={isTestingConnection}
-                setIsTestingConnection={setIsTestingConnection}
-                isBackingUp={isBackingUp}
-                setIsBackingUp={setIsBackingUp}
-                showPushNotification={showPushNotification}
-              />
+              <ProtectedRoute requiredRole="admin">
+                <AdminSettings 
+                  isTestingConnection={isTestingConnection}
+                  setIsTestingConnection={setIsTestingConnection}
+                  isBackingUp={isBackingUp}
+                  setIsBackingUp={setIsBackingUp}
+                  showPushNotification={showPushNotification}
+                />
+              </ProtectedRoute>
             } 
           />
           <Route 
             path="/admin/reports" 
             element={
-              <AdminReports 
-                showPushNotification={showPushNotification}
-              />
+              <ProtectedRoute requiredRole="admin">
+                <AdminReports 
+                  showPushNotification={showPushNotification}
+                />
+              </ProtectedRoute>
             } 
           />
           
-          {/* Personal Trainer Routes */}
+          {/* Personal Trainer Routes - Protegidas */}
           <Route 
             path="/personal-trainer/dashboard" 
             element={
-              <PersonalTrainerDashboard 
-                showPushNotification={showPushNotification}
-              />
+              <ProtectedRoute requiredRole="personal_trainer">
+                <PersonalTrainerDashboard 
+                  showPushNotification={showPushNotification}
+                />
+              </ProtectedRoute>
             } 
           />
           <Route 
             path="/personal-trainer/clients" 
             element={
-              <PersonalTrainerClients 
-                showPushNotification={showPushNotification}
-              />
+              <ProtectedRoute requiredRole="personal_trainer">
+                <PersonalTrainerClients 
+                  showPushNotification={showPushNotification}
+                />
+              </ProtectedRoute>
             } 
           />
           <Route 
             path="/personal-trainer/diets" 
             element={
-              <PersonalTrainerDiets 
-                showPushNotification={showPushNotification}
-              />
+              <ProtectedRoute requiredRole="personal_trainer">
+                <PersonalTrainerDiets 
+                  showPushNotification={showPushNotification}
+                />
+              </ProtectedRoute>
             } 
           />
           
-          {/* Default redirects */}
+          {/* Default redirects baseados no papel do usuário */}
           <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
           <Route path="/personal-trainer" element={<Navigate to="/personal-trainer/dashboard" replace />} />
-          <Route path="/" element={<Navigate to="/admin/dashboard" replace />} />
+          <Route path="/" element={<Navigate to={getDefaultRoute()} replace />} />
         </Routes>
       </div>
     </Router>
+  );
+};
+
+// Componente App principal com AuthProvider
+const App = () => {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 };
 

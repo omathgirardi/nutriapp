@@ -6,7 +6,9 @@
   "main": "src/index.js",
   "scripts": {
     "dev": "serve . -l 3000",
-    "start": "serve . -l 3000",
+    "test": "serve . -l 3001",
+    "start": "serve . -l 8080",
+    "prod": "serve . -l 8080",
     "build": "echo 'No build process needed for this project'",
     "preview": "serve . -l 4173"
   },

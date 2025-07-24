@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Users2, Plus, Search, Filter, Edit, Trash2, Eye, Star, Award } from 'lucide-react';
+import { dbService } from '../../services/supabase';
+import { useAuth } from '../../contexts/AuthContext';
 
 // Componentes simulados (normalmente viriam de arquivos separados)
 const Card = ({ children, className = "", ...props }) => (
@@ -47,9 +49,82 @@ const PersonalTrainersPage = ({
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
+  const [trainers, setTrainers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const { user } = useAuth();
 
-  // Mock data - será substituído por dados reais
-  const mockTrainers = [];
+  // Buscar personal trainers do Supabase
+  useEffect(() => {
+    loadTrainers();
+  }, []);
+
+  const loadTrainers = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      // Buscar personal trainers com dados do usuário
+      const trainersData = await dbService.getAll('personal_trainers');
+      
+      // Para cada trainer, buscar dados do usuário e contar clientes
+      const trainersWithDetails = await Promise.all(
+        trainersData.map(async (trainer) => {
+          try {
+            // Buscar dados do usuário
+            const userData = await dbService.getById('users', trainer.user_id);
+            
+            // Contar clientes do trainer
+            const clients = await dbService.getAll('clients', {
+              filters: { personal_trainer_id: trainer.id }
+            });
+            
+            return {
+              ...trainer,
+              user: userData,
+              name: userData?.full_name || 'Nome não disponível',
+              email: userData?.email || 'Email não disponível',
+              photo: userData?.avatar,
+              clientsCount: clients?.length || 0,
+              status: trainer.is_active ? 'active' : 'inactive',
+              credits: trainer.credits || 0,
+              rating: trainer.rating || 5.0
+            };
+          } catch (err) {
+            console.error('Erro ao carregar detalhes do trainer:', err);
+            return {
+              ...trainer,
+              name: 'Nome não disponível',
+              email: 'Email não disponível',
+              clientsCount: 0,
+              status: 'inactive',
+              credits: 0,
+              rating: 5.0
+            };
+          }
+        })
+      );
+      
+      setTrainers(trainersWithDetails);
+    } catch (err) {
+      console.error('Erro ao carregar personal trainers:', err);
+      setError('Erro ao carregar personal trainers');
+      showPushNotification?.('Erro ao carregar personal trainers', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Filtrar trainers baseado na busca e filtro de status
+  const filteredTrainers = trainers.filter(trainer => {
+    const matchesSearch = trainer.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         trainer.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         trainer.specialization?.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesStatus = filterStatus === 'all' || trainer.status === filterStatus;
+    
+    return matchesSearch && matchesStatus;
+  });
 
   const handleEditTrainer = (trainer) => {
     setSelectedTrainer(trainer);
@@ -61,10 +136,17 @@ const PersonalTrainersPage = ({
     setShowManageCreditsModal(true);
   };
 
-  const handleDeleteTrainer = (trainerId) => {
+  const handleDeleteTrainer = async (trainerId) => {
     if (window.confirm('Tem certeza que deseja excluir este personal trainer?')) {
-      // Lógica de exclusão aqui
-      showPushNotification('Personal trainer excluído com sucesso!', 'success');
+      try {
+        await dbService.delete('personal_trainers', trainerId);
+        showPushNotification('Personal trainer excluído com sucesso!', 'success');
+        // Recarregar a lista
+        loadTrainers();
+      } catch (err) {
+        console.error('Erro ao excluir personal trainer:', err);
+        showPushNotification('Erro ao excluir personal trainer', 'error');
+      }
     }
   };
 
@@ -117,21 +199,43 @@ const PersonalTrainersPage = ({
       </Card>
 
       {/* Lista de Personal Trainers */}
-      {mockTrainers.length === 0 ? (
+      {loading ? (
+        <Card className="p-8 text-center">
+          <Users2 className="mx-auto h-12 w-12 text-gray-400 mb-4 animate-pulse" />
+          <h3 className="text-lg font-medium text-gray-900 mb-2">Carregando personal trainers...</h3>
+          <p className="text-gray-500 text-sm">Aguarde enquanto buscamos os dados.</p>
+        </Card>
+      ) : error ? (
+        <Card className="p-8 text-center">
+          <Users2 className="mx-auto h-12 w-12 text-red-400 mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 mb-2">Erro ao carregar dados</h3>
+          <p className="text-gray-500 text-sm mb-4">{error}</p>
+          <Button onClick={loadTrainers}>
+            Tentar novamente
+          </Button>
+        </Card>
+      ) : filteredTrainers.length === 0 ? (
         <Card className="p-8 text-center">
           <Users2 className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">Nenhum personal trainer cadastrado</h3>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">
+            {searchTerm || filterStatus !== 'all' ? 'Nenhum resultado encontrado' : 'Nenhum personal trainer cadastrado'}
+          </h3>
           <p className="text-gray-500 text-sm mb-4">
-            Comece adicionando o primeiro personal trainer à plataforma.
+            {searchTerm || filterStatus !== 'all' 
+              ? 'Tente ajustar os filtros de busca.' 
+              : 'Comece adicionando o primeiro personal trainer à plataforma.'
+            }
           </p>
-          <Button onClick={() => setShowAddTrainerModal(true)}>
-            <Plus size={16} />
-            Adicionar Primeiro Personal Trainer
-          </Button>
+          {!searchTerm && filterStatus === 'all' && (
+            <Button onClick={() => setShowAddTrainerModal(true)}>
+              <Plus size={16} />
+              Adicionar Primeiro Personal Trainer
+            </Button>
+          )}
         </Card>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {mockTrainers.map((trainer) => (
+          {filteredTrainers.map((trainer) => (
             <Card key={trainer.id} className="p-6">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center space-x-3">

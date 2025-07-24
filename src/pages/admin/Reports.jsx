@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BarChart3, TrendingUp, Users, DollarSign, Download, Calendar, Filter } from 'lucide-react';
+import { dbService } from '../../services/supabase';
+import { useAuth } from '../../contexts/AuthContext';
 
 // Componentes simulados (normalmente viriam de arquivos separados)
 const Card = ({ children, className = "", ...props }) => (
@@ -45,6 +47,142 @@ const AdminReports = ({ showPushNotification }) => {
   const [selectedPeriod, setSelectedPeriod] = useState('30');
   const [selectedReport, setSelectedReport] = useState('overview');
   const [isGenerating, setIsGenerating] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [reportData, setReportData] = useState({
+    overview: {
+      totalUsers: 0,
+      totalTrainers: 0,
+      totalDiets: 0,
+      revenue: 0,
+      growth: {
+        users: 0,
+        trainers: 0,
+        diets: 0,
+        revenue: 0
+      }
+    },
+    usage: {
+      activeUsers: 0,
+      dietCreations: 0,
+      avgSessionTime: '0min',
+      bounceRate: '0%'
+    },
+    financial: {
+      monthlyRevenue: 0,
+      subscriptions: 0,
+      avgRevenuePerUser: 0,
+      churnRate: '0%'
+    }
+  });
+  const [chartData, setChartData] = useState([]);
+  const { user } = useAuth();
+
+  useEffect(() => {
+    loadReportData();
+  }, [selectedPeriod]);
+
+  const loadReportData = async () => {
+    try {
+      setLoading(true);
+      
+      // Calcular data de início baseada no período selecionado
+      const endDate = new Date();
+      const startDate = new Date();
+      startDate.setDate(endDate.getDate() - parseInt(selectedPeriod));
+      
+      // Buscar dados do Supabase
+      const [users, trainers, diets, clients] = await Promise.all([
+        dbService.getAll('users'),
+        dbService.getAll('personal_trainers'),
+        dbService.getAll('diets'),
+        dbService.getAll('clients')
+      ]);
+      
+      // Filtrar dados por período
+      const usersInPeriod = users.filter(user => 
+        new Date(user.created_at) >= startDate
+      );
+      const trainersInPeriod = trainers.filter(trainer => 
+        new Date(trainer.created_at) >= startDate
+      );
+      const dietsInPeriod = diets.filter(diet => 
+        new Date(diet.created_at) >= startDate
+      );
+      
+      // Calcular métricas
+      const totalUsers = users.length;
+      const totalTrainers = trainers.length;
+      const totalDiets = diets.length;
+      const activeUsers = users.filter(user => user.is_active).length;
+      
+      // Simular dados de crescimento (em um cenário real, você compararia com período anterior)
+      const userGrowth = usersInPeriod.length > 0 ? ((usersInPeriod.length / totalUsers) * 100) : 0;
+      const trainerGrowth = trainersInPeriod.length > 0 ? ((trainersInPeriod.length / totalTrainers) * 100) : 0;
+      const dietGrowth = dietsInPeriod.length > 0 ? ((dietsInPeriod.length / totalDiets) * 100) : 0;
+      
+      // Gerar dados do gráfico (últimos 6 meses)
+      const monthlyData = [];
+      const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+      const currentMonth = new Date().getMonth();
+      
+      for (let i = 5; i >= 0; i--) {
+        const monthIndex = (currentMonth - i + 12) % 12;
+        const monthStart = new Date();
+        monthStart.setMonth(monthIndex, 1);
+        monthStart.setHours(0, 0, 0, 0);
+        
+        const monthEnd = new Date(monthStart);
+        monthEnd.setMonth(monthIndex + 1, 0);
+        monthEnd.setHours(23, 59, 59, 999);
+        
+        const monthUsers = users.filter(user => {
+          const userDate = new Date(user.created_at);
+          return userDate >= monthStart && userDate <= monthEnd;
+        }).length;
+        
+        monthlyData.push({
+          month: months[monthIndex],
+          users: monthUsers,
+          revenue: monthUsers * 50 // Simular receita baseada em usuários
+        });
+      }
+      
+      setReportData({
+        overview: {
+          totalUsers,
+          totalTrainers,
+          totalDiets,
+          revenue: totalUsers * 50, // Simular receita
+          growth: {
+            users: Math.round(userGrowth * 100) / 100,
+            trainers: Math.round(trainerGrowth * 100) / 100,
+            diets: Math.round(dietGrowth * 100) / 100,
+            revenue: Math.round(userGrowth * 100) / 100
+          }
+        },
+        usage: {
+          activeUsers,
+          dietCreations: dietsInPeriod.length,
+          avgSessionTime: '24min', // Dados simulados
+          bounceRate: '23%' // Dados simulados
+        },
+        financial: {
+          monthlyRevenue: totalUsers * 50,
+          subscriptions: activeUsers,
+          avgRevenuePerUser: 50,
+          churnRate: '5.2%' // Dados simulados
+        }
+      });
+      
+      setChartData(monthlyData);
+      
+    } catch (error) {
+      console.error('Erro ao carregar dados do relatório:', error);
+      showPushNotification?.('Erro ao carregar dados do relatório', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleGenerateReport = async () => {
     setIsGenerating(true);
@@ -59,41 +197,31 @@ const AdminReports = ({ showPushNotification }) => {
     showPushNotification(`Relatório ${type} baixado com sucesso!`, 'success');
   };
 
-  const reportData = {
-    overview: {
-      totalUsers: 1247,
-      totalTrainers: 89,
-      totalDiets: 3456,
-      revenue: 45670,
-      growth: {
-        users: 12.5,
-        trainers: 8.3,
-        diets: 23.1,
-        revenue: 15.7
-      }
-    },
-    usage: {
-      activeUsers: 892,
-      dietCreations: 234,
-      avgSessionTime: '24min',
-      bounceRate: '23%'
-    },
-    financial: {
-      monthlyRevenue: 45670,
-      subscriptions: 156,
-      avgRevenuePerUser: 89.50,
-      churnRate: '5.2%'
-    }
-  };
-
-  const chartData = [
-    { month: 'Jan', users: 120, revenue: 3200 },
-    { month: 'Fev', users: 145, revenue: 3800 },
-    { month: 'Mar', users: 167, revenue: 4200 },
-    { month: 'Abr', users: 189, revenue: 4800 },
-    { month: 'Mai', users: 203, revenue: 5200 },
-    { month: 'Jun', users: 234, revenue: 5800 }
-  ];
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">Relatórios e Analytics</h1>
+            <p className="text-gray-500 text-sm">Carregando dados...</p>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {[1, 2, 3, 4].map((i) => (
+            <Card key={i} className="p-6 animate-pulse">
+              <div className="flex items-center justify-between">
+                <div className="space-y-2">
+                  <div className="h-4 bg-gray-200 rounded w-24"></div>
+                  <div className="h-8 bg-gray-200 rounded w-16"></div>
+                </div>
+                <div className="w-12 h-12 bg-gray-200 rounded-lg"></div>
+              </div>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
