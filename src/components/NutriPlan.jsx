@@ -61,7 +61,7 @@ import {
 import { Button, Card, Input, Select, Modal } from './index.js';
 import ClientsSection from './ClientsSection.jsx';
 
-const { useStoredState } = hatch;
+// Removido hatch - usando React hooks padrão
 
 // Componente CleanChart
 const CleanChart = () => {
