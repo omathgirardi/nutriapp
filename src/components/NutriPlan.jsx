@@ -297,47 +297,14 @@ const Chart = ({ data, height = 300 }) => {
 
 // Componente principal NutriPlan
 const NutriPlan = () => {
-  // Estados principais
-  const [userRole, setUserRole] = useStoredState('userRole', 'admin');
-  const [currentUser, setCurrentUser] = useStoredState('currentUser', {
-    id: 'admin',
-    name: 'Administrador',
-    email: 'admin@nutriapp.com'
-  });
-  const [activeSection, setActiveSection] = useStoredState('activeSection', 'dashboard');
-  const [profilePhoto, setProfilePhoto] = useStoredState('profilePhoto', null);
+  const [activeTab, setActiveTab] = useState('clients');
 
-  // Estados da aplicação
-  const [dietCreationStep, setDietCreationStep] = useState(1);
-  const [generatedDiet, setGeneratedDiet] = useState(null);
-  const [selectedClient, setSelectedClient] = useState(null);
-  const [isGeneratingDiet, setIsGeneratingDiet] = useState(false);
-  const [selectedTemplate, setSelectedTemplate] = useState(null);
-  const [mealPlan, setMealPlan] = useState([]);
-  const [showDietModal, setShowDietModal] = useState(false);
-  const [showTemplateModal, setShowTemplateModal] = useState(false);
-  const [showClientModal, setShowClientModal] = useState(false);
-  const [showUserModal, setShowUserModal] = useState(false);
-  const [showLoginModal, setShowLoginModal] = useState(false);
-  const [showRegisterModal, setShowRegisterModal] = useState(false);
-  const [showVerificationModal, setShowVerificationModal] = useState(false);
-  const [showSettingsModal, setShowSettingsModal] = useState(false);
-  const [showPaymentModal, setShowPaymentModal] = useState(false);
-  const [showFoodModal, setShowFoodModal] = useState(false);
-  const [showSubstitutionModal, setShowSubstitutionModal] = useState(false);
-  const [showPortionModal, setShowPortionModal] = useState(false);
-  const [showSubstitutionPortionModal, setShowSubstitutionPortionModal] = useState(false);
-  const [showPushNotification, setShowPushNotification] = useState(false);
-  const [showInfoPopup, setShowInfoPopup] = useState(false);
-  const [notificationMessage, setNotificationMessage] = useState('');
-  const [notificationType, setNotificationType] = useState('success');
-  const [infoPopupData, setInfoPopupData] = useState({ title: '', content: '', type: 'info' });
-  const [confettiActive, setConfettiActive] = useState(false);
-  const [selectedFood, setSelectedFood] = useState(null);
-  const [selectedMealIndex, setSelectedMealIndex] = useState(null);
-  const [selectedSubstitutionFood, setSelectedSubstitutionFood] = useState(null);
-  const [selectedSubstitutionMealIndex, setSelectedSubstitutionMealIndex] = useState(null);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const tabs = [
+    { id: 'clients', label: 'Clientes' },
+    { id: 'diets', label: 'Dietas' },
+    { id: 'templates', label: 'Templates' },
+    { id: 'whatsapp', label: '📱 WhatsApp' }
+  ];
 
   // Formulários
   const [clientForm, setClientForm] = useState({
@@ -434,37 +401,11 @@ const NutriPlan = () => {
               onClick={() => setIsSidebarOpen(false)}
               className="lg:hidden p-2 rounded-lg hover:bg-gray-100"
             >
-              <X size={20} />
-            </button>
-          </div>
-          
-          <nav className="mt-8 px-4">
-            <div className="space-y-1">
-              {[
-                { id: 'dashboard', label: 'Dashboard', icon: Home },
-                { id: 'clients', label: 'Clientes', icon: Users },
-                { id: 'diets', label: 'Dietas', icon: Utensils },
-                { id: 'templates', label: 'Templates', icon: FileText },
-                { id: 'calculator', label: 'Calculadora', icon: Calculator },
-                { id: 'reports', label: 'Relatórios', icon: BarChart3 },
-                { id: 'settings', label: 'Configurações', icon: Settings }
-              ].map((item) => (
-                <button
-                  key={item.id}
-                  onClick={() => setActiveSection(item.id)}
-                  className={`flex items-center w-full px-4 py-3 text-left rounded-lg transition-colors duration-200 ${
-                    activeSection === item.id
-                      ? 'bg-blue-50 text-blue-700 border-r-2 border-blue-700'
-                      : 'text-gray-700 hover:bg-gray-50'
-                  }`}
-                >
-                  <item.icon size={20} className="mr-3" />
-                  {item.label}
-                </button>
-              ))}
-            </div>
-          </nav>
+              {tab.label}
+            </Button>
+          ))}
         </div>
+      </div>
 
         {/* Conteúdo principal */}
         <div className="flex-1 lg:ml-0">

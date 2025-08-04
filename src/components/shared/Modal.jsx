@@ -1,6 +1,39 @@
-import React from 'react';
-import { X } from 'lucide-react';
-import { colors } from '../styles/colors.js';
+import React, { useEffect } from 'react';
+import PropTypes from 'prop-types';
+import Button from './Button';
+
+const Modal = ({
+  isOpen,
+  onClose,
+  title,
+  children,
+  size = 'medium',
+  showCloseButton = true,
+  closeOnOverlayClick = true,
+  footer = null
+}) => {
+  // Previne scroll do body quando modal está aberto
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
+  // Fecha modal com tecla ESC
+  useEffect(() => {
+    const handleEsc = (event) => {
+      if (event.keyCode === 27) onClose();
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => {
+      window.removeEventListener('keydown', handleEsc);
+    };
+  }, [onClose]);
 
 const Modal = ({ isOpen, onClose, title, children, size = 'md' }) => {
   if (!isOpen) return null;
