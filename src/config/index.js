@@ -17,11 +17,11 @@ export const config = {
     }
   },
   evolution: {
-    baseURL: "https://dev-studiogirardi-evolution-api.lt0sh0.easypanel.host",
-    apiKey: "02314644FB70-4D08-A756-A53CED8621A9",
-    instanceName: "teste_nutriplan",
-    enabled: true,
-    phone: "+553591619970"
+    baseURL: process.env.REACT_APP_EVOLUTION_BASE_URL || "",
+    apiKey: process.env.REACT_APP_EVOLUTION_API_KEY || "",
+    instanceName: process.env.REACT_APP_EVOLUTION_INSTANCE_NAME || "",
+    enabled: false,
+    phone: process.env.REACT_APP_EVOLUTION_PHONE || ""
   },
   features: {
     enableNotifications: true,

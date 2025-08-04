@@ -255,32 +255,7 @@ const colors = {
 
 // Mock Data
 const mockUsers = [];
-const initialClients = [
-  {
-    id: '1',
-    name: 'João Silva',
-    age: 28,
-    weight: 75,
-    height: 180,
-    goal: 'Perda de peso',
-    trainingFrequency: '3x por semana',
-    gender: 'masculino',
-    activityLevel: 'moderado',
-    observations: 'Sem restrições alimentares'
-  },
-  {
-    id: '2',
-    name: 'Maria Santos',
-    age: 32,
-    weight: 65,
-    height: 165,
-    goal: 'Ganho de massa',
-    trainingFrequency: '4x por semana',
-    gender: 'feminino',
-    activityLevel: 'intenso',
-    observations: 'Vegetariana'
-  }
-];
+const initialClients = [];
 const mockDiets = [];
 const mockTemplates = [];
 
