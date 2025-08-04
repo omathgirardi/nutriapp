@@ -13,9 +13,21 @@ export const authService = {
       const { data: { user }, error } = await supabase.auth.signUp({ email, password });
       if (error) throw error;
 
+      // Criar hash da senha para armazenar na tabela users
+      const bcrypt = await import('bcryptjs');
+      const saltRounds = 10;
+      const password_hash = await bcrypt.hash(password, saltRounds);
+
       const { error: insertError } = await supabase
         .from('users')
-        .insert({ ...userData, email, uid: user.id, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
+        .insert({ 
+          ...userData, 
+          email, 
+          uid: user.id, 
+          password_hash,
+          created_at: new Date().toISOString(), 
+          updated_at: new Date().toISOString() 
+        });
       if (insertError) throw insertError;
 
       return { user, success: true };
@@ -58,7 +70,7 @@ export const dbService = {
     try {
       const { data: insertedData, error } = await supabase
         .from(tableName)
-        .insert({ ...data, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
+        .insert({ ...data, created_at: new Date().toISOString(), updated_at: new Date().toISOString() });
       if (error) throw error;
       return { id: insertedData[0].id, success: true };
     } catch (error) {
@@ -82,7 +94,7 @@ export const dbService = {
     }
   },
 
-  async getAll(tableName, orderField = 'createdAt', orderDirection = 'desc') {
+  async getAll(tableName, orderField = 'created_at', orderDirection = 'desc') {
     try {
       const { data, error } = await supabase
         .from(tableName)
@@ -112,12 +124,12 @@ export const dbService = {
 
   async update(tableName, id, data) {
     try {
-      const { error } = await supabase
+      const { data: updatedData, error } = await supabase
         .from(tableName)
-        .update({ ...data, updatedAt: new Date().toISOString() })
+        .update({ ...data, updated_at: new Date().toISOString() })
         .eq('id', id);
       if (error) throw error;
-      return { success: true };
+      return { data: updatedData, success: true };
     } catch (error) {
       console.error('Erro ao atualizar registro:', error);
       return { error: error.message, success: false };
