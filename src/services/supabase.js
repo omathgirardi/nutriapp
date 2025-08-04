@@ -18,17 +18,40 @@ export const authService = {
       const saltRounds = 10;
       const password_hash = await bcrypt.hash(password, saltRounds);
 
-      const { error: insertError } = await supabase
+      // Preparar dados para inserção na tabela users
+      const userInsertData = {
+        uid: user.id,
+        email: email,
+        password_hash: password_hash,
+        full_name: userData.full_name,
+        role: userData.role,
+        phone_number: userData.phone_number,
+        bio: userData.bio,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+
+      const { data: insertedUser, error: insertError } = await supabase
         .from('users')
-        .insert({ 
-          ...userData, 
-          email, 
-          uid: user.id, 
-          password_hash,
-          created_at: new Date().toISOString(), 
-          updated_at: new Date().toISOString() 
-        });
+        .insert(userInsertData)
+        .select();
       if (insertError) throw insertError;
+
+      // Se for personal trainer, inserir na tabela personal_trainers
+      if (userData.role === 'personal_trainer' && userData.profile && userData.profile.crn) {
+        const { error: ptError } = await supabase
+          .from('personal_trainers')
+          .insert({
+            user_id: insertedUser[0].id,
+            crn: userData.profile.crn,
+            specialization: userData.profile.specialization || 'Musculação',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          });
+        if (ptError) {
+          console.warn('Erro ao inserir na tabela personal_trainers:', ptError);
+        }
+      }
 
       return { user, success: true };
     } catch (error) {

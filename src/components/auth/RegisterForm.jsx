@@ -75,7 +75,7 @@ const RegisterForm = ({ onSwitchToLogin }) => {
       phone_number: formData.phone_number.trim() || null,
       bio: formData.bio.trim() || null,
       profile: formData.role === 'personal_trainer' ? {
-        specialization: formData.specialization.trim() || null,
+        specialization: formData.specialization.trim() || 'Musculação',
         crn: formData.crn.trim()
       } : {}
     };
