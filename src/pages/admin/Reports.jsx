@@ -61,38 +61,38 @@ const AdminReports = ({ showPushNotification }) => {
 
   const reportData = {
     overview: {
-      totalUsers: 1247,
-      totalTrainers: 89,
-      totalDiets: 3456,
-      revenue: 45670,
+      totalUsers: 0,
+      totalTrainers: 0,
+      totalDiets: 0,
+      revenue: 0,
       growth: {
-        users: 12.5,
-        trainers: 8.3,
-        diets: 23.1,
-        revenue: 15.7
+        users: 0,
+        trainers: 0,
+        diets: 0,
+        revenue: 0
       }
     },
     usage: {
-      activeUsers: 892,
-      dietCreations: 234,
-      avgSessionTime: '24min',
-      bounceRate: '23%'
+      activeUsers: 0,
+      dietCreations: 0,
+      avgSessionTime: '0min',
+      bounceRate: '0%'
     },
     financial: {
-      monthlyRevenue: 45670,
-      subscriptions: 156,
-      avgRevenuePerUser: 89.50,
-      churnRate: '5.2%'
+      monthlyRevenue: 0,
+      subscriptions: 0,
+      avgRevenuePerUser: 0,
+      churnRate: '0%'
     }
   };
 
   const chartData = [
-    { month: 'Jan', users: 120, revenue: 3200 },
-    { month: 'Fev', users: 145, revenue: 3800 },
-    { month: 'Mar', users: 167, revenue: 4200 },
-    { month: 'Abr', users: 189, revenue: 4800 },
-    { month: 'Mai', users: 203, revenue: 5200 },
-    { month: 'Jun', users: 234, revenue: 5800 }
+    { month: 'Jan', users: 0, revenue: 0 },
+    { month: 'Fev', users: 0, revenue: 0 },
+    { month: 'Mar', users: 0, revenue: 0 },
+    { month: 'Abr', users: 0, revenue: 0 },
+    { month: 'Mai', users: 0, revenue: 0 },
+    { month: 'Jun', users: 0, revenue: 0 }
   ];
 
   return (

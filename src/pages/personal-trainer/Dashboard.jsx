@@ -77,71 +77,15 @@ const Modal = ({ isOpen, onClose, title, children }) => {
 };
 
 const PersonalTrainerDashboard = ({ showPushNotification }) => {
-  const [clients] = useState([
-    {
-      id: 1,
-      name: 'Maria Silva',
-      email: 'maria@email.com',
-      phone: '(11) 99999-9999',
-      goal: 'Perda de peso',
-      startDate: '2024-01-15',
-      lastDiet: '2024-01-20',
-      status: 'Ativo',
-      progress: 75
-    },
-    {
-      id: 2,
-      name: 'João Santos',
-      email: 'joao@email.com',
-      phone: '(11) 88888-8888',
-      goal: 'Ganho de massa',
-      startDate: '2024-01-10',
-      lastDiet: '2024-01-18',
-      status: 'Ativo',
-      progress: 60
-    },
-    {
-      id: 3,
-      name: 'Ana Costa',
-      email: 'ana@email.com',
-      phone: '(11) 77777-7777',
-      goal: 'Manutenção',
-      startDate: '2024-01-05',
-      lastDiet: '2024-01-22',
-      status: 'Inativo',
-      progress: 40
-    }
-  ]);
+  const [clients] = useState([]);
 
-  const [recentActivities] = useState([
-    {
-      id: 1,
-      type: 'diet_created',
-      client: 'Maria Silva',
-      description: 'Nova dieta criada',
-      time: '2 horas atrás'
-    },
-    {
-      id: 2,
-      type: 'client_added',
-      client: 'João Santos',
-      description: 'Cliente adicionado',
-      time: '1 dia atrás'
-    },
-    {
-      id: 3,
-      type: 'diet_updated',
-      client: 'Ana Costa',
-      description: 'Dieta atualizada',
-      time: '2 dias atrás'
-    }
-  ]);
+  const [recentActivities] = useState([]);
 
   const stats = {
     totalClients: clients.length,
     activeClients: clients.filter(c => c.status === 'Ativo').length,
-    dietsCreated: 15,
-    successRate: 85
+    dietsCreated: 0,
+    successRate: 0
   };
 
   const [showClientModal, setShowClientModal] = useState(false);

@@ -557,80 +557,7 @@ var NutriPlan = () => {
       { name: "Jantar", foods: [], substitutions: [] }
     ]
   });
-  const foodDatabase = [
-    {
-      name: "Arroz branco cozido",
-      protein: 2.5,
-      carbs: 28.1,
-      fat: 0.2,
-      calories: 124,
-      baseAmount: 100,
-      unit: "g"
-    },
-    {
-      name: "Feij\\xE3o preto cozido",
-      protein: 4.5,
-      carbs: 14,
-      fat: 0.5,
-      calories: 77,
-      baseAmount: 100,
-      unit: "g"
-    },
-    {
-      name: "Frango grelhado (peito)",
-      protein: 23.1,
-      carbs: 0,
-      fat: 3.2,
-      calories: 119,
-      baseAmount: 100,
-      unit: "g"
-    },
-    {
-      name: "Banana",
-      protein: 1.1,
-      carbs: 22.8,
-      fat: 0.2,
-      calories: 96,
-      baseAmount: 100,
-      unit: "g"
-    },
-    {
-      name: "Aveia",
-      protein: 13.2,
-      carbs: 66.3,
-      fat: 6.9,
-      calories: 379,
-      baseAmount: 100,
-      unit: "g"
-    },
-    {
-      name: "Ovo cozido",
-      protein: 13,
-      carbs: 1.1,
-      fat: 10.6,
-      calories: 155,
-      baseAmount: 100,
-      unit: "g"
-    },
-    {
-      name: "Leite desnatado",
-      protein: 3.4,
-      carbs: 4.8,
-      fat: 0.2,
-      calories: 34,
-      baseAmount: 100,
-      unit: "ml"
-    },
-    {
-      name: "Batata doce",
-      protein: 2,
-      carbs: 20,
-      fat: 0.1,
-      calories: 86,
-      baseAmount: 100,
-      unit: "g"
-    }
-  ];
+  const foodDatabase = [];
   const [generationStage, setGenerationStage] = useState("");
   const [generationProgress, setGenerationProgress] = useState(0);
   const [showGenerationModal, setShowGenerationModal] = useState(false);
@@ -2245,7 +2172,7 @@ NutriApp - Sistema Profissional de Nutri\\xE7\\xE3o
     },
     /* @__PURE__ */ React.createElement(Plus, { size: 16 }),
     "Criar Template"
-  ))), /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-1 md:grid-cols-4 gap-4" }, /* @__PURE__ */ React.createElement(Card, { className: "p-4" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center space-x-3" }, /* @__PURE__ */ React.createElement("div", { className: "w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center" }, /* @__PURE__ */ React.createElement(FileText, { className: "text-blue-600", size: 20 })), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { className: "text-2xl font-bold text-gray-900" }, mockTemplates.length), /* @__PURE__ */ React.createElement("p", { className: "text-sm text-gray-600" }, "Templates Ativos")))), /* @__PURE__ */ React.createElement(Card, { className: "p-4" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center space-x-3" }, /* @__PURE__ */ React.createElement("div", { className: "w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center" }, /* @__PURE__ */ React.createElement(TrendingUp, { className: "text-green-600", size: 20 })), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { className: "text-2xl font-bold text-gray-900" }, "847"), /* @__PURE__ */ React.createElement("p", { className: "text-sm text-gray-600" }, "Usos Este M\\xEAs")))), /* @__PURE__ */ React.createElement(Card, { className: "p-4" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center space-x-3" }, /* @__PURE__ */ React.createElement("div", { className: "w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center" }, /* @__PURE__ */ React.createElement(Star, { className: "text-purple-600", size: 20 })), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { className: "text-2xl font-bold text-gray-900" }, "4.8"), /* @__PURE__ */ React.createElement("p", { className: "text-sm text-gray-600" }, "Avalia\\xE7\\xE3o M\\xE9dia")))), /* @__PURE__ */ React.createElement(Card, { className: "p-4" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center space-x-3" }, /* @__PURE__ */ React.createElement("div", { className: "w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center" }, /* @__PURE__ */ React.createElement(Users, { className: "text-orange-600", size: 20 })), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { className: "text-2xl font-bold text-gray-900" }, "23"), /* @__PURE__ */ React.createElement("p", { className: "text-sm text-gray-600" }, "Personal Trainers"))))), /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" }, mockTemplates.map((template) => /* @__PURE__ */ React.createElement(Card, { key: template.id, className: "p-6 hover:shadow-lg transition-shadow" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center space-x-4 mb-4" }, /* @__PURE__ */ React.createElement("div", { className: "w-12 h-12 bg-green-100 rounded-full flex items-center justify-center" }, /* @__PURE__ */ React.createElement(FileText, { className: "text-green-600", size: 24 })), /* @__PURE__ */ React.createElement("div", { className: "flex-1" }, /* @__PURE__ */ React.createElement("h3", { className: "font-semibold text-gray-900" }, template.name), /* @__PURE__ */ React.createElement("p", { className: "text-sm text-gray-600" }, template.meals, " refei\\xE7\\xF5es")), /* @__PURE__ */ React.createElement("div", { className: "flex flex-col items-end" }, /* @__PURE__ */ React.createElement("span", { className: "text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full" }, "\\u2713 Ativo"))), /* @__PURE__ */ React.createElement("p", { className: "text-sm text-gray-600 mb-4 line-clamp-2" }, template.description), /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-2 gap-3 mb-4" }, /* @__PURE__ */ React.createElement("div", { className: "text-center p-2 bg-blue-50 rounded" }, /* @__PURE__ */ React.createElement("p", { className: "text-lg font-bold text-blue-600" }, "127"), /* @__PURE__ */ React.createElement("p", { className: "text-xs text-gray-600" }, "Usos")), /* @__PURE__ */ React.createElement("div", { className: "text-center p-2 bg-purple-50 rounded" }, /* @__PURE__ */ React.createElement("p", { className: "text-lg font-bold text-purple-600" }, "4.9"), /* @__PURE__ */ React.createElement("p", { className: "text-xs text-gray-600" }, "Avalia\\xE7\\xE3o"))), /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-2 gap-2" }, /* @__PURE__ */ React.createElement(
+  ))), /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-1 md:grid-cols-4 gap-4" }, /* @__PURE__ */ React.createElement(Card, { className: "p-4" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center space-x-3" }, /* @__PURE__ */ React.createElement("div", { className: "w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center" }, /* @__PURE__ */ React.createElement(FileText, { className: "text-blue-600", size: 20 })), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { className: "text-2xl font-bold text-gray-900" }, mockTemplates.length), /* @__PURE__ */ React.createElement("p", { className: "text-sm text-gray-600" }, "Templates Ativos")))), /* @__PURE__ */ React.createElement(Card, { className: "p-4" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center space-x-3" }, /* @__PURE__ */ React.createElement("div", { className: "w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center" }, /* @__PURE__ */ React.createElement(TrendingUp, { className: "text-green-600", size: 20 })), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { className: "text-2xl font-bold text-gray-900" }, "0"), /* @__PURE__ */ React.createElement("p", { className: "text-sm text-gray-600" }, "Usos Este M\\xEAs")))), /* @__PURE__ */ React.createElement(Card, { className: "p-4" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center space-x-3" }, /* @__PURE__ */ React.createElement("div", { className: "w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center" }, /* @__PURE__ */ React.createElement(Star, { className: "text-purple-600", size: 20 })), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { className: "text-2xl font-bold text-gray-900" }, "0.0"), /* @__PURE__ */ React.createElement("p", { className: "text-sm text-gray-600" }, "Avalia\\xE7\\xE3o M\\xE9dia")))), /* @__PURE__ */ React.createElement(Card, { className: "p-4" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center space-x-3" }, /* @__PURE__ */ React.createElement("div", { className: "w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center" }, /* @__PURE__ */ React.createElement(Users, { className: "text-orange-600", size: 20 })), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { className: "text-2xl font-bold text-gray-900" }, "0"), /* @__PURE__ */ React.createElement("p", { className: "text-sm text-gray-600" }, "Personal Trainers"))))), /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" }, mockTemplates.map((template) => /* @__PURE__ */ React.createElement(Card, { key: template.id, className: "p-6 hover:shadow-lg transition-shadow" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center space-x-4 mb-4" }, /* @__PURE__ */ React.createElement("div", { className: "w-12 h-12 bg-green-100 rounded-full flex items-center justify-center" }, /* @__PURE__ */ React.createElement(FileText, { className: "text-green-600", size: 24 })), /* @__PURE__ */ React.createElement("div", { className: "flex-1" }, /* @__PURE__ */ React.createElement("h3", { className: "font-semibold text-gray-900" }, template.name), /* @__PURE__ */ React.createElement("p", { className: "text-sm text-gray-600" }, template.meals, " refei\\xE7\\xF5es")), /* @__PURE__ */ React.createElement("div", { className: "flex flex-col items-end" }, /* @__PURE__ */ React.createElement("span", { className: "text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full" }, "\\u2713 Ativo"))), /* @__PURE__ */ React.createElement("p", { className: "text-sm text-gray-600 mb-4 line-clamp-2" }, template.description), /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-2 gap-3 mb-4" }, /* @__PURE__ */ React.createElement("div", { className: "text-center p-2 bg-blue-50 rounded" }, /* @__PURE__ */ React.createElement("p", { className: "text-lg font-bold text-blue-600" }, "0"), /* @__PURE__ */ React.createElement("p", { className: "text-xs text-gray-600" }, "Usos")), /* @__PURE__ */ React.createElement("div", { className: "text-center p-2 bg-purple-50 rounded" }, /* @__PURE__ */ React.createElement("p", { className: "text-lg font-bold text-purple-600" }, "0.0"), /* @__PURE__ */ React.createElement("p", { className: "text-xs text-gray-600" }, "Avalia\\xE7\\xE3o"))), /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-2 gap-2" }, /* @__PURE__ */ React.createElement(
     Button,
     {
       size: "sm",
@@ -2262,9 +2189,9 @@ NutriApp - Sistema Profissional de Nutri\\xE7\\xE3o
 \\u2022 Baseado em evid\\xEAncias nutricionais
 
 \\u{1F4CA} Estat\\xEDsticas:
-\\u2022 127 usos este m\\xEAs
-\\u2022 Avalia\\xE7\\xE3o: 4.9/5.0
-\\u2022 Criado por: Equipe NutriApp
+\\u2022 0 usos este m\xEAs
+\u2022 Avalia\xE7\xE3o: 0/5.0
+\u2022 Criado por: Sistema
 
 \\u2705 Status: Ativo e dispon\\xEDvel
 
@@ -2363,8 +2290,8 @@ Isto ir\\xE1 criar uma c\\xF3pia edit\\xE1vel que voc\\xEA pode personalizar con
 Esta a\\xE7\\xE3o n\\xE3o pode ser desfeita.
 
 \\u{1F4CA} Estat\\xEDsticas do template:
-\\u2022 127 usos registrados
-\\u2022 Avalia\\xE7\\xE3o: 4.9/5.0
+\\u2022 0 usos registrados
+\u2022 Avalia\xE7\xE3o: 0/5.0
 \\u2022 Criado h\\xE1 3 meses
 
 \\u{1F4A1} Considere desativar ao inv\\xE9s de excluir se houver depend\\xEAncias.\`,
@@ -2478,7 +2405,7 @@ Esta a\\xE7\\xE3o n\\xE3o pode ser desfeita.
 \\u2022 M\\xE9dia cal\\xF3rica: \${Math.floor(Math.random() * 200 + 100)} kcal
 \\u2022 Adicionados este m\\xEAs: \${Math.floor(Math.random() * 20 + 5)}
 
-\\u{1F3AF} Esta categoria representa \${Math.floor(category.count / 2847 * 100)}% da base de dados.
+\\u{1F3AF} Esta categoria representa \${Math.floor(category.count / 1 * 100)}% da base de dados.
 
 \\u{1F4A1} Categoria bem estruturada e atualizada!\`,
           "info"
@@ -2490,7 +2417,7 @@ Esta a\\xE7\\xE3o n\\xE3o pode ser desfeita.
       "div",
       {
         className: \`h-2 rounded-full \${category.color.replace("text-", "bg-").replace("-700", "-500")}\`,
-        style: { width: \`\${category.count / 847 * 100}%\` }
+        style: { width: \`\${category.count / 1 * 100}%\` }
       }
     )))
   ))))), /* @__PURE__ */ React.createElement(Card, { className: "p-6" }, /* @__PURE__ */ React.createElement("h3", { className: "text-lg font-semibold text-gray-900 mb-4" }, "Atividade Recente da Base"), /* @__PURE__ */ React.createElement("div", { className: "space-y-3" }, [

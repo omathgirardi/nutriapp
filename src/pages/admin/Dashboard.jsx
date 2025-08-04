@@ -92,7 +92,7 @@ const AdminDashboard = ({ setShowAddTrainerModal }) => {
         <Card className="p-4 md:p-6 lg:col-span-2">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4 md:mb-6">
             <h3 className="text-lg font-semibold text-gray-900">Top Personal Trainers</h3>
-            <span className="text-sm text-gray-500">Este mês</span>
+            <span className="text-sm text-gray-500">Período atual</span>
           </div>
           
           <div className="space-y-3 md:space-y-4">

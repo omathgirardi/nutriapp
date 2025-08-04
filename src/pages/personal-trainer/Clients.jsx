@@ -77,54 +77,7 @@ const Modal = ({ isOpen, onClose, title, children }) => {
 };
 
 const PersonalTrainerClients = () => {
-  const [clients, setClients] = useState([
-    {
-      id: 1,
-      name: 'Maria Silva',
-      email: 'maria@email.com',
-      phone: '(11) 99999-9999',
-      age: 28,
-      weight: 65,
-      height: 165,
-      goal: 'Perda de peso',
-      startDate: '2024-01-15',
-      status: 'Ativo',
-      progress: 75,
-      notes: 'Cliente muito dedicada, segue a dieta rigorosamente.',
-      frequency: '3x por semana',
-      dietaryRestriction: 'Vegetariano'
-    },
-    {
-      id: 2,
-      name: 'João Santos',
-      email: 'joao@email.com',
-      phone: '(11) 88888-8888',
-      age: 35,
-      weight: 80,
-      height: 175,
-      goal: 'Ganho de massa',
-      startDate: '2024-01-10',
-      status: 'Ativo',
-      progress: 60,
-      notes: 'Precisa aumentar a ingestão de proteínas.',
-      frequency: '4x por semana'
-    },
-    {
-      id: 3,
-      name: 'Ana Costa',
-      email: 'ana@email.com',
-      phone: '(11) 77777-7777',
-      age: 42,
-      weight: 70,
-      height: 160,
-      goal: 'Manutenção',
-      startDate: '2024-01-05',
-      status: 'Inativo',
-      progress: 40,
-      notes: 'Cliente com dificuldades para seguir a dieta.',
-      frequency: '2x por semana'
-    }
-  ]);
+  const [clients, setClients] = useState([]);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');

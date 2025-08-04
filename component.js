@@ -1082,80 +1082,7 @@ ${diet.meals.map((meal) => `• ${meal.name}: ${meal.calories} kcal`).join("\n")
       { name: "Jantar", foods: [], substitutions: [] }
     ]
   });
-  const foodDatabase = [
-    {
-      name: "Arroz branco cozido",
-      protein: 2.5,
-      carbs: 28.1,
-      fat: 0.2,
-      calories: 124,
-      baseAmount: 100,
-      unit: "g"
-    },
-    {
-      name: "Feij\xE3o preto cozido",
-      protein: 4.5,
-      carbs: 14,
-      fat: 0.5,
-      calories: 77,
-      baseAmount: 100,
-      unit: "g"
-    },
-    {
-      name: "Frango grelhado (peito)",
-      protein: 23.1,
-      carbs: 0,
-      fat: 3.2,
-      calories: 119,
-      baseAmount: 100,
-      unit: "g"
-    },
-    {
-      name: "Banana",
-      protein: 1.1,
-      carbs: 22.8,
-      fat: 0.2,
-      calories: 96,
-      baseAmount: 100,
-      unit: "g"
-    },
-    {
-      name: "Aveia",
-      protein: 13.2,
-      carbs: 66.3,
-      fat: 6.9,
-      calories: 379,
-      baseAmount: 100,
-      unit: "g"
-    },
-    {
-      name: "Ovo cozido",
-      protein: 13,
-      carbs: 1.1,
-      fat: 10.6,
-      calories: 155,
-      baseAmount: 100,
-      unit: "g"
-    },
-    {
-      name: "Leite desnatado",
-      protein: 3.4,
-      carbs: 4.8,
-      fat: 0.2,
-      calories: 34,
-      baseAmount: 100,
-      unit: "ml"
-    },
-    {
-      name: "Batata doce",
-      protein: 2,
-      carbs: 20,
-      fat: 0.1,
-      calories: 86,
-      baseAmount: 100,
-      unit: "g"
-    }
-  ];
+  const foodDatabase = [];
   const [generationStage, setGenerationStage] = useState("");
   const [generationProgress, setGenerationProgress] = useState(0);
   const [showGenerationModal, setShowGenerationModal] = useState(false);
@@ -1793,7 +1720,7 @@ NutriApp - Sistema Profissional de Nutri\xE7\xE3o
       setCurrentUser({ id: "admin", name: "Administrador", email: "admin@nutriapp.com" });
       setUserRole("admin");
     } else {
-      setCurrentUser({ id: "P0001", name: "Usuário Exemplo", email: loginData.email });
+      setCurrentUser({ id: "P0001", name: "Personal Trainer", email: loginData.email });
       setUserRole("personal");
     }
     setShowLoginModal(false);
@@ -2296,10 +2223,10 @@ NutriApp - Sistema Profissional de Nutri\xE7\xE3o
     "img",
     {
       src: profilePhoto || currentUser.photo,
-      alt: "Usuário Exemplo",
+      alt: "Personal Trainer",
       className: "w-full h-full object-cover"
     }
-  ) : /* @__PURE__ */ React.createElement(Crown, { className: "text-yellow-600", size: 20 })), /* @__PURE__ */ React.createElement("div", { className: "min-w-0 flex-1" }, /* @__PURE__ */ React.createElement("h4", { className: "font-semibold text-gray-900 text-sm md:text-base truncate" }, "Usuário Exemplo"), /* @__PURE__ */ React.createElement("p", { className: "text-xs md:text-sm text-gray-600" }, "Personal Trainer"), /* @__PURE__ */ React.createElement("div", { className: "flex flex-wrap items-center gap-2 mt-1" }, /* @__PURE__ */ React.createElement("span", { className: "text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full whitespace-nowrap" }, "0 dietas"), /* @__PURE__ */ React.createElement("span", { className: "text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full whitespace-nowrap" }, "0 clientes")))), /* @__PURE__ */ React.createElement("div", { className: "text-right flex-shrink-0 ml-2" }, /* @__PURE__ */ React.createElement("p", { className: "text-xl md:text-2xl font-bold text-yellow-600" }, "#1"), /* @__PURE__ */ React.createElement("p", { className: "text-xs md:text-sm text-gray-500" }, "L\xEDder")))), /* @__PURE__ */ React.createElement("div", { className: "bg-gray-50 rounded-xl p-3 md:p-4" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center space-x-3 md:space-x-4 min-w-0 flex-1" }, /* @__PURE__ */ React.createElement("div", { className: "w-10 h-10 md:w-12 md:h-12 bg-gray-100 rounded-full overflow-hidden flex items-center justify-center flex-shrink-0" }, /* @__PURE__ */ React.createElement(User, { className: "text-gray-600", size: 20 })), /* @__PURE__ */ React.createElement("div", { className: "min-w-0 flex-1" }, /* @__PURE__ */ React.createElement("h4", { className: "font-semibold text-gray-900 text-sm md:text-base truncate" }, "Usuário Exemplo"), /* @__PURE__ */ React.createElement("p", { className: "text-xs md:text-sm text-gray-600" }, "Personal Trainer"), /* @__PURE__ */ React.createElement("div", { className: "flex flex-wrap items-center gap-2 mt-1" }, /* @__PURE__ */ React.createElement("span", { className: "text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full whitespace-nowrap" }, "0 dietas"), /* @__PURE__ */ React.createElement("span", { className: "text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full whitespace-nowrap" }, "0 clientes")))), /* @__PURE__ */ React.createElement("div", { className: "text-right flex-shrink-0 ml-2" }, /* @__PURE__ */ React.createElement("p", { className: "text-xl md:text-2xl font-bold text-gray-600" }, "#2"), /* @__PURE__ */ React.createElement("p", { className: "text-xs md:text-sm text-gray-500" }, "Vice-l\xEDder")))), /* @__PURE__ */ React.createElement("div", { className: "bg-gray-50 rounded-xl p-3 md:p-4" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center space-x-3 md:space-x-4 min-w-0 flex-1" }, /* @__PURE__ */ React.createElement("div", { className: "w-10 h-10 md:w-12 md:h-12 bg-gray-100 rounded-full overflow-hidden flex items-center justify-center flex-shrink-0" }, /* @__PURE__ */ React.createElement(User, { className: "text-gray-600", size: 20 })), /* @__PURE__ */ React.createElement("div", { className: "min-w-0 flex-1" }, /* @__PURE__ */ React.createElement("h4", { className: "font-semibold text-gray-900 text-sm md:text-base truncate" }, "Usuário Exemplo"), /* @__PURE__ */ React.createElement("p", { className: "text-xs md:text-sm text-gray-600" }, "Personal Trainer"), /* @__PURE__ */ React.createElement("div", { className: "flex flex-wrap items-center gap-2 mt-1" }, /* @__PURE__ */ React.createElement("span", { className: "text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full whitespace-nowrap" }, "0 dietas"), /* @__PURE__ */ React.createElement("span", { className: "text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full whitespace-nowrap" }, "0 clientes")))), /* @__PURE__ */ React.createElement("div", { className: "text-right flex-shrink-0 ml-2" }, /* @__PURE__ */ React.createElement("p", { className: "text-xl md:text-2xl font-bold text-gray-600" }, "#3"), /* @__PURE__ */ React.createElement("p", { className: "text-xs md:text-sm text-gray-500" }, "3\xBA lugar")))), /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-2 gap-3 md:gap-4 mt-4 md:mt-6" }, /* @__PURE__ */ React.createElement("div", { className: "bg-blue-50 p-3 md:p-4 rounded-lg text-center" }, /* @__PURE__ */ React.createElement("p", { className: "text-xl md:text-2xl font-bold text-blue-600" }, "0"), /* @__PURE__ */ React.createElement("p", { className: "text-xs md:text-sm text-gray-600" }, "Total de Dietas")), /* @__PURE__ */ React.createElement("div", { className: "bg-green-50 p-3 md:p-4 rounded-lg text-center" }, /* @__PURE__ */ React.createElement("p", { className: "text-xl md:text-2xl font-bold text-green-600" }, "0"), /* @__PURE__ */ React.createElement("p", { className: "text-xs md:text-sm text-gray-600" }, "Total de Clientes"))))), /* @__PURE__ */ React.createElement(Card, { className: "p-4 md:p-6" }, /* @__PURE__ */ React.createElement("h3", { className: "text-lg font-semibold text-gray-900 mb-4 md:mb-6" }, "Atividade Recente"), /* @__PURE__ */ React.createElement("div", { className: "space-y-3 md:space-y-4" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-start space-x-3 p-3 bg-blue-50 rounded-lg" }, /* @__PURE__ */ React.createElement("div", { className: "w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0" }, /* @__PURE__ */ React.createElement(User, { size: 16, className: "text-blue-600" })), /* @__PURE__ */ React.createElement("div", { className: "min-w-0 flex-1" }, /* @__PURE__ */ React.createElement("p", { className: "font-medium text-gray-900 text-sm truncate" }, "Usuário Exemplo"), /* @__PURE__ */ React.createElement("p", { className: "text-xs text-gray-500" }, "2 horas atr\xE1s \u2022 0 kcal"))), /* @__PURE__ */ React.createElement("div", { className: "flex items-start space-x-3 p-3 bg-emerald-50 rounded-lg" }, /* @__PURE__ */ React.createElement("div", { className: "w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center flex-shrink-0" }, /* @__PURE__ */ React.createElement(DollarSign, { size: 16, className: "text-emerald-600" })), /* @__PURE__ */ React.createElement("div", { className: "min-w-0 flex-1" }, /* @__PURE__ */ React.createElement("p", { className: "font-medium text-gray-900 text-sm" }, "Nenhuma atividade recente"), /* @__PURE__ */ React.createElement("p", { className: "text-xs text-gray-500" }, "1 dia atr\xE1s"))), /* @__PURE__ */ React.createElement("div", { className: "flex items-start space-x-3 p-3 bg-blue-50 rounded-lg" }, /* @__PURE__ */ React.createElement("div", { className: "w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0" }, /* @__PURE__ */ React.createElement(User, { size: 16, className: "text-blue-600" })), /* @__PURE__ */ React.createElement("div", { className: "min-w-0 flex-1" }, /* @__PURE__ */ React.createElement("p", { className: "font-medium text-gray-900 text-sm truncate" }, "Cliente Exemplo"), /* @__PURE__ */ React.createElement("p", { className: "text-xs text-gray-500" }, "2 dias atr\xE1s \u2022 0 kcal"))), /* @__PURE__ */ React.createElement("div", { className: "flex items-start space-x-3 p-3 bg-blue-50 rounded-lg" }, /* @__PURE__ */ React.createElement("div", { className: "w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0" }, /* @__PURE__ */ React.createElement(Star, { size: 16, className: "text-blue-600" })), /* @__PURE__ */ React.createElement("div", { className: "min-w-0 flex-1" }, /* @__PURE__ */ React.createElement("p", { className: "font-medium text-gray-900 text-sm" }, "Nenhuma conquista"), /* @__PURE__ */ React.createElement("p", { className: "text-xs text-gray-500" }, "3 dias atr\xE1s"))))))) : /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { className: "text-gray-500 text-sm mb-6" }, "Aqui est\xE1 um resumo da sua atividade hoje")), /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-6" }, /* @__PURE__ */ React.createElement(Card, { className: "p-4 md:p-6" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React.createElement("div", { className: "min-w-0 flex-1" }, /* @__PURE__ */ React.createElement("h3", { className: "text-xl md:text-2xl font-bold text-gray-900" }, "0"), /* @__PURE__ */ React.createElement("p", { className: "text-gray-500 text-sm mb-2" }, "Alunos Cadastrados"), /* @__PURE__ */ React.createElement("div", { className: "flex items-center text-xs" }, /* @__PURE__ */ React.createElement("span", { className: "text-gray-400 bg-gray-50 px-2 py-1 rounded-full whitespace-nowrap" }, "Sem dados"))), /* @__PURE__ */ React.createElement("div", { className: "w-10 h-10 md:w-12 md:h-12 bg-blue-50 rounded-xl flex items-center justify-center flex-shrink-0 ml-3" }, /* @__PURE__ */ React.createElement(Users, { className: "text-blue-600", size: 20 })))), /* @__PURE__ */ React.createElement(Card, { className: "p-4 md:p-6" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React.createElement("div", { className: "min-w-0 flex-1" }, /* @__PURE__ */ React.createElement("h3", { className: "text-xl md:text-2xl font-bold text-gray-900" }, "0"), /* @__PURE__ */ React.createElement("p", { className: "text-gray-500 text-sm mb-2" }, "Receitas Geradas"), /* @__PURE__ */ React.createElement("div", { className: "flex items-center text-xs" }, /* @__PURE__ */ React.createElement("span", { className: "text-gray-400 bg-gray-50 px-2 py-1 rounded-full whitespace-nowrap" }, "Sem dados"))), /* @__PURE__ */ React.createElement("div", { className: "w-10 h-10 md:w-12 md:h-12 bg-green-50 rounded-xl flex items-center justify-center flex-shrink-0 ml-3" }, /* @__PURE__ */ React.createElement(FileText, { className: "text-green-600", size: 20 })))), /* @__PURE__ */ React.createElement(
+  ) : /* @__PURE__ */ React.createElement(Crown, { className: "text-yellow-600", size: 20 })), /* @__PURE__ */ React.createElement("div", { className: "min-w-0 flex-1" }, /* @__PURE__ */ React.createElement("h4", { className: "font-semibold text-gray-900 text-sm md:text-base truncate" }, "Personal Trainer"), /* @__PURE__ */ React.createElement("p", { className: "text-xs md:text-sm text-gray-600" }, "Personal Trainer"), /* @__PURE__ */ React.createElement("div", { className: "flex flex-wrap items-center gap-2 mt-1" }, /* @__PURE__ */ React.createElement("span", { className: "text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full whitespace-nowrap" }, "0 dietas"), /* @__PURE__ */ React.createElement("span", { className: "text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full whitespace-nowrap" }, "0 clientes")))), /* @__PURE__ */ React.createElement("div", { className: "text-right flex-shrink-0 ml-2" }, /* @__PURE__ */ React.createElement("p", { className: "text-xl md:text-2xl font-bold text-yellow-600" }, "#1"), /* @__PURE__ */ React.createElement("p", { className: "text-xs md:text-sm text-gray-500" }, "L\xEDder")))), /* @__PURE__ */ React.createElement("div", { className: "bg-gray-50 rounded-xl p-3 md:p-4" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center space-x-3 md:space-x-4 min-w-0 flex-1" }, /* @__PURE__ */ React.createElement("div", { className: "w-10 h-10 md:w-12 md:h-12 bg-gray-100 rounded-full overflow-hidden flex items-center justify-center flex-shrink-0" }, /* @__PURE__ */ React.createElement(User, { className: "text-gray-600", size: 20 })), /* @__PURE__ */ React.createElement("div", { className: "min-w-0 flex-1" }, /* @__PURE__ */ React.createElement("h4", { className: "font-semibold text-gray-900 text-sm md:text-base truncate" }, "Personal Trainer"), /* @__PURE__ */ React.createElement("p", { className: "text-xs md:text-sm text-gray-600" }, "Personal Trainer"), /* @__PURE__ */ React.createElement("div", { className: "flex flex-wrap items-center gap-2 mt-1" }, /* @__PURE__ */ React.createElement("span", { className: "text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full whitespace-nowrap" }, "0 dietas"), /* @__PURE__ */ React.createElement("span", { className: "text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full whitespace-nowrap" }, "0 clientes")))), /* @__PURE__ */ React.createElement("div", { className: "text-right flex-shrink-0 ml-2" }, /* @__PURE__ */ React.createElement("p", { className: "text-xl md:text-2xl font-bold text-gray-600" }, "#2"), /* @__PURE__ */ React.createElement("p", { className: "text-xs md:text-sm text-gray-500" }, "Vice-l\xEDder")))), /* @__PURE__ */ React.createElement("div", { className: "bg-gray-50 rounded-xl p-3 md:p-4" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center space-x-3 md:space-x-4 min-w-0 flex-1" }, /* @__PURE__ */ React.createElement("div", { className: "w-10 h-10 md:w-12 md:h-12 bg-gray-100 rounded-full overflow-hidden flex items-center justify-center flex-shrink-0" }, /* @__PURE__ */ React.createElement(User, { className: "text-gray-600", size: 20 })), /* @__PURE__ */ React.createElement("div", { className: "min-w-0 flex-1" }, /* @__PURE__ */ React.createElement("h4", { className: "font-semibold text-gray-900 text-sm md:text-base truncate" }, "Personal Trainer"), /* @__PURE__ */ React.createElement("p", { className: "text-xs md:text-sm text-gray-600" }, "Personal Trainer"), /* @__PURE__ */ React.createElement("div", { className: "flex flex-wrap items-center gap-2 mt-1" }, /* @__PURE__ */ React.createElement("span", { className: "text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full whitespace-nowrap" }, "0 dietas"), /* @__PURE__ */ React.createElement("span", { className: "text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full whitespace-nowrap" }, "0 clientes")))), /* @__PURE__ */ React.createElement("div", { className: "text-right flex-shrink-0 ml-2" }, /* @__PURE__ */ React.createElement("p", { className: "text-xl md:text-2xl font-bold text-gray-600" }, "#3"), /* @__PURE__ */ React.createElement("p", { className: "text-xs md:text-sm text-gray-500" }, "3\xBA lugar")))), /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-2 gap-3 md:gap-4 mt-4 md:mt-6" }, /* @__PURE__ */ React.createElement("div", { className: "bg-blue-50 p-3 md:p-4 rounded-lg text-center" }, /* @__PURE__ */ React.createElement("p", { className: "text-xl md:text-2xl font-bold text-blue-600" }, "0"), /* @__PURE__ */ React.createElement("p", { className: "text-xs md:text-sm text-gray-600" }, "Total de Dietas")), /* @__PURE__ */ React.createElement("div", { className: "bg-green-50 p-3 md:p-4 rounded-lg text-center" }, /* @__PURE__ */ React.createElement("p", { className: "text-xl md:text-2xl font-bold text-green-600" }, "0"), /* @__PURE__ */ React.createElement("p", { className: "text-xs md:text-sm text-gray-600" }, "Total de Clientes"))))), /* @__PURE__ */ React.createElement(Card, { className: "p-4 md:p-6" }, /* @__PURE__ */ React.createElement("h3", { className: "text-lg font-semibold text-gray-900 mb-4 md:mb-6" }, "Atividade Recente"), /* @__PURE__ */ React.createElement("div", { className: "space-y-3 md:space-y-4" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-start space-x-3 p-3 bg-blue-50 rounded-lg" }, /* @__PURE__ */ React.createElement("div", { className: "w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0" }, /* @__PURE__ */ React.createElement(User, { size: 16, className: "text-blue-600" })), /* @__PURE__ */ React.createElement("div", { className: "min-w-0 flex-1" }, /* @__PURE__ */ React.createElement("p", { className: "font-medium text-gray-900 text-sm truncate" }, "Personal Trainer"), /* @__PURE__ */ React.createElement("p", { className: "text-xs text-gray-500" }, "2 horas atr\xE1s \u2022 0 kcal"))), /* @__PURE__ */ React.createElement("div", { className: "flex items-start space-x-3 p-3 bg-emerald-50 rounded-lg" }, /* @__PURE__ */ React.createElement("div", { className: "w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center flex-shrink-0" }, /* @__PURE__ */ React.createElement(DollarSign, { size: 16, className: "text-emerald-600" })), /* @__PURE__ */ React.createElement("div", { className: "min-w-0 flex-1" }, /* @__PURE__ */ React.createElement("p", { className: "font-medium text-gray-900 text-sm" }, "Nenhuma atividade recente"), /* @__PURE__ */ React.createElement("p", { className: "text-xs text-gray-500" }, "1 dia atr\xE1s"))), /* @__PURE__ */ React.createElement("div", { className: "flex items-start space-x-3 p-3 bg-blue-50 rounded-lg" }, /* @__PURE__ */ React.createElement("div", { className: "w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0" }, /* @__PURE__ */ React.createElement(User, { size: 16, className: "text-blue-600" })), /* @__PURE__ */ React.createElement("div", { className: "min-w-0 flex-1" }, /* @__PURE__ */ React.createElement("p", { className: "font-medium text-gray-900 text-sm truncate" }, "Cliente"), /* @__PURE__ */ React.createElement("p", { className: "text-xs text-gray-500" }, "2 dias atr\xE1s \u2022 0 kcal"))), /* @__PURE__ */ React.createElement("div", { className: "flex items-start space-x-3 p-3 bg-blue-50 rounded-lg" }, /* @__PURE__ */ React.createElement("div", { className: "w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0" }, /* @__PURE__ */ React.createElement(Star, { size: 16, className: "text-blue-600" })), /* @__PURE__ */ React.createElement("div", { className: "min-w-0 flex-1" }, /* @__PURE__ */ React.createElement("p", { className: "font-medium text-gray-900 text-sm" }, "Nenhuma conquista"), /* @__PURE__ */ React.createElement("p", { className: "text-xs text-gray-500" }, "3 dias atr\xE1s"))))))) : /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { className: "text-gray-500 text-sm mb-6" }, "Aqui est\xE1 um resumo da sua atividade hoje")), /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-6" }, /* @__PURE__ */ React.createElement(Card, { className: "p-4 md:p-6" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React.createElement("div", { className: "min-w-0 flex-1" }, /* @__PURE__ */ React.createElement("h3", { className: "text-xl md:text-2xl font-bold text-gray-900" }, "0"), /* @__PURE__ */ React.createElement("p", { className: "text-gray-500 text-sm mb-2" }, "Alunos Cadastrados"), /* @__PURE__ */ React.createElement("div", { className: "flex items-center text-xs" }, /* @__PURE__ */ React.createElement("span", { className: "text-gray-400 bg-gray-50 px-2 py-1 rounded-full whitespace-nowrap" }, "Sem dados"))), /* @__PURE__ */ React.createElement("div", { className: "w-10 h-10 md:w-12 md:h-12 bg-blue-50 rounded-xl flex items-center justify-center flex-shrink-0 ml-3" }, /* @__PURE__ */ React.createElement(Users, { className: "text-blue-600", size: 20 })))), /* @__PURE__ */ React.createElement(Card, { className: "p-4 md:p-6" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React.createElement("div", { className: "min-w-0 flex-1" }, /* @__PURE__ */ React.createElement("h3", { className: "text-xl md:text-2xl font-bold text-gray-900" }, "0"), /* @__PURE__ */ React.createElement("p", { className: "text-gray-500 text-sm mb-2" }, "Receitas Geradas"), /* @__PURE__ */ React.createElement("div", { className: "flex items-center text-xs" }, /* @__PURE__ */ React.createElement("span", { className: "text-gray-400 bg-gray-50 px-2 py-1 rounded-full whitespace-nowrap" }, "Sem dados"))), /* @__PURE__ */ React.createElement("div", { className: "w-10 h-10 md:w-12 md:h-12 bg-green-50 rounded-xl flex items-center justify-center flex-shrink-0 ml-3" }, /* @__PURE__ */ React.createElement(FileText, { className: "text-green-600", size: 20 })))), /* @__PURE__ */ React.createElement(
     Card,
     {
       className: "p-4 md:p-6 cursor-pointer hover:shadow-md transition-shadow border-orange-200 bg-gradient-to-r from-orange-50 to-red-50",
@@ -2811,9 +2738,9 @@ ${template.description}
 \u2022 Baseado em evid\xEAncias nutricionais
 
 📊 Estat\xEDsticas:
-\u2022 127 usos este m\xEAs
-\u2022 Avalia\xE7\xE3o: 4.9/5.0
-\u2022 Criado por: Equipe NutriApp
+\u2022 0 usos este m\xEAs
+\u2022 Avalia\xE7\xE3o: 0/5.0
+\u2022 Criado por: Sistema
 
 \u2705 Status: Ativo e dispon\xEDvel
 
@@ -2912,8 +2839,8 @@ Isto ir\xE1 criar uma c\xF3pia edit\xE1vel que voc\xEA pode personalizar conform
 Esta a\xE7\xE3o n\xE3o pode ser desfeita.
 
 📊 Estat\xEDsticas do template:
-\u2022 127 usos registrados
-\u2022 Avalia\xE7\xE3o: 4.9/5.0
+\u2022 0 usos registrados
+\u2022 Avalia\xE7\xE3o: 0/5.0
 \u2022 Criado h\xE1 3 meses
 
 💡 Considere desativar ao inv\xE9s de excluir se houver depend\xEAncias.`,
@@ -2949,14 +2876,14 @@ Esta a\xE7\xE3o n\xE3o pode ser desfeita.
   ), /* @__PURE__ */ React.createElement(Button, { onClick: () => {
     showInfoPopup("🔄 Sincroniza\xE7\xE3o Iniciada", "\u2705 Base TACO atualizada\n\u2705 Novos alimentos: 47\n\u2705 Corre\xE7\xF5es nutricionais: 12\n\nTempo estimado: 2-3 minutos\nVoc\xEA ser\xE1 notificado quando conclu\xEDdo.", "info");
   } }, /* @__PURE__ */ React.createElement(Database, { size: 16 }), "Sincronizar TACO"))), /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" }, /* @__PURE__ */ React.createElement(Card, { className: "p-6 text-center hover:shadow-lg transition-shadow cursor-pointer", onClick: () => {
-    showInfoPopup("📊 Alimentos Cadastrados", "Total: 2,847 alimentos\n\n\u{1F4C8} Crescimento mensal: +47 alimentos\n🔄 \xDAltima atualiza\xE7\xE3o: Hoje\n📋 Categorias: 23\n\u2705 Validados TACO: 2,635\n\u{1F195} Adicionados manual: 212", "info");
-  } }, /* @__PURE__ */ React.createElement("div", { className: "w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4" }, /* @__PURE__ */ React.createElement(Database, { className: "text-blue-600", size: 24 })), /* @__PURE__ */ React.createElement("h3", { className: "text-lg font-semibold text-gray-900" }, "2,847"), /* @__PURE__ */ React.createElement("p", { className: "text-sm text-gray-600" }, "Alimentos Cadastrados"), /* @__PURE__ */ React.createElement("div", { className: "mt-2" }, /* @__PURE__ */ React.createElement("span", { className: "text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full" }, "+47 este m\xEAs"))), /* @__PURE__ */ React.createElement(Card, { className: "p-6 text-center hover:shadow-lg transition-shadow cursor-pointer", onClick: () => {
-    showInfoPopup("👥 Clientes Totais", "Total: 1,247 clientes\n\n📊 Distribui\xE7\xE3o:\n\u2022 Ativos: 987 (79%)\n\u2022 Pausados: 184 (15%)\n\u2022 Inativos: 76 (6%)\n\n🎯 Objetivos mais comuns:\n\u2022 Perda de peso: 45%\n\u2022 Ganho de massa: 32%\n\u2022 Manuten\xE7\xE3o: 23%", "info");
-  } }, /* @__PURE__ */ React.createElement("div", { className: "w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4" }, /* @__PURE__ */ React.createElement(Users, { className: "text-green-600", size: 24 })), /* @__PURE__ */ React.createElement("h3", { className: "text-lg font-semibold text-gray-900" }, "1,247"), /* @__PURE__ */ React.createElement("p", { className: "text-sm text-gray-600" }, "Clientes Totais"), /* @__PURE__ */ React.createElement("div", { className: "mt-2" }, /* @__PURE__ */ React.createElement("span", { className: "text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full" }, "987 ativos"))), /* @__PURE__ */ React.createElement(Card, { className: "p-6 text-center hover:shadow-lg transition-shadow cursor-pointer", onClick: () => {
-    showInfoPopup("📋 Dietas Geradas", "Total: 8,432 dietas\n\n\u{1F4C8} Este m\xEAs: 547 dietas\n\u26A1 M\xE9dia di\xE1ria: 18 dietas\n🎯 Tipos mais gerados:\n\u2022 IA Personalizada: 67%\n\u2022 Templates: 28%\n\u2022 Manual: 5%\n\n\u{1F3C6} Personal mais ativo:\nJo\xE3o Silva - 127 dietas", "info");
-  } }, /* @__PURE__ */ React.createElement("div", { className: "w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4" }, /* @__PURE__ */ React.createElement(FileText, { className: "text-orange-600", size: 24 })), /* @__PURE__ */ React.createElement("h3", { className: "text-lg font-semibold text-gray-900" }, "8,432"), /* @__PURE__ */ React.createElement("p", { className: "text-sm text-gray-600" }, "Dietas Geradas"), /* @__PURE__ */ React.createElement("div", { className: "mt-2" }, /* @__PURE__ */ React.createElement("span", { className: "text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-full" }, "547 este m\xEAs"))), /* @__PURE__ */ React.createElement(Card, { className: "p-6 text-center hover:shadow-lg transition-shadow cursor-pointer", onClick: () => {
-    showInfoPopup("📊 Taxa de Sucesso", "Taxa atual: 94.2%\n\n\u2705 M\xE9tricas:\n\u2022 Clientes satisfeitos: 94.2%\n\u2022 Dietas seguidas: 87.3%\n\u2022 Objetivos alcan\xE7ados: 91.8%\n\u2022 Renova\xE7\xF5es: 89.4%\n\n\u{1F4C8} Tend\xEAncia: +2.1% vs m\xEAs anterior\n🎯 Meta: 95% at\xE9 fim do ano", "success");
-  } }, /* @__PURE__ */ React.createElement("div", { className: "w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4" }, /* @__PURE__ */ React.createElement(BarChart3, { className: "text-purple-600", size: 24 })), /* @__PURE__ */ React.createElement("h3", { className: "text-lg font-semibold text-gray-900" }, "94.2%"), /* @__PURE__ */ React.createElement("p", { className: "text-sm text-gray-600" }, "Taxa de Sucesso"), /* @__PURE__ */ React.createElement("div", { className: "mt-2" }, /* @__PURE__ */ React.createElement("span", { className: "text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full" }, "+2.1% mensal")))), /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-1 lg:grid-cols-2 gap-6" }, /* @__PURE__ */ React.createElement(Card, { className: "p-6" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center justify-between mb-4" }, /* @__PURE__ */ React.createElement("h3", { className: "text-lg font-semibold text-gray-900" }, "Alimentos Mais Utilizados"), /* @__PURE__ */ React.createElement(
+    showInfoPopup("📊 Alimentos Cadastrados", "Nenhum alimento cadastrado\n\nInicie adicionando alimentos à base de dados.", "info");
+  } }, /* @__PURE__ */ React.createElement("div", { className: "w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4" }, /* @__PURE__ */ React.createElement(Database, { className: "text-blue-600", size: 24 })), /* @__PURE__ */ React.createElement("h3", { className: "text-lg font-semibold text-gray-900" }, "0"), /* @__PURE__ */ React.createElement("p", { className: "text-sm text-gray-600" }, "Alimentos Cadastrados"), /* @__PURE__ */ React.createElement("div", { className: "mt-2" }, /* @__PURE__ */ React.createElement("span", { className: "text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full" }, "Nenhum alimento"))), /* @__PURE__ */ React.createElement(Card, { className: "p-6 text-center hover:shadow-lg transition-shadow cursor-pointer", onClick: () => {
+    showInfoPopup("👥 Clientes Totais", "Nenhum cliente cadastrado\n\nInicie adicionando seus primeiros clientes.", "info");
+  } }, /* @__PURE__ */ React.createElement("div", { className: "w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4" }, /* @__PURE__ */ React.createElement(Users, { className: "text-green-600", size: 24 })), /* @__PURE__ */ React.createElement("h3", { className: "text-lg font-semibold text-gray-900" }, "0"), /* @__PURE__ */ React.createElement("p", { className: "text-sm text-gray-600" }, "Clientes Totais"), /* @__PURE__ */ React.createElement("div", { className: "mt-2" }, /* @__PURE__ */ React.createElement("span", { className: "text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full" }, "Nenhum cliente"))), /* @__PURE__ */ React.createElement(Card, { className: "p-6 text-center hover:shadow-lg transition-shadow cursor-pointer", onClick: () => {
+    showInfoPopup("📋 Dietas Geradas", "Nenhuma dieta gerada\n\nComece criando suas primeiras dietas personalizadas.", "info");
+  } }, /* @__PURE__ */ React.createElement("div", { className: "w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4" }, /* @__PURE__ */ React.createElement(FileText, { className: "text-orange-600", size: 24 })), /* @__PURE__ */ React.createElement("h3", { className: "text-lg font-semibold text-gray-900" }, "0"), /* @__PURE__ */ React.createElement("p", { className: "text-sm text-gray-600" }, "Dietas Geradas"), /* @__PURE__ */ React.createElement("div", { className: "mt-2" }, /* @__PURE__ */ React.createElement("span", { className: "text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-full" }, "Nenhuma dieta"))), /* @__PURE__ */ React.createElement(Card, { className: "p-6 text-center hover:shadow-lg transition-shadow cursor-pointer", onClick: () => {
+    showInfoPopup("📊 Taxa de Sucesso", "Sem dados suficientes\n\nAs métricas aparecerão conforme você usar o sistema.", "success");
+  } }, /* @__PURE__ */ React.createElement("div", { className: "w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4" }, /* @__PURE__ */ React.createElement(BarChart3, { className: "text-purple-600", size: 24 })), /* @__PURE__ */ React.createElement("h3", { className: "text-lg font-semibold text-gray-900" }, "0%"), /* @__PURE__ */ React.createElement("p", { className: "text-sm text-gray-600" }, "Taxa de Sucesso"), /* @__PURE__ */ React.createElement("div", { className: "mt-2" }, /* @__PURE__ */ React.createElement("span", { className: "text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full" }, "Sem dados")))), /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-1 lg:grid-cols-2 gap-6" }, /* @__PURE__ */ React.createElement(Card, { className: "p-6" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center justify-between mb-4" }, /* @__PURE__ */ React.createElement("h3", { className: "text-lg font-semibold text-gray-900" }, "Alimentos Mais Utilizados"), /* @__PURE__ */ React.createElement(
     Button,
     {
       size: "sm",
@@ -3007,12 +2934,12 @@ Esta a\xE7\xE3o n\xE3o pode ser desfeita.
     /* @__PURE__ */ React.createElement("div", { className: "flex-1" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center space-x-3" }, /* @__PURE__ */ React.createElement("div", { className: "w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center" }, /* @__PURE__ */ React.createElement("span", { className: "text-xs font-bold text-blue-600" }, "#", index + 1)), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { className: "font-medium text-gray-900" }, food.name), /* @__PURE__ */ React.createElement("p", { className: "text-sm text-gray-600" }, food.calories, " kcal por ", food.baseAmount, food.unit)))),
     /* @__PURE__ */ React.createElement("div", { className: "text-right" }, /* @__PURE__ */ React.createElement("p", { className: "text-sm font-medium text-gray-900" }, "P: ", food.protein, "g"), /* @__PURE__ */ React.createElement("p", { className: "text-sm text-gray-600" }, "C: ", food.carbs, "g | G: ", food.fat, "g"), /* @__PURE__ */ React.createElement("div", { className: "mt-1" }, /* @__PURE__ */ React.createElement("span", { className: "text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full" }, Math.floor(Math.random() * 200 + 50), " usos")))
   )))), /* @__PURE__ */ React.createElement(Card, { className: "p-6" }, /* @__PURE__ */ React.createElement("h3", { className: "text-lg font-semibold text-gray-900 mb-4" }, "An\xE1lise por Categoria"), /* @__PURE__ */ React.createElement("div", { className: "space-y-4" }, [
-    { name: "Carboidratos", count: 847, color: "bg-yellow-100 text-yellow-700" },
-    { name: "Prote\xEDnas", count: 623, color: "bg-red-100 text-red-700" },
-    { name: "Gorduras", count: 412, color: "bg-purple-100 text-purple-700" },
-    { name: "Vegetais", count: 534, color: "bg-green-100 text-green-700" },
-    { name: "Frutas", count: 289, color: "bg-orange-100 text-orange-700" },
-    { name: "Diversos", count: 142, color: "bg-gray-100 text-gray-700" }
+    { name: "Carboidratos", count: 0, color: "bg-yellow-100 text-yellow-700" },
+     { name: "Proteínas", count: 0, color: "bg-red-100 text-red-700" },
+     { name: "Gorduras", count: 0, color: "bg-purple-100 text-purple-700" },
+     { name: "Vegetais", count: 0, color: "bg-green-100 text-green-700" },
+     { name: "Frutas", count: 0, color: "bg-orange-100 text-orange-700" },
+     { name: "Diversos", count: 0, color: "bg-gray-100 text-gray-700" }
   ].map((category, index) => /* @__PURE__ */ React.createElement(
     "div",
     {
@@ -3027,7 +2954,7 @@ Esta a\xE7\xE3o n\xE3o pode ser desfeita.
 \u2022 M\xE9dia cal\xF3rica: ${Math.floor(Math.random() * 200 + 100)} kcal
 \u2022 Adicionados este m\xEAs: ${Math.floor(Math.random() * 20 + 5)}
 
-🎯 Esta categoria representa ${Math.floor(category.count / 2847 * 100)}% da base de dados.
+🎯 Esta categoria representa ${Math.floor(category.count / 1 * 100)}% da base de dados.
 
 💡 Categoria bem estruturada e atualizada!`,
           "info"
@@ -3039,7 +2966,7 @@ Esta a\xE7\xE3o n\xE3o pode ser desfeita.
       "div",
       {
         className: `h-2 rounded-full ${category.color.replace("text-", "bg-").replace("-700", "-500")}`,
-        style: { width: `${category.count / 847 * 100}%` }
+        style: { width: `${category.count / 1 * 100}%` }
       }
     )))
   ))))), /* @__PURE__ */ React.createElement(Card, { className: "p-6" }, /* @__PURE__ */ React.createElement("h3", { className: "text-lg font-semibold text-gray-900 mb-4" }, "Atividade Recente da Base"), /* @__PURE__ */ React.createElement("div", { className: "space-y-3" }, [
@@ -3157,7 +3084,7 @@ Esta a\xE7\xE3o n\xE3o pode ser desfeita.
       onClick: () => {
         showInfoPopup(
           "📊 Status do Sistema",
-          "\u{1F5A5}\uFE0F Status: Online\n\u26A1 Performance: 98.7%\n💾 Uso de mem\xF3ria: 234MB\n🔄 Uptime: 14 dias, 7 horas\n\u{1F4C8} Requests/min: 127\n📊 CPU: 23% utiliza\xE7\xE3o\n\u{1F310} Lat\xEAncia: 45ms\n\n🎯 Tudo funcionando perfeitamente!\nSistema otimizado e est\xE1vel.",
+          "\u{1F5A5}\uFE0F Status: Online\n\u26A1 Performance: 98.7%\n💾 Uso de mem\xF3ria: 234MB\n🔄 Uptime: 14 dias, 7 horas\n\u{1F4C8} Requests/min: 127\n📊 CPU: 0% utilização\n\u{1F310} Lat\xEAncia: 45ms\n\n🎯 Tudo funcionando perfeitamente!\nSistema otimizado e est\xE1vel.",
           "success"
         );
       },

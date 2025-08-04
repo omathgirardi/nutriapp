@@ -672,7 +672,7 @@ const NutriPlan = () => {
                     </div>
                     <div className="ml-4">
                       <p className="text-sm font-medium text-gray-600">Dietas Criadas</p>
-                      <p className="text-2xl font-bold text-gray-900">{mockDiets.length}</p>
+                      <p className="text-2xl font-bold text-gray-900">0</p>
                     </div>
                   </div>
                 </Card>
@@ -695,8 +695,8 @@ const NutriPlan = () => {
                       <TrendingUp className="text-purple-600" size={24} />
                     </div>
                     <div className="ml-4">
-                      <p className="text-sm font-medium text-gray-600">Este Mês</p>
-                      <p className="text-2xl font-bold text-gray-900">+12%</p>
+                      <p className="text-sm font-medium text-gray-600">Crescimento</p>
+                      <p className="text-2xl font-bold text-gray-900">0%</p>
                     </div>
                   </div>
                 </Card>
