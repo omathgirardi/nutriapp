@@ -101,8 +101,8 @@ export const authService = {
 
   async logout() {
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
+      // Como não estamos usando Supabase Auth, apenas retornar sucesso
+      // O estado será limpo pelo AuthContext
       return { success: true };
     } catch (error) {
       console.error('Erro ao fazer logout:', error);
@@ -110,9 +110,7 @@ export const authService = {
     }
   },
 
-  onAuthStateChange(callback) {
-    return supabase.auth.onAuthStateChange(callback);
-  }
+  // Removido onAuthStateChange - não usado no sistema personalizado
 };
 
 // Serviços de Banco de Dados

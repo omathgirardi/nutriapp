@@ -150,25 +150,9 @@ export const AuthProvider = ({ children }) => {
     return userProfile?.role === 'client';
   };
 
-  // Monitorar mudanças no estado de autenticação
+  // Inicializar estado de loading como false após carregamento
   useEffect(() => {
-    const { data: { subscription } } = authService.onAuthStateChange(async (event, session) => {
-      setLoading(true);
-      
-      if (session?.user) {
-        setUser(session.user);
-        await loadUserProfile(session.user);
-      } else {
-        setUser(null);
-        setUserProfile(null);
-      }
-      
-      setLoading(false);
-    });
-
-    return () => {
-      subscription?.unsubscribe();
-    };
+    setLoading(false);
   }, []);
 
   const value = {
