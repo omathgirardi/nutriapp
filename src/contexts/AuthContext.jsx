@@ -25,13 +25,20 @@ export const AuthProvider = ({ children }) => {
     }
 
     try {
-      const { data: profile, success } = await dbService.getByFilter('users', 'uid', 'eq', authUser.id);
-      if (success && profile && profile.length > 0) {
-        setUserProfile(profile[0]);
-      } else {
+      // Buscar dados do usuário na tabela users
+      const { data: profile, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('uid', authUser.id)
+        .single();
+
+      if (error || !profile) {
         console.warn('Perfil do usuário não encontrado');
         setUserProfile(null);
+        return;
       }
+
+      setUserProfile(profile);
     } catch (error) {
       console.error('Erro ao carregar perfil do usuário:', error);
       setError('Erro ao carregar dados do usuário');

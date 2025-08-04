@@ -62,8 +62,36 @@ export const authService = {
 
   async login(email, password) {
     try {
-      const { data: { user }, error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) throw error;
+      // Primeiro, verificar se o usuário existe na nossa tabela users
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('*')
+        .eq('email', email)
+        .single();
+
+      if (userError || !userData) {
+        throw new Error('Usuário não encontrado');
+      }
+
+      // Verificar se a senha está correta usando bcrypt
+      const bcrypt = await import('bcryptjs');
+      const isPasswordValid = await bcrypt.compare(password, userData.password_hash);
+      
+      if (!isPasswordValid) {
+        throw new Error('Senha incorreta');
+      }
+
+      // Se chegou até aqui, o login é válido
+      // Criar um objeto user simulado para manter compatibilidade
+      const user = {
+        id: userData.uid,
+        email: userData.email,
+        user_metadata: {
+          full_name: userData.full_name,
+          role: userData.role
+        }
+      };
+
       return { user, success: true };
     } catch (error) {
       console.error('Erro ao fazer login:', error);
