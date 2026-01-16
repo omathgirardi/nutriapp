@@ -60,6 +60,7 @@ import {
 } from '../utils/dietGeneration.js';
 import { Button, Card, Input, Select, Modal } from './index.js';
 import ClientsSection from './ClientsSection.jsx';
+import { useAuth } from '../contexts/AuthContext.jsx';
 
 // Removido hatch - usando React hooks padrão
 
@@ -295,9 +296,22 @@ const Chart = ({ data, height = 300 }) => {
   );
 };
 
-// Componente principal NutriPlan
-const NutriPlan = () => {
+// Componente principal NutriApp
+const NutriApp = () => {
+  const { user, userProfile, logout } = useAuth();
   const [activeTab, setActiveTab] = useState('clients');
+  const [activeSection, setActiveSection] = useState('dashboard');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  // Usar dados reais do usuário logado
+  const currentUser = userProfile ? {
+    id: userProfile.uid,
+    name: userProfile.full_name,
+    email: userProfile.email,
+    role: userProfile.role,
+    phone: userProfile.phone_number,
+    photo: userProfile.avatar_url
+  } : null;
 
   const tabs = [
     { id: 'clients', label: 'Clientes' },
@@ -401,11 +415,78 @@ const NutriPlan = () => {
               onClick={() => setIsSidebarOpen(false)}
               className="lg:hidden p-2 rounded-lg hover:bg-gray-100"
             >
-              {tab.label}
+              <X size={20} />
+            </button>
+          </div>
+          
+          {/* Navegação */}
+          <nav className="mt-6 px-3">
+            <div className="space-y-1">
+              {[
+                { id: 'dashboard', label: 'Dashboard', icon: Home },
+                { id: 'clients', label: 'Clientes', icon: Users },
+                { id: 'calculator', label: 'Calculadoras', icon: Calculator },
+                { id: 'history', label: 'Histórico', icon: History },
+                { id: 'plans', label: 'Planos', icon: CreditCard },
+                { id: 'settings', label: 'Configurações', icon: Settings }
+              ].map((item) => {
+                const Icon = item.icon;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => setActiveSection(item.id)}
+                    className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+                      activeSection === item.id
+                        ? 'bg-blue-50 text-blue-700 border-r-2 border-blue-700'
+                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                    }`}
+                  >
+                    <Icon size={20} className="mr-3" />
+                    {item.label}
+                  </button>
+                );
+              })}
+            </div>
+          </nav>
+          
+          {/* Perfil do usuário na parte inferior */}
+          <div className="absolute bottom-0 w-full p-4 border-t border-gray-200">
+            <div className="flex items-center space-x-3 mb-4">
+              {/* Mostrar foto apenas se existir, senão mostrar apenas as iniciais */}
+              {currentUser.photo ? (
+                <div className="w-10 h-10 rounded-full overflow-hidden">
+                  <img
+                    src={currentUser.photo}
+                    alt="Foto de perfil"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              ) : (
+                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                  <span className="text-blue-600 font-semibold text-sm">
+                    {currentUser.name ? currentUser.name.split(' ').map(n => n[0]).join('').toUpperCase() : 'U'}
+                  </span>
+                </div>
+              )}
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-gray-900 truncate">
+                  {currentUser.name}
+                </p>
+                <p className="text-xs text-gray-500 truncate">
+                  {currentUser.email}
+                </p>
+              </div>
+            </div>
+            <Button
+              variant="outline"
+              onClick={logout}
+              className="w-full text-sm"
+            >
+              <LogOut size={16} className="mr-2" />
+              Sair
             </Button>
-          ))}
+          </div>
         </div>
-      </div>
 
         {/* Conteúdo principal */}
         <div className="flex-1 lg:ml-0">
@@ -435,7 +516,10 @@ const NutriPlan = () => {
                   >
                     <Settings size={20} />
                   </button>
-                  <button className="p-2 rounded-lg hover:bg-gray-100 text-red-600">
+                  <button 
+                    onClick={logout}
+                    className="p-2 rounded-lg hover:bg-gray-100 text-red-600"
+                  >
                     <LogOut size={20} />
                   </button>
                 </div>
@@ -532,4 +616,4 @@ const NutriPlan = () => {
   );
 };
 
-export default NutriPlan;
+export default NutriApp;

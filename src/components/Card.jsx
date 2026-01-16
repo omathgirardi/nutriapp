@@ -1,0 +1,15 @@
+import React from 'react';
+import { colors } from '../styles/colors.js';
+
+const Card = ({ children, className = '', ...props }) => {
+  return (
+    <div 
+      className={`bg-white rounded-xl shadow-sm border border-[${colors.gray[200]}] ${className}`} 
+      {...props}
+    >
+      {children}
+    </div>
+  );
+};
+
+export default Card; 

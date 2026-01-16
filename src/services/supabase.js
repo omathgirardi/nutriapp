@@ -18,17 +18,40 @@ export const authService = {
       const saltRounds = 10;
       const password_hash = await bcrypt.hash(password, saltRounds);
 
-      const { error: insertError } = await supabase
+      // Preparar dados para inserção na tabela users
+      const userInsertData = {
+        uid: user.id,
+        email: email,
+        password_hash: password_hash,
+        full_name: userData.full_name,
+        role: userData.role,
+        phone_number: userData.phone_number,
+        bio: userData.bio,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+
+      const { data: insertedUser, error: insertError } = await supabase
         .from('users')
-        .insert({ 
-          ...userData, 
-          email, 
-          uid: user.id, 
-          password_hash,
-          created_at: new Date().toISOString(), 
-          updated_at: new Date().toISOString() 
-        });
+        .insert(userInsertData)
+        .select();
       if (insertError) throw insertError;
+
+      // Se for personal trainer, inserir na tabela personal_trainers
+      if (userData.role === 'personal_trainer' && userData.profile && userData.profile.crn) {
+        const { error: ptError } = await supabase
+          .from('personal_trainers')
+          .insert({
+            user_id: insertedUser[0].id,
+            crn: userData.profile.crn,
+            specialization: userData.profile.specialization || 'Musculação',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          });
+        if (ptError) {
+          console.warn('Erro ao inserir na tabela personal_trainers:', ptError);
+        }
+      }
 
       return { user, success: true };
     } catch (error) {
@@ -39,8 +62,36 @@ export const authService = {
 
   async login(email, password) {
     try {
-      const { data: { user }, error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) throw error;
+      // Primeiro, verificar se o usuário existe na nossa tabela users
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('*')
+        .eq('email', email)
+        .single();
+
+      if (userError || !userData) {
+        throw new Error('Usuário não encontrado');
+      }
+
+      // Verificar se a senha está correta usando bcrypt
+      const bcrypt = await import('bcryptjs');
+      const isPasswordValid = await bcrypt.compare(password, userData.password_hash);
+      
+      if (!isPasswordValid) {
+        throw new Error('Senha incorreta');
+      }
+
+      // Se chegou até aqui, o login é válido
+      // Criar um objeto user simulado para manter compatibilidade
+      const user = {
+        id: userData.uid,
+        email: userData.email,
+        user_metadata: {
+          full_name: userData.full_name,
+          role: userData.role
+        }
+      };
+
       return { user, success: true };
     } catch (error) {
       console.error('Erro ao fazer login:', error);
@@ -50,8 +101,8 @@ export const authService = {
 
   async logout() {
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
+      // Como não estamos usando Supabase Auth, apenas retornar sucesso
+      // O estado será limpo pelo AuthContext
       return { success: true };
     } catch (error) {
       console.error('Erro ao fazer logout:', error);
@@ -59,9 +110,7 @@ export const authService = {
     }
   },
 
-  onAuthStateChange(callback) {
-    return supabase.auth.onAuthStateChange(callback);
-  }
+  // Removido onAuthStateChange - não usado no sistema personalizado
 };
 
 // Serviços de Banco de Dados

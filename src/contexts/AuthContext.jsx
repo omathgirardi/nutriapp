@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { authService, dbService } from '../services/supabase';
+import { authService, dbService, supabase } from '../services/supabase';
 
 const AuthContext = createContext({});
 
@@ -25,13 +25,20 @@ export const AuthProvider = ({ children }) => {
     }
 
     try {
-      const { data: profile, success } = await dbService.getByFilter('users', 'uid', 'eq', authUser.id);
-      if (success && profile && profile.length > 0) {
-        setUserProfile(profile[0]);
-      } else {
+      // Buscar dados do usuário na tabela users
+      const { data: profile, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('uid', authUser.id)
+        .single();
+
+      if (error || !profile) {
         console.warn('Perfil do usuário não encontrado');
         setUserProfile(null);
+        return;
       }
+
+      setUserProfile(profile);
     } catch (error) {
       console.error('Erro ao carregar perfil do usuário:', error);
       setError('Erro ao carregar dados do usuário');
@@ -143,25 +150,9 @@ export const AuthProvider = ({ children }) => {
     return userProfile?.role === 'client';
   };
 
-  // Monitorar mudanças no estado de autenticação
+  // Inicializar estado de loading como false após carregamento
   useEffect(() => {
-    const { data: { subscription } } = authService.onAuthStateChange(async (event, session) => {
-      setLoading(true);
-      
-      if (session?.user) {
-        setUser(session.user);
-        await loadUserProfile(session.user);
-      } else {
-        setUser(null);
-        setUserProfile(null);
-      }
-      
-      setLoading(false);
-    });
-
-    return () => {
-      subscription?.unsubscribe();
-    };
+    setLoading(false);
   }, []);
 
   const value = {
